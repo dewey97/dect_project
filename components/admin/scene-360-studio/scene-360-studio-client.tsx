@@ -3,6 +3,9 @@
 import { useRouter } from "next/navigation";
 import { Rotate3d } from "lucide-react";
 import { Scene360Editor } from "./scene-360-editor";
+import { HotspotEditor } from "./hotspot-editor";
+import type { ReinvestigateHotspotConfig } from "@/lib/actions/board-actions";
+import type { DbCaseEvidence } from "@/lib/types/database";
 
 interface Scene360StudioClientProps {
   caseId: string;
@@ -11,6 +14,8 @@ interface Scene360StudioClientProps {
     panorama_url?: string | null;
     scene_360_url?: string | null;
   } | null;
+  initialHotspots: ReinvestigateHotspotConfig[];
+  evidence: DbCaseEvidence[];
 }
 
 /** Studio page "Hiện Trường 360": pick a case, edit its panorama sources. */
@@ -18,6 +23,8 @@ export function Scene360StudioClient({
   caseId,
   cases,
   initialConfig,
+  initialHotspots,
+  evidence,
 }: Scene360StudioClientProps) {
   const router = useRouter();
 
@@ -43,6 +50,14 @@ export function Scene360StudioClient({
         caseId={caseId}
         initialConfig={initialConfig}
         onSave={() => router.refresh()}
+      />
+
+      <HotspotEditor
+        caseId={caseId}
+        imageUrl={initialConfig?.scene_360_url ?? null}
+        fallbackImageUrl={initialConfig?.panorama_url ?? null}
+        initialHotspots={initialHotspots}
+        evidence={evidence}
       />
     </div>
   );

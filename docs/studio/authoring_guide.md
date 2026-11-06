@@ -174,7 +174,9 @@ Luật mở khóa khi chơi (`lib/progress/case-progress.ts`):
 
 ## 5b. Hiện Trường 360 — `/studio/scene-360?case=<slug>`
 
-Tải ảnh cầu 360 và ảnh panorama dự phòng (ghi `cases.scene_360_url`, `cases.panorama_url`), có khung xem thử. Hotspot khám xét lại (`reinvestigation_hotspots`) chưa có giao diện sửa (ROADMAP #8).
+Tải ảnh cầu 360 và ảnh panorama dự phòng (ghi `cases.scene_360_url`, `cases.panorama_url`), có khung xem thử.
+
+**Hotspot khám xét** (ghi `reinvestigation_hotspots.hotspots`, gameplay đọc qua `/api/reinvestigation`): ảnh 360 hiện trải phẳng, bấm lên ảnh để thêm điểm, kéo để dời. Toạ độ `x`, `y` là % theo chiều ngang, dọc của ảnh (x 0–100 ứng với yaw -180°..180°). Mỗi điểm có tên, vật chứng gắn kèm (lấy ảnh và tên từ `case_evidence`), URL ảnh, file âm thanh và chú thích. Nút "Xem thử 360" hiện các điểm trong trình xem thật. Ảnh 360 hỏng thì trình sửa dùng panorama, giống gameplay.
 
 ## 6. Phone — `/studio/phone?case=<slug>`
 

@@ -372,14 +372,21 @@ export async function getBoardgamePinPositions(caseId: string): Promise<{
 // Reinvestigate Hotspots
 // ==============================================================================
 
+/**
+ * One clickable spot in the crime-scene revisit (ReinvestigationModal).
+ * x / y are percentages of the equirectangular 360 image (x 0-100 maps to
+ * yaw -180..180, y 0-100 maps to pitch 90..-90).
+ */
 export interface ReinvestigateHotspotConfig {
   id: string;
   num: number;
-  photoNumber?: string;
+  /** Evidence code in case_evidence; gameplay refreshes title/image from it. */
+  photoId?: string;
   title?: string;
   x: number;
   y: number;
   imageUrl: string;
+  driveUrl?: string;
   soundFile: string;
   soundCaption: string;
 }
@@ -395,7 +402,7 @@ export async function saveReinvestigationHotspots(
       .from("reinvestigation_hotspots")
       .upsert(
         {
-          case_slug: caseId,
+          case_slug: normalizeCaseId(caseId),
           hotspots,
           updated_at: new Date().toISOString(),
         },
@@ -414,6 +421,7 @@ export async function saveReinvestigationHotspots(
   }
 }
 
+/** Same table gameplay reads through /api/reinvestigation. */
 export async function getReinvestigationHotspots(caseId: string): Promise<{
   success: boolean;
   hotspots: ReinvestigateHotspotConfig[];
@@ -422,36 +430,16 @@ export async function getReinvestigationHotspots(caseId: string): Promise<{
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
-      .from("boardgame_pins")
-      .select("*")
-      .eq("case_id", caseId)
-      .like("id", `reinvestigate-${caseId}-%`);
-
+      .from("reinvestigation_hotspots")
+      .select("hotspots")
+      .eq("case_slug", normalizeCaseId(caseId))
+      .maybeSingle();
     if (error) throw error;
-    if (!data || data.length === 0) {
-      return { success: true, hotspots: [] };
-    }
-
-    const hotspots: ReinvestigateHotspotConfig[] = data
-      .map((row) => {
-        const numPart =
-          parseInt(row.id.replace(`reinvestigate-${caseId}-`, ""), 10) || 1;
-        return {
-          id: row.id,
-          num: numPart,
-          title: row.label || `Điểm #${numPart}`,
-          x: row.position_x,
-          y: row.position_y,
-          imageUrl: row.photo_url || "",
-          soundFile: row.color || "sat_soat.mp3",
-          soundCaption: row.detail || "",
-        };
-      })
-      .sort((a, b) => a.num - b.num);
-
+    const hotspots = Array.isArray(data?.hotspots)
+      ? (data.hotspots as ReinvestigateHotspotConfig[])
+      : [];
     return { success: true, hotspots };
   } catch (error: unknown) {
-    console.error("Error fetching reinvestigation hotspots:", error);
     return {
       success: false,
       hotspots: [],
