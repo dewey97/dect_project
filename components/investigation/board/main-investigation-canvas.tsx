@@ -228,10 +228,6 @@ export function MainInvestigationCanvas({
     state.checkpoints,
   ]);
 
-  const normalizedSheetCaseId = useMemo(
-    () => caseId.replace(/-/g, "_"),
-    [caseId],
-  );
   const { rawEvidence: sheetEvidences, loading: isEvidenceLoading } =
     useCaseEvidence(caseId);
 

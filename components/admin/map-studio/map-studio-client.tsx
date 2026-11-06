@@ -33,30 +33,6 @@ import { MapStudioHeader, MapStudioToolsPalette } from "./map-studio-toolbar";
 import { MapStudioCanvas } from "./map-studio-canvas";
 
 // Color palettes for authentic Apple Maps-style urban vector map aesthetic
-const WATER_COLORS = [
-  "#97C8EB",
-  "#71B4EC",
-  "#55CBE8",
-  "#3498DB",
-  "#1D4ED8",
-  "#A4CEEC",
-];
-const ROAD_COLORS = [
-  "#CFDDE8",
-  "#C4D5E3",
-  "#D6E2EC",
-  "#B8CBD8",
-  "#E8F0F6",
-  "#FFFFFF",
-];
-const ZONE_COLORS = [
-  "#F5F0E8",
-  "#EDF4ED",
-  "#FFF5E1",
-  "#FCE7F3",
-  "#E0E7FF",
-  "#F1F5F9",
-];
 
 export function MapStudioClient() {
   // Core Map Vector Data (Khởi tạo rỗng, nạp 100% dữ liệu thật từ Database)
@@ -114,7 +90,7 @@ export function MapStudioClient() {
 
   // In-progress Drawing State
   const [drawingPoints, setDrawingPoints] = useState<Point[]>([]);
-  const [cursorPos, setCursorPos] = useState<Point>({ x: 0, y: 0 });
+  const [] = useState<Point>({ x: 0, y: 0 });
 
   // Tool Sub-options
   const [waterType, setWaterType] = useState<WaterType>("river");
@@ -124,7 +100,7 @@ export function MapStudioClient() {
 
   // Canvas Settings
   const [showGrid, setShowGrid] = useState(false);
-  const [gridSize, setGridSize] = useState(25);
+  const [gridSize] = useState(25);
   const [hiddenFeatureIds, setHiddenFeatureIds] = useState<
     Record<string, boolean>
   >({});

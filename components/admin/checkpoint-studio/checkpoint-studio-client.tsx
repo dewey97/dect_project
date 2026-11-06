@@ -64,8 +64,8 @@ export function CheckpointStudioClient({
   initialCharacters = [],
   initialView = "flow",
 }: CheckpointStudioClientProps) {
-  const [caseId, setCaseId] = useState(initialCaseId);
-  const [activeView, setActiveView] = useState<"flow" | "board">(initialView);
+  const [caseId] = useState(initialCaseId);
+  const [activeView] = useState<"flow" | "board">(initialView);
 
   // Giữ vụ án và view đang chọn trên URL (?case=...&view=...) để tương thích ngược 100% với URL query cũ
   useEffect(() => {
@@ -99,10 +99,6 @@ export function CheckpointStudioClient({
   }, []);
   const [isResizingFlow, setIsResizingFlow] = useState(false);
 
-  const startResizingFlow = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsResizingFlow(true);
-  }, []);
 
   useEffect(() => {
     if (!isResizingFlow) return;
@@ -184,10 +180,10 @@ export function CheckpointStudioClient({
   }, [isResizing, sidebarWidth]);
 
   const router = useRouter();
-  const [allCases, setAllCases] = useState<DbCase[]>(initialCases);
+  const [] = useState<DbCase[]>(initialCases);
   const [rows, setRows] = useState<DbCaseCheckpoint[]>(initialRows);
-  const [dossiers, setDossiers] = useState<DbCaseDossier[]>(initialDossiers);
-  const [availableDocs, setAvailableDocs] = useState<AvailableDocumentItem[]>(
+  const [dossiers] = useState<DbCaseDossier[]>(initialDossiers);
+  const [availableDocs] = useState<AvailableDocumentItem[]>(
     initialAvailableDocuments,
   );
   const [selectedId, setSelectedId] = useState<string | null>(
@@ -200,11 +196,11 @@ export function CheckpointStudioClient({
     initialRows[0] ? JSON.stringify(toDraft(initialRows[0])) : "",
   );
   const [isSaving, setIsSaving] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [characters, setCharacters] =
     useState<DbCaseCharacter[]>(initialCharacters);
   const [isLintModalOpen, setIsLintModalOpen] = useState(false);
-  const [isCreatingCustomNode, setIsCreatingCustomNode] = useState(false);
+  const [isCreatingCustomNode] = useState(false);
   const [inspectorTab, setInspectorTab] = useState<
     "checkpoints" | "characters" | "indictment" | "epilogue"
   >("checkpoints");
@@ -233,7 +229,7 @@ export function CheckpointStudioClient({
   }, [rows]);
 
   // Chế độ "Lớp logic" (Logic Overlay)
-  const [isLogicLayerActive, setIsLogicLayerActive] = useState(false);
+  const [isLogicLayerActive] = useState(false);
 
   // Live Checkpoints: kết hợp giữa rows, draft đang chỉnh sửa và modifiedCheckpoints
   // để Bảng điều tra (Board Canvas) cập nhật tức thì (0s delay) khi đổi display_mode, note_color, label, scale, v.v.
@@ -280,8 +276,6 @@ export function CheckpointStudioClient({
     handleSaveAll: handleSaveBoardLayout,
     handleUndo,
     handleRedo,
-    canUndo,
-    canRedo,
     handleAdjustNodeTransform,
     handleAdjustNodeZIndex,
     handleUpdateNodeLocal,
@@ -464,64 +458,9 @@ export function CheckpointStudioClient({
     return () => window.removeEventListener("beforeunload", handler);
   }, [hasUnsaved]);
 
-  const caseOptions = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const item of allCases) {
-      map.set(item.slug, item.title);
-    }
-    if (!map.has(caseId)) {
-      const currentCase = allCases.find((c) => c.slug === caseId);
-      map.set(caseId, currentCase?.title || caseId);
-    }
-    return Array.from(map, ([value, label]) => ({ value, label }));
-  }, [allCases, caseId]);
 
-  const confirmDiscardForm = useCallback(() => {
-    if (!formDirty) return true;
-    return window.confirm(
-      "Checkpoint có thay đổi chưa lưu. Bỏ các thay đổi này?",
-    );
-  }, [formDirty]);
 
-  const confirmDiscardAll = useCallback(() => {
-    if (!hasUnsaved) return true;
-    return window.confirm(
-      "Có thay đổi chưa lưu ở checkpoint hoặc bố cục bảng. Bỏ tất cả thay đổi này?",
-    );
-  }, [hasUnsaved]);
 
-  const loadCase = useCallback(
-    async (nextCaseId: string) => {
-      setIsLoading(true);
-      try {
-        const [cpRes, dossierList, docsList, charsRes] = await Promise.all([
-          getCheckpointsByCase(nextCaseId),
-          getCaseDossiers(nextCaseId),
-          getAllCaseDocumentsCatalog(nextCaseId),
-          getCharactersByCase(nextCaseId),
-        ]);
-        if (!cpRes.success) {
-          toast.error(cpRes.error);
-          return;
-        }
-        setRows(cpRes.data);
-        setDossiers(dossierList);
-        setAvailableDocs(docsList);
-        if (charsRes.success && charsRes.data) {
-          setCharacters(charsRes.data);
-        }
-        const first = cpRes.data[0] ?? null;
-        setSelectedId(first?.id ?? null);
-        const nextDraft = first ? toDraft(first) : null;
-        setDraft(nextDraft);
-        setBaseline(nextDraft ? JSON.stringify(nextDraft) : "");
-        setSelectedNodeId(null);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [setSelectedNodeId],
-  );
 
   const selectRow = (row: DbCaseCheckpoint): boolean => {
     const isSpecialIndictment =
@@ -654,16 +593,6 @@ export function CheckpointStudioClient({
     setInspectorTab("checkpoints");
   };
 
-  const changeCase = async (nextCaseId: string) => {
-    if (nextCaseId === caseId) return;
-    if (!confirmDiscardAll()) return;
-    setCaseId(nextCaseId);
-    setSelectedId(null);
-    setDraft(null);
-    setBaseline("");
-    setSelectedNodeId(null);
-    await loadCase(nextCaseId);
-  };
 
   const updateDraft = (patch: Partial<CheckpointStudioDraft>) => {
     setDraft((current) => {
@@ -1212,34 +1141,6 @@ export function CheckpointStudioClient({
     await refreshBoardModel();
   };
 
-  const handlePromoteCharacterToSuspect = async (char: DbCaseCharacter) => {
-    try {
-      const { saveCharacter } = await import("@/lib/actions/character-actions");
-      const res = await saveCharacter({
-        id: char.id,
-        caseId,
-        key: char.key,
-        name: char.name,
-        role: "suspect",
-        avatarCode: char.avatar_code || `avatar_${char.key}`,
-        avatarUrl: char.avatar_url || null,
-        avatarAssetPath: char.avatar_asset_path || null,
-        phones: char.phones || [],
-        aliases: char.aliases || [],
-        description: char.description || "",
-        slotIndex: char.slot_index ?? characters.length,
-        device: char.device || null,
-      });
-      if (res.success) {
-        toast.success(`Đã đưa "${char.name}" lên bảng điều tra làm Nghi phạm`);
-        await handleSaveCharacter(res.data);
-      } else {
-        toast.error(res.error || "Lỗi khi đưa nhân vật lên bảng");
-      }
-    } catch (err: unknown) {
-      toast.error("Lỗi khi đưa nhân vật lên bảng");
-    }
-  };
 
   const handleSelectFromFlow = (cp: DbCaseCheckpoint) => {
     setInspectorTab("checkpoints");
@@ -1508,72 +1409,7 @@ export function CheckpointStudioClient({
     }
   };
 
-  const handleCreateNewCustomNode = async () => {
-    if (
-      isLoading ||
-      isBoardLoading ||
-      isCreatingCustomNode ||
-      isSaving ||
-      isBoardSaving
-    )
-      return;
-    setIsCreatingCustomNode(true);
-    try {
-      const randomSuffix = Math.random().toString(36).substring(2, 6);
-      const newId = `${caseId}:custom:node_${randomSuffix}`;
-      const draftNode = {
-        id: newId,
-        caseId,
-        nodeKind: "custom" as const,
-        title: "Ghim mới",
-        config: {
-          pin_title: "Ghim mới",
-          position: {
-            desktop: { x: 0.5, y: 0.5 },
-            mobile: { x: 0.5, y: 0.5 },
-          },
-        },
-      };
-      const ok = await handleSaveNode(draftNode);
-      if (ok) {
-        setSelectedId(null);
-        setDraft(null);
-        setSelectedNodeId(newId);
-      }
-    } finally {
-      setIsCreatingCustomNode(false);
-    }
-  };
 
-  const handleMoveToBoard = async (checkpointId: string) => {
-    const cp = rows.find(
-      (r) => r.id === checkpointId || r.checkpoint_id === checkpointId,
-    );
-    if (!cp) return;
-
-    const nextBoardConfig: BoardConfig = {
-      ...((cp.board_config as BoardConfig) || {}),
-      hidden: false,
-    };
-
-    const res = await updateCheckpointBoardConfig(cp.id, nextBoardConfig);
-    if (res.success) {
-      setRows((prev) =>
-        prev.map((r) =>
-          r.id === cp.id ? { ...r, board_config: nextBoardConfig } : r,
-        ),
-      );
-      if (draft && draft.id === cp.id) {
-        setDraft((d) => (d ? { ...d, boardConfig: nextBoardConfig } : d));
-      }
-      toast.success(
-        `Đã đưa "${cp.title || cp.checkpoint_id}" lên bảng điều tra.`,
-      );
-      await refreshBoardModel();
-    } else {
-      toast.error(res.error || "Lỗi khi đưa checkpoint lên bảng.");
-    }
-  };
 
   // Mũi tên quan hệ phụ thuộc depends_on trong Lớp logic (B23-4)
   const dependencyConnections: CaseConnection[] = useMemo(() => {
@@ -1755,70 +1591,6 @@ export function CheckpointStudioClient({
     handleDeleteConnection(connId);
   };
 
-  const handleAutoLayoutLogic = () => {
-    const ids = rows.map((r) => r.checkpoint_id);
-    const inDegree = new Map<string, number>(ids.map((id) => [id, 0]));
-    const adj = new Map<string, string[]>(ids.map((id) => [id, []]));
-
-    for (const r of rows) {
-      for (const dep of r.depends_on || []) {
-        if (adj.has(dep)) {
-          adj.get(dep)!.push(r.checkpoint_id);
-          inDegree.set(
-            r.checkpoint_id,
-            (inDegree.get(r.checkpoint_id) || 0) + 1,
-          );
-        }
-      }
-    }
-
-    const levels = new Map<string, number>(ids.map((id) => [id, 0]));
-    const queue = ids.filter((id) => (inDegree.get(id) || 0) === 0);
-
-    while (queue.length > 0) {
-      const u = queue.shift()!;
-      const curL = levels.get(u) || 0;
-      for (const v of adj.get(u) || []) {
-        levels.set(v, Math.max(levels.get(v) || 0, curL + 1));
-        inDegree.set(v, (inDegree.get(v) || 0) - 1);
-        if ((inDegree.get(v) || 0) === 0) queue.push(v);
-      }
-    }
-
-    const maxLevel = Math.max(0, ...Array.from(levels.values()));
-    const levelNodes = new Map<number, string[]>();
-    for (const [id, lvl] of levels.entries()) {
-      const list = levelNodes.get(lvl) || [];
-      list.push(id);
-      levelNodes.set(lvl, list);
-    }
-
-    levelNodes.forEach((nodeList, lvl) => {
-      const x =
-        maxLevel === 0 ? 0.5 : 0.15 + (lvl / Math.max(1, maxLevel)) * 0.7;
-      nodeList.forEach((cpId, idx) => {
-        const y = 0.2 + ((idx + 1) / (nodeList.length + 1)) * 0.6;
-        const pin = displayPins.find(
-          (p) =>
-            p.checkpointId === cpId ||
-            (cpId.includes("phone") && p.nodeKind === "phone_lookup") ||
-            (cpId.includes("indictment") && p.nodeKind === "indictment") ||
-            p.id.includes(cpId),
-        );
-        if (pin) {
-          handlePositionChange(
-            pin.id,
-            Number(x.toFixed(3)),
-            Number(y.toFixed(3)),
-          );
-        }
-      });
-    });
-
-    toast.info(
-      "Đã sắp xếp tự động lớp logic (chỉ hiển thị tạm thời, bấm 'Lưu Bố Cục' nếu muốn áp dụng).",
-    );
-  };
 
   const isEditingBoardNode = Boolean(
     selectedNode &&

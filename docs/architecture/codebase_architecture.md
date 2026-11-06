@@ -143,6 +143,6 @@ Nguồn: [`lib/progress/case-progress.ts`](../../lib/progress/case-progress.ts).
 
 Xem [`../TECHDEBT.md`](../TECHDEBT.md) và [`../ROADMAP.md`](../ROADMAP.md). Điểm kiến trúc đáng chú ý:
 
-- File > 1.000 dòng: `dossier-canvas-board.tsx` (1.550, phần còn lại là state và handler), `checkpoint-studio-client.tsx` (1.970), `map-studio-client.tsx` (1.400), `dossier-studio-client.tsx`, `render-scene.ts`, `room-sync-context.tsx`, `messages-editor.tsx`, `pin-builder.ts`, `add-suspect-modal.tsx`. Đợt 2026-11-06 đã tách phần JSX (toolbar, mặt bàn, inspector, cửa sổ nổi); bước sau là tách state/handler thành hook.
+- File > 1.000 dòng: `dossier-canvas-board.tsx` (1.550, phần còn lại là state và handler), `checkpoint-studio-client.tsx` (1.970), `map-studio-client.tsx` (1.400), `dossier-studio-client.tsx` (1.240), `render-scene.ts`, `room-sync-context.tsx`, `pin-builder.ts`, `add-suspect-modal.tsx`; `messages-editor.tsx` đã xuống 600 dòng. Đợt 2026-11-06 đã tách phần JSX (toolbar, mặt bàn, inspector, cửa sổ nổi); bước sau là tách state/handler thành hook.
 - `pin-builder.ts` còn so khớp key bố cục cũ `c0-pin-*`.
 - ~25 key tiến độ rời trong `localStorage`; chưa gom về một object.

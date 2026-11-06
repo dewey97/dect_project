@@ -76,15 +76,11 @@ function WebEvidencePageContent() {
   const rawCaseId =
     searchParams.get("case_id") || searchParams.get("caseId") || "case_000";
   const caseId = normalizeCaseId(rawCaseId);
-  const normalizedSheetCaseId = useMemo(
-    () => normalizeCaseId(caseId),
-    [caseId],
-  );
 
   // Single modal registry
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
   const [isJumpscareActive, setIsJumpscareActive] = useState(false);
-  const [isAudioMuted, setIsAudioMuted] = useState(detectiveAudio.isMuted);
+  const [] = useState(detectiveAudio.isMuted);
 
   // Unlocked phase tracking (read from storage / boardgame progress)
   // Tiến độ mở bộ hồ sơ (lib/progress/case-progress.ts); phase suy ra từ đây.
@@ -184,8 +180,8 @@ function WebEvidencePageContent() {
   // Cột 1 (Trái): Khay hồ sơ & vật chứng (Dossier Tray) - width cố định/resizable (240px -> 450px)
   // Cột 2 (Giữa): Bảng điều tra (Investigation Canvas) - flex-1 (chiếm trọn không gian trung tâm)
   // Cột 3 (Phải): Trình duyệt chi tiết PDF / Vật chứng / Phone (Viewer Inspector) - width cố định/resizable (320px -> 750px)
-  const [isDossierCollapsed, setIsDossierCollapsed] = useState<boolean>(false);
-  const [isViewerExpanded, setIsViewerExpanded] = useState<boolean>(false);
+  const [, setIsDossierCollapsed] = useState<boolean>(false);
+  const [] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<"single" | "canvas">("single");
 
   // Đọc preference chế độ xem tài liệu từ localStorage sau khi mount
@@ -208,10 +204,9 @@ function WebEvidencePageContent() {
       // Ignore
     }
   }, []);
-  const [isReinvestigationExpanded, setIsReinvestigationExpanded] =
+  const [, setIsReinvestigationExpanded] =
     useState(false);
   const [isBoardOpen, setIsBoardOpen] = useState(false);
-  const dossierWidth = 320;
   const workspaceRef = useRef<HTMLDivElement>(null);
 
   // Phase filter: 'all' | string | number
@@ -619,14 +614,6 @@ function WebEvidencePageContent() {
 
 
 
-  const toggleDossierCollapse = useCallback(() => {
-    detectiveAudio.playPaperRustle();
-    setIsDossierCollapsed((prev) => {
-      const next = !prev;
-      setStorageItem("web_dossier_collapsed", next ? "true" : "false");
-      return next;
-    });
-  }, []);
 
   const isPhaseUnlocked = useCallback(
     (phase: number) => {

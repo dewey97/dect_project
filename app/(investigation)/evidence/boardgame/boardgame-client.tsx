@@ -41,7 +41,7 @@ function BoardGameCompanionContent() {
     searchParams.get("case_id") || searchParams.get("caseId") || "case_000";
   const caseId = normalizeCaseId(rawCaseId);
 
-  const { completedCheckpointIds } = useCheckpoints();
+  useCheckpoints();
 
   // Single modal state
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);

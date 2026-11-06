@@ -113,29 +113,6 @@ export function renderScene({
   const image = boardImage;
   const frameImg = boardFrame;
 
-  // Calculate frame "cover" fit (maintain aspect ratio, fill canvas, crop overflow)
-  let frameDx = 0,
-    frameDy = 0,
-    frameDw = width,
-    frameDh = height;
-  if (frameImg && frameImg.width > 0 && frameImg.height > 0) {
-    const frameAspect = frameImg.width / frameImg.height;
-    const canvasAspect = width / height;
-    if (canvasAspect > frameAspect) {
-      // Canvas is wider → match width, crop top/bottom
-      frameDw = width;
-      frameDh = width / frameAspect;
-      frameDx = 0;
-      frameDy = (height - frameDh) / 2;
-    } else {
-      // Canvas is taller → match height, crop left/right
-      frameDh = height;
-      frameDw = height * frameAspect;
-      frameDx = (width - frameDw) / 2;
-      frameDy = 0;
-    }
-  }
-
   // Use the shared bounds calculation so pins align with click targets
   const bounds = getInnerBoardBounds(width, height, frameImg);
   const transform = getViewTransform(zoom, pan);

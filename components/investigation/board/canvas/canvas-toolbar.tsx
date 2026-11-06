@@ -46,7 +46,7 @@ export function CanvasToolbar({
   isBoardGame = false,
   onOpenNotebook,
 }: CanvasToolbarProps) {
-  const { roomCode, nickname, memberCount, members, currentUser, broadcastPing } = useRoomSync();
+  const { roomCode, nickname, memberCount, members } = useRoomSync();
   const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
 
   return (

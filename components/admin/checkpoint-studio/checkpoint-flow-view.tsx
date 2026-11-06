@@ -309,25 +309,6 @@ export function CheckpointFlowView({
   }, [rows]);
 
   // Sắp xếp bố cục DAG phân tầng
-  const handleAutoLayout = useCallback(() => {
-    const dependencyEdges = buildDependencyEdges(rows);
-    const layout = layoutCheckpointGraph(rows, dependencyEdges);
-    setNodes((prevNodes) =>
-      prevNodes.map((n) => {
-        const targetPos = layout[n.id];
-        if (targetPos) {
-          return {
-            ...n,
-            position: { x: targetPos.x, y: targetPos.y },
-          };
-        }
-        return n;
-      }),
-    );
-    setTimeout(() => {
-      flowRef.current?.fitView({ padding: 0.2, duration: 400 });
-    }, 50);
-  }, [rows, setNodes]);
 
   // Đồng bộ nodes từ rows (giữ vị trí đã kéo trên canvas)
   useEffect(() => {

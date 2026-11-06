@@ -20,7 +20,7 @@ export function EpilogueModal({
   caseId,
 }: EpilogueModalProps) {
   const [activeStoryIdx, setActiveStoryIdx] = useState(0);
-  const { checkpoints, loading } = useCaseCheckpoints(caseId);
+  const { checkpoints } = useCaseCheckpoints(caseId);
 
   // Đọc các bài Hậu Án từ Checkpoint Studio (Supabase) qua useCaseCheckpoints
   const epilogueStories = useMemo(() => {

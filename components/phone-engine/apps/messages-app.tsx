@@ -92,7 +92,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
   const [activeAudioId, setActiveAudioId] = useState<string | null>(null);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [audioProgress, setAudioProgress] = useState(0);
-  const [audioDuration, setAudioDuration] = useState<number | null>(null);
+  const [] = useState<number | null>(null);
   const audioRef = useState<HTMLAudioElement | null>(null)[0];
 
   // Media preview modal (Image lightbox or Video popup)

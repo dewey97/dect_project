@@ -116,7 +116,7 @@ export function useCaseDossiers(
   }, [dossiers]);
 
   // Tạo map tra cứu nhanh từ document_code -> DbCaseDossier & phase/slotIndex
-  const { codeMap, dossierPhaseMap } = useMemo(() => {
+  const { codeMap } = useMemo(() => {
     const codeMap = new Map<
       string,
       { dossier: DbCaseDossier; slotIndex: number }

@@ -25,15 +25,7 @@ export type DependencyValidation =
   | { ok: true; dependencies: Record<string, string[]> }
   | { ok: false; error: string };
 
-function normalize(value: string): string {
-  return normalizeForMatch(value);
-}
 
-function tokens(value: string): string[] {
-  return normalize(value)
-    .split(/[^a-z0-9]+/)
-    .filter(Boolean);
-}
 
 function readStringArray(
   config: Record<string, unknown> | null | undefined,
@@ -47,45 +39,6 @@ function readStringArray(
     .filter(Boolean);
 }
 
-/**
- * Tìm checkpoint được một khóa CMS tham chiếu tới (ví dụ `followup_of`).
- * Khớp theo mã chính xác hoặc toàn bộ token của mã/tiêu đề; không hardcode
- * tên nhân vật hay tên bộ hồ sơ để vụ án mới có thể tùy biến dữ liệu.
- */
-function findReferencedCheckpoint(
-  checkpoints: DbCaseCheckpoint[],
-  rawKey: string,
-  excludeId?: string,
-): DbCaseCheckpoint | undefined {
-  const key = normalize(rawKey);
-  const keyTokens = tokens(rawKey);
-  if (!key || keyTokens.length === 0) return undefined;
-
-  const candidates = checkpoints.filter((checkpoint) => {
-    if (checkpoint.checkpoint_id === excludeId) return false;
-    if (checkpoint.followup_of) return false;
-    if (checkpoint.checkpoint_id.toLowerCase().includes("followup"))
-      return false;
-    return true;
-  });
-
-  const exactId = candidates.find(
-    (checkpoint) => normalize(checkpoint.checkpoint_id) === key,
-  );
-  if (exactId) return exactId;
-
-  return candidates.find((checkpoint) => {
-    // Không dùng `question`: câu hỏi mở có thể nhắc nhiều nhân vật và gây
-    // khớp nhầm. Chỉ dùng định danh và tiêu đề của checkpoint.
-    const haystack = tokens(
-      [
-        checkpoint.checkpoint_id,
-        checkpoint.title,
-      ].join(" "),
-    );
-    return keyTokens.every((token) => haystack.includes(token));
-  });
-}
 
 function edgeKey(edge: CheckpointGraphEdge): string {
   return `${edge.source}->${edge.target}`;

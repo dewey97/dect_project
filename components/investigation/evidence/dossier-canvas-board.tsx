@@ -113,7 +113,6 @@ export function DossierCanvasBoard({
 
   const isPanningRef = useRef(false);
   const [isPanningState, setIsPanningState] = useState(false);
-  const panStartRef = useRef({ x: 0, y: 0 });
   const [isSpacePressed, setIsSpacePressed] = useState(false);
   const isSpacePressedRef = useRef(false);
 
@@ -149,7 +148,7 @@ export function DossierCanvasBoard({
 
   // Annotation states (Công cụ vẽ vời ở dưới màn hình)
   const [activeTool, setActiveTool] = useState<AnnotationTool>("cursor");
-  const [clearTrigger, setClearTrigger] = useState<number>(0);
+  const [clearTrigger] = useState<number>(0);
 
   // Bút vẽ riêng biệt (Pen)
   const [penColor, setPenColor] = useState<string>("#dc2626");

@@ -152,39 +152,6 @@ export function CharacterEditor({
     });
   };
 
-  const handleSave = () => {
-    const cleanName = name.trim();
-    if (!cleanName) {
-      alert("Vui lòng nhập họ và tên nhân vật!");
-      return;
-    }
-    const slugFromName = slugifyVietnamese(cleanName).slice(0, 32);
-
-    const isTemp = !character?.id || character.id.startsWith("temp_");
-    const effectiveKey =
-      (isTemp ? (slugFromName || key || character?.key) : (key || character?.key || slugFromName)) ||
-      ("char_" + Date.now().toString(36));
-
-    const updatedChar: DbCaseCharacter = {
-      id: character?.id || "temp_" + effectiveKey,
-      case_slug: caseId,
-      key: effectiveKey,
-      name: cleanName,
-      role,
-      avatar_url: avatarUrl.trim() || null,
-      avatar_code: character?.avatar_code || `avatar_${effectiveKey}`,
-      avatar_asset_path: character?.avatar_asset_path || null,
-      phones: character?.phones || [],
-      aliases: character?.aliases || [],
-      description: description.trim(),
-      slot_index: character?.slot_index ?? allCharacters.length,
-      device: character?.device || null,
-      created_at: character?.created_at || new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-
-    onSave(updatedChar);
-  };
 
   const handleDelete = async () => {
     if (!character?.id) return;

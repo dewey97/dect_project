@@ -55,7 +55,7 @@ export function CallsEditor({
   const [duration, setDuration] = useState("");
   const [audioUrl, setAudioUrl] = useState("");
   const [isClue, setIsClue] = useState(false);
-  const [clueCode, setClueCode] = useState("");
+  const [, setClueCode] = useState("");
   const [clueTitle, setClueTitle] = useState("");
   const [clueAnalysis, setClueAnalysis] = useState("");
 

@@ -65,7 +65,7 @@ export function DiegeticDossierSheet({
   const containerRef = useRef<HTMLDivElement>(null)
   const paperWrapperRef = useRef<HTMLDivElement>(null)
   const [unscaledHeight, setUnscaledHeight] = useState<number>(isLoiKhai ? 1123 : 730)
-  const { roomCode, broadcastPing, activePing } = useRoomSync()
+  const { broadcastPing } = useRoomSync()
   const [isAudioMuted, setIsAudioMuted] = useState(() => detectiveAudio.isMuted)
   const handleToggleAudio = useCallback(() => {
     const next = detectiveAudio.toggleMute()
@@ -76,7 +76,7 @@ export function DiegeticDossierSheet({
   const [activeTool, setActiveTool] = useState<AnnotationTool>('cursor')
   const [activeColor, setActiveColor] = useState<AnnotationColor>('#dc2626')
   const [activeSize, setActiveSize] = useState<number>(3)
-  const [clearTrigger, setClearTrigger] = useState<number>(0)
+  const [clearTrigger] = useState<number>(0)
   const [isColorPickerOpen, setIsColorPickerOpen] = useState<boolean>(false)
 
   // Chiều rộng thiết kế chuẩn của văn bản

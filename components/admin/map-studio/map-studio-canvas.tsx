@@ -184,7 +184,7 @@ export function MapStudioCanvas({
               }}
             >
               {allFeaturesSorted.map((layer) => {
-                const { type, item } = layer;
+                const { item } = layer;
                 if (hiddenFeatureIds[item.id]) return null;
                 // Viewport Culling: Loại bỏ các node SVG nằm ngoài khung nhìn để giữ 60-120 FPS
                 if (!isFeatureInView(item.id)) return null;

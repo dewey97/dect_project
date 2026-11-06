@@ -67,7 +67,7 @@ export function MiscEditors({
   // 1. Notes Form State
   const [noteTitle, setNoteTitle] = useState("");
   const [noteContent, setNoteContent] = useState("");
-  const [noteMeta, setNoteMeta] = useState("");
+  const [, setNoteMeta] = useState("");
   const [noteTimestamp, setNoteTimestamp] = useState("2023-07-23 15:40");
   const [noteDamaged, setNoteDamaged] = useState(false);
 

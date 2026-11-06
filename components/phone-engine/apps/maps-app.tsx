@@ -32,7 +32,7 @@ let _clientMapCache: MapVectorData | null = null
 export function MapsApp({ onBackToHome }: MapsAppProps) {
   // Custom Map Studio Vector Data Integration (Nạp 100% từ Database/API, không dùng seed hardcode)
   const [customMapVector, setCustomMapVector] = useState<MapVectorData | null>(_clientMapCache)
-  const [isLoadingMap, setIsLoadingMap] = useState<boolean>(!_clientMapCache)
+  const [, setIsLoadingMap] = useState<boolean>(!_clientMapCache)
 
   useEffect(() => {
     let isMounted = true

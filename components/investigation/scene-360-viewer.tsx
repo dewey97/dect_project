@@ -56,7 +56,7 @@ export function Scene360Viewer({
     }>
   >([]);
 
-  const [fov, setFov] = useState(70);
+  const [, setFov] = useState(70);
   const [heading, setHeading] = useState(0); // 0 - 360 for compass
   const [isLoading, setIsLoading] = useState(true);
   const [autoRotate, setAutoRotate] = useState(false);

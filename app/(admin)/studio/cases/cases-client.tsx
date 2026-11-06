@@ -11,7 +11,7 @@ import type { DbCase } from "@/lib/types/database";
 export function CasesListClient({ initialCases }: { initialCases: DbCase[] }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
-  const [isPending, setIsPending] = useState(false);
+  const [isPending] = useState(false);
 
   const filteredCases = useMemo(() => {
     return initialCases.filter((c) => {

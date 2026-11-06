@@ -43,7 +43,7 @@ export function CustomPinModal({
   embedded = false,
 }: CustomPinModalProps) {
   const [userInput, setUserInput] = useState("");
-  const [selectedOption, setSelectedOption] = useState<string>("");
+  const [, setSelectedOption] = useState<string>("");
 
   // States for text_match_3 (3 phone lookup)
   const [phoneInput1, setPhoneInput1] = useState("");

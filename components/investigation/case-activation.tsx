@@ -400,7 +400,6 @@ export function CaseActivation({ initialCases }: CaseActivationProps = {}) {
     }
 
     if (activatedCaseId) {
-      const targetCaseId = activatedCaseId;
       toast.success(
         `Mã xác thực chính xác! Đang mở hồ sơ chuyên án ${selectedCase.title}...`,
       );

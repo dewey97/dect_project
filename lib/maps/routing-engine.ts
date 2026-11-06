@@ -93,10 +93,6 @@ function coordToKey(p: Point): string {
   return `${Math.round(p.x)}_${Math.round(p.y)}`
 }
 
-function keyToCoord(key: string): Point {
-  const [x, y] = key.split('_').map(Number)
-  return { x, y }
-}
 
 /**
  * Xây dựng đồ thị giao thông từ các trục đường Vector (Được Cache tối ưu + Spatial Grid Index)

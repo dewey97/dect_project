@@ -141,8 +141,6 @@ function PhoneScreenContent({
     device,
     isLocked,
     activeApp,
-    threads,
-    photos,
     notes,
     history,
     unlock,

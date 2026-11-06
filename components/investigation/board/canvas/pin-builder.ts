@@ -432,7 +432,6 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
 
   suspectsList.forEach((s) => {
     const primaryId = `${caseSlug}:suspect:${s.key}`;
-    const legacyId = undefined;
 
     // Tìm checkpoint thẩm tra tương ứng (ưu tiên kind === suspect_interrogation)
     let matchCp = allCheckpoints.find((cp) => {
@@ -742,7 +741,6 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     const rawCode = (item.code || item.photo_code || `ev_${idx}`).trim();
     const codeLower = rawCode.toLowerCase();
     const primaryId = `${caseSlug}:evidence:${codeLower}`;
-    const legacyId = undefined;
 
     const rawX =
       typeof item.board_x === "number"

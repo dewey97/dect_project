@@ -43,7 +43,7 @@ export function PhotosEditor({
   useEffect(() => {
     onBusyChange?.(isPending || isUploading);
   }, [isPending, isUploading, onBusyChange]);
-  const [editingPhoto, setEditingPhoto] = useState<DbPhonePhoto | null>(null);
+  const [] = useState<DbPhonePhoto | null>(null);
 
   // New photo manual form
   const [newUrl, setNewUrl] = useState("");

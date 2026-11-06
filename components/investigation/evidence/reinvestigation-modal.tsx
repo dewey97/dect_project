@@ -72,54 +72,6 @@ interface RawSheetPhotoItem {
 }
 
 // SFX HIỆU ỨNG ÂM THANH CÓ SẴN
-const SFX_OPTIONS = [
-  {
-    file: "train_sound.mp3",
-    label: "Còi tàu & chuông đường sắt",
-    caption: "*Tu tu... Xình xịch...*",
-  },
-  {
-    file: "sound_tu.mp3",
-    label: "Kẹt then cửa sắt / Tủ gỗ",
-    caption: "*Két... Cạch...*",
-  },
-  {
-    file: "breaking.mp3",
-    label: "Mảnh ấm chén rơi vỡ",
-    caption: "*Choang! Xoảng...*",
-  },
-  {
-    file: "Clack.mp3",
-    label: "Cạch then cửa hậu",
-    caption: "*Cạch... cạch...*",
-  },
-  {
-    file: "sat_soat.mp3",
-    label: "Giấy sột soạt / Khăn giấy",
-    caption: "*Sột soạt... sột soạt...*",
-  },
-  {
-    file: "ceramic_shatter.mp3",
-    label: "Gốm sứ vỡ vụn",
-    caption: "*Xoảng...*",
-  },
-  { file: "glass_break.mp3", label: "Thủy tinh vỡ", caption: "*Choang!*" },
-  {
-    file: "ha_voicemail_2032.mp3",
-    label: "Thì thầm ma mị",
-    caption: "*Thì thào...*",
-  },
-  {
-    file: "heartbeat.mp3",
-    label: "Nhịp tim dồn dập",
-    caption: "*Thình thịch...*",
-  },
-  {
-    file: "paper_rustle.mp3",
-    label: "Lật trang hồ sơ",
-    caption: "*Xào xạc...*",
-  },
-];
 
 
 export function ReinvestigationModal({
@@ -133,15 +85,11 @@ export function ReinvestigationModal({
   const [hotspots, setHotspots] = useState<ReinvestigationHotspot2D[]>([]);
   const [selectedSpot, setSelectedSpot] =
     useState<ReinvestigationHotspot2D | null>(null);
-  const [activeAudioToast, setActiveAudioToast] = useState<string | null>(null);
+  const [] = useState<string | null>(null);
   const dragDistanceRef = useRef(0);
-  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Infinite horizontal pan state & refs
-  const [offsetX, setOffsetX] = useState(0);
-  const isDraggingRef = useRef(false);
-  const lastXRef = useRef(0);
-  const velocityRef = useRef(0);
+  const [offsetX] = useState(0);
   const animFrameRef = useRef<number | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -153,7 +101,7 @@ export function ReinvestigationModal({
   // Gameplay state (read-only)
 
   // Fetch live photos & hotspots from Supabase (case_evidence)
-  const { rawEvidence: rawSheetPhotos, loading: isPhotosLoading } =
+  const { rawEvidence: rawSheetPhotos } =
     useCaseEvidence(caseId);
 
   // Load hotspots from Server API, falling back to localStorage
@@ -391,9 +339,6 @@ export function ReinvestigationModal({
 
   if (!isOpen) return null;
 
-  const playCustomSfx = (_filename: string) => {
-    // Tạm ẩn âm thanh theo yêu cầu
-  };
 
   // Handle clicking a hotspot pin on the scene
   const handleSpotClick = (spot: ReinvestigationHotspot2D) => {
@@ -402,66 +347,11 @@ export function ReinvestigationModal({
   };
 
   // Pointer drag event handlers for smooth infinite horizontal loop
-  const handlePointerDown = (e: React.PointerEvent) => {
-    if (e.button !== 0) return;
-    isDraggingRef.current = true;
-    lastXRef.current = e.clientX;
-    dragDistanceRef.current = 0;
-    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-    try {
-      (e.target as HTMLElement).setPointerCapture(e.pointerId);
-    } catch {}
-  };
 
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDraggingRef.current) return;
-    const dx = e.clientX - lastXRef.current;
-    lastXRef.current = e.clientX;
-    dragDistanceRef.current += Math.abs(dx);
-    velocityRef.current = dx;
-    setOffsetX((prev) => prev + dx);
-  };
 
-  const handlePointerUp = (e: React.PointerEvent) => {
-    if (!isDraggingRef.current) return;
-    isDraggingRef.current = false;
-    try {
-      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
-    } catch {}
 
-    const applyMomentum = () => {
-      velocityRef.current *= 0.92;
-      if (Math.abs(velocityRef.current) > 0.3) {
-        setOffsetX((prev) => prev + velocityRef.current);
-        animFrameRef.current = requestAnimationFrame(applyMomentum);
-      }
-    };
-    if (Math.abs(velocityRef.current) > 1.2) {
-      animFrameRef.current = requestAnimationFrame(applyMomentum);
-    }
-  };
 
-  const handlePointerCancel = () => {
-    isDraggingRef.current = false;
-  };
 
-  const handleWheel = (e: React.WheelEvent) => {
-    const delta = e.deltaX !== 0 ? e.deltaX : e.deltaY;
-    setOffsetX((prev) => prev - delta * 0.9);
-  };
-
-  const handleNudge = (direction: "left" | "right") => {
-    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-    velocityRef.current = direction === "left" ? 22 : -22;
-    const applyMomentum = () => {
-      velocityRef.current *= 0.92;
-      if (Math.abs(velocityRef.current) > 0.3) {
-        setOffsetX((prev) => prev + velocityRef.current);
-        animFrameRef.current = requestAnimationFrame(applyMomentum);
-      }
-    };
-    animFrameRef.current = requestAnimationFrame(applyMomentum);
-  };
 
   // Calculate dynamic dimensions for seamless wrapping
   const imageAspect = 4096 / 2286;

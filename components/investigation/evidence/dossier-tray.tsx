@@ -276,7 +276,6 @@ export function DossierTray({
     return list;
   }, [dossiers]);
 
-  const filteredPdfs = pdfItems;
   const filteredEvidence = evidenceItems;
 
   return (

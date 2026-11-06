@@ -183,8 +183,8 @@ export function HeroInteractive({
   }, [activeCase]);
 
   // User created pins/connections
-  const [userPins, setUserPins] = useState<UserPin[]>([]);
-  const [userConnections, setUserConnections] = useState<UserConnection[]>([]);
+  const [, setUserPins] = useState<UserPin[]>([]);
+  const [, setUserConnections] = useState<UserConnection[]>([]);
   const [, setConnectionStartId] = useState<string | null>(null);
 
   const userPinsRef = useRef<UserPin[]>([]);
@@ -221,7 +221,7 @@ export function HeroInteractive({
   }, []);
 
   // ── Zoom hook ──
-  const { zoomRef, panRef, resetZoom } = useBoardZoom({
+  const { zoomRef, panRef } = useBoardZoom({
     containerSizeRef,
     onZoomChange: () => {
       requestRenderRef.current();

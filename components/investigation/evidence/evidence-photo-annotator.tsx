@@ -57,7 +57,7 @@ export function EvidencePhotoAnnotator({
   const [activeTool, setActiveTool] = useState<AnnotationTool>('cursor')
   const [activeColor, setActiveColor] = useState<AnnotationColor>('#dc2626')
   const [activeSize, setActiveSize] = useState<number>(3)
-  const [clearTrigger, setClearTrigger] = useState<number>(0)
+  const [clearTrigger] = useState<number>(0)
   const [isColorPickerOpen, setIsColorPickerOpen] = useState<boolean>(false)
 
   // Zoom controls

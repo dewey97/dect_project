@@ -34,7 +34,7 @@ export function CulpritEpilogueModal({
   const charactersContext = useOptionalCaseCharacters();
   const characters = charactersContext?.characters || [];
   const { checkpoints } = useCaseCheckpoints(caseId);
-  const [isNarrativeComplete, setIsNarrativeComplete] = useState(false);
+  const [, setIsNarrativeComplete] = useState(false);
   const [internalChoice, setInternalChoice] = useState<
     "CÓ" | "KHÔNG" | "tin" | "khong_tin" | null
   >(

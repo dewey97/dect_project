@@ -21,7 +21,7 @@ export function PhoneNarrativeModal({
   onTakeTestimony,
   caseId,
 }: PhoneNarrativeModalProps) {
-  const [isNarrativeComplete, setIsNarrativeComplete] = useState(false);
+  const [, setIsNarrativeComplete] = useState(false);
   const { checkpoints } = useCaseCheckpoints(caseId);
 
   React.useEffect(() => {

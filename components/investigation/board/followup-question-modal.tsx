@@ -67,7 +67,7 @@ export function FollowupQuestionModal({
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
   const [codeInput, setCodeInput] = useState<string>("");
   const [textInput, setTextInput] = useState<string>("");
-  const [showPhotoPopup, setShowPhotoPopup] = useState<boolean>(false);
+  const [, setShowPhotoPopup] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState("");
 
   // Fetch photos dynamically from Supabase case_evidence
@@ -447,14 +447,6 @@ export function FollowupQuestionModal({
     }
   };
 
-  const handleFinishAfterPhotoPopup = () => {
-    detectiveAudio.playStampSound();
-    setShowPhotoPopup(false);
-    if (onSuccess) {
-      onSuccess(targetCulprit, "solved_box");
-    }
-    onClose();
-  };
 
   const choiceQuestionText =
     activeCheckpoint?.question ||

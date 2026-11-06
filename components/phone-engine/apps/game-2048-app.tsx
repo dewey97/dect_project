@@ -39,7 +39,7 @@ export function Game2048App({
   ]);
   const [score, setScore] = useState<number>(0);
   const [bestScore, setBestScore] = useState<number>(3840);
-  const [isGameOver, setIsGameOver] = useState<boolean>(false);
+  const [, setIsGameOver] = useState<boolean>(false);
   const [clueUnlocked, setClueUnlocked] = useState<boolean>(false);
 
   // Thêm ngẫu nhiên 2 hoặc 4 vào ô trống
