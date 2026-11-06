@@ -43,6 +43,7 @@ export interface MobileInvestigationWorkspaceProps {
   broadcastPing: any;
   activeModal: InvestigationActiveModal;
   setActiveModal: (modal: InvestigationActiveModal) => void;
+  onBoardReady?: () => void;
 }
 
 /**
@@ -73,6 +74,7 @@ export function MobileInvestigationWorkspace({
   activePing,
   broadcastPing,
   setActiveModal,
+  onBoardReady,
 }: MobileInvestigationWorkspaceProps) {
   return (
     <div className="w-full h-full flex flex-col min-h-0 overflow-hidden relative">
@@ -104,6 +106,7 @@ export function MobileInvestigationWorkspace({
             onOpenReinvestigation={() => setActiveModal("reinvestigate")}
             onOpenEpilogue={() => setActiveModal("epilogue")}
             onOpenNotebook={() => setActiveModal("notebook")}
+            onBoardReady={onBoardReady}
           />
         </div>
 

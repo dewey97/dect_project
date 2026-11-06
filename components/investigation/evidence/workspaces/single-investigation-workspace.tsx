@@ -34,6 +34,7 @@ export interface SingleInvestigationWorkspaceProps {
   broadcastPing: any;
   activeModal: InvestigationActiveModal;
   setActiveModal: (modal: InvestigationActiveModal) => void;
+  onBoardReady?: () => void;
 }
 
 /**
@@ -61,6 +62,7 @@ export function SingleInvestigationWorkspace({
   broadcastPing,
   activeModal,
   setActiveModal,
+  onBoardReady,
 }: SingleInvestigationWorkspaceProps) {
   const [dossierWidth] = useState<number>(340);
   const [isDossierCollapsed, setIsDossierCollapsed] = useState<boolean>(false);
@@ -81,6 +83,7 @@ export function SingleInvestigationWorkspace({
             onOpenReinvestigation={() => setActiveModal("reinvestigate")}
             onOpenEpilogue={() => setActiveModal("epilogue")}
             onOpenNotebook={() => setActiveModal("notebook")}
+            onBoardReady={onBoardReady}
           />
         </div>
       </div>

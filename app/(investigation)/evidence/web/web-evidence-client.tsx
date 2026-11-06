@@ -59,6 +59,7 @@ import nextDynamic from "next/dynamic";
 import { HintModal } from "@/components/investigation/hint-modal";
 import { DetectiveNotebookModal } from "@/components/investigation/detective-notebook-modal";
 import { MainInvestigationCanvas } from "@/components/investigation/board/main-investigation-canvas";
+import { GameplayLoadingScreen } from "@/components/investigation/gameplay-loading-screen";
 import { useDossierDocuments } from "@/lib/hooks/use-dossier-documents";
 import { getDossierSlot, useCaseDossiers } from "@/lib/hooks/use-case-dossiers";
 import {
@@ -126,10 +127,58 @@ function WebEvidencePageContent() {
   const [mobileTab, setMobileTab] = useState<"board" | "dossier">("board");
 
   // Nạp toàn bộ hồ sơ từ Dossier Studio (nguồn tài liệu chính)
-  const { documents: dossierDocs } = useDossierDocuments(caseId);
+  const { documents: dossierDocs, loading: isLoadingDocs } =
+    useDossierDocuments(caseId);
 
   // Nạp danh mục các bộ hồ sơ từ bảng case_dossiers theo đồ thị vụ án (C1)
-  const { dossiers, dossierOf, getPhaseForCode } = useCaseDossiers(caseId);
+  const {
+    dossiers,
+    dossierOf,
+    getPhaseForCode,
+    loading: isLoadingDossiers,
+  } = useCaseDossiers(caseId);
+
+  // Nạp danh mục chứng cứ & PDF per-case từ Supabase (M1 / WT-2 / WT-6)
+  const {
+    pdfs: casePdfs,
+    evidence: caseEvs,
+    rawEvidence: sheetEvidences,
+    loading: isLoadingSheet,
+  } = useCaseEvidence(caseId);
+
+  // Trạng thái sẵn sàng của bàn điều tra (dữ liệu + ảnh nền & polaroid)
+  const [isBoardReady, setIsBoardReady] = useState(false);
+  const handleBoardReady = useCallback(() => {
+    setIsBoardReady(true);
+  }, []);
+
+  const isDocsLoaded = !isLoadingDocs && !isLoadingDossiers && !isLoadingSheet;
+  const isGameplayReady = isDocsLoaded && isBoardReady;
+
+  const { loadingStatus, loadingProgress } = useMemo(() => {
+    if (!isDocsLoaded && !isBoardReady) {
+      return {
+        loadingStatus: "Đang giải mật hồ sơ & biên bản lời khai...",
+        loadingProgress: 35,
+      };
+    }
+    if (!isDocsLoaded && isBoardReady) {
+      return {
+        loadingStatus: "Đang nạp hồ sơ & danh mục vật chứng...",
+        loadingProgress: 65,
+      };
+    }
+    if (isDocsLoaded && !isBoardReady) {
+      return {
+        loadingStatus: "Đang đồng bộ ảnh hiện trường & bàn chứng cứ...",
+        loadingProgress: 85,
+      };
+    }
+    return {
+      loadingStatus: "Bàn điều tra đã sẵn sàng!",
+      loadingProgress: 100,
+    };
+  }, [isDocsLoaded, isBoardReady]);
 
   const refreshDossierProgress = useCallback(() => {
     setUnlockedDossierRefs(getUnlockedDossiers(caseId));
@@ -156,14 +205,6 @@ function WebEvidencePageContent() {
       ),
     [dossiers, unlockedDossierRefs, isIndictmentSolved],
   );
-
-  // Nạp danh mục chứng cứ & PDF per-case từ Supabase (M1 / WT-2 / WT-6)
-  const {
-    pdfs: casePdfs,
-    evidence: caseEvs,
-    rawEvidence: sheetEvidences,
-    loading: isLoadingSheet,
-  } = useCaseEvidence(caseId);
 
   // 3-Zone Layout State (Desktop):
   // Cột 1 (Trái): Khay hồ sơ & vật chứng (Dossier Tray) - width cố định/resizable (240px -> 450px)
@@ -792,6 +833,7 @@ function WebEvidencePageContent() {
             broadcastPing={broadcastPing}
             activeModal={activeModal}
             setActiveModal={setActiveModal}
+            onBoardReady={handleBoardReady}
           />
         </div>
       ) : (
@@ -822,6 +864,7 @@ function WebEvidencePageContent() {
             setActiveModal={setActiveModal}
             setSelectedView={setSelectedView}
             onSwitchToSingleView={() => handleSetViewMode("single")}
+            onBoardReady={handleBoardReady}
           />
         ) : (
           <SingleInvestigationWorkspace
@@ -842,10 +885,19 @@ function WebEvidencePageContent() {
             broadcastPing={broadcastPing}
             activeModal={activeModal}
             setActiveModal={setActiveModal}
+            onBoardReady={handleBoardReady}
           />
         )}
       </div>
       )}
+
+      {/* MÀN HÌNH CHỜ NẠP DỮ LIỆU & ẢNH BÀN ĐIỀU TRA TRƯỚC KHI VÀO GAMEPLAY */}
+      <GameplayLoadingScreen
+        caseId={caseId}
+        isReady={isGameplayReady}
+        statusText={loadingStatus}
+        progress={loadingProgress}
+      />
 
       {/* PHASE UNLOCKED CINEMATIC STORY MODAL */}
       <PhaseUnlockedModal

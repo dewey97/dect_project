@@ -75,6 +75,7 @@ export interface CanvasInvestigationWorkspaceProps {
   setActiveModal: (modal: InvestigationActiveModal) => void;
   setSelectedView: (view: SelectedView | null) => void;
   onSwitchToSingleView: () => void;
+  onBoardReady?: () => void;
 }
 
 /**
@@ -105,6 +106,7 @@ export function CanvasInvestigationWorkspace({
   setActiveModal,
   setSelectedView,
   onSwitchToSingleView,
+  onBoardReady,
 }: CanvasInvestigationWorkspaceProps) {
   const [isBoardOpen, setIsBoardOpen] = useState(true);
   const [isBoardFullscreen, setIsBoardFullscreen] = useState(false);
@@ -1039,6 +1041,7 @@ export function CanvasInvestigationWorkspace({
               onSelectSuspectInspector={handleOpenSuspectInspector}
               onSelectFollowupInspector={handleOpenFollowupInspector}
               onSelectPinInspector={handleOpenPinInspector}
+              onBoardReady={onBoardReady}
             />
           </div>
 
@@ -1255,6 +1258,7 @@ export function CanvasInvestigationWorkspace({
               onSelectSuspectInspector={handleOpenSuspectInspector}
               onSelectFollowupInspector={handleOpenFollowupInspector}
               onSelectPinInspector={handleOpenPinInspector}
+              onBoardReady={onBoardReady}
             />
           }
         />

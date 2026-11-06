@@ -37,6 +37,7 @@ import { CanvasToolbar } from "./canvas/canvas-toolbar";
 import { CanvasModals } from "./canvas/canvas-modals";
 import { CanvasPhotoZoom } from "./canvas/canvas-photo-zoom";
 import { caseStorageKey } from "@/lib/cases/case-id";
+import { preloadImages } from "@/lib/utils/image-preloader";
 
 interface MainInvestigationCanvasProps {
   caseId: string;
@@ -61,6 +62,7 @@ interface MainInvestigationCanvasProps {
   onSelectSuspectInspector?: (suspect: SuspectItem, pinId?: string) => void;
   onSelectFollowupInspector?: (culprit: string | null, pinId?: string) => void;
   onSelectPinInspector?: (pin: PinPoint, pinId?: string) => void;
+  onBoardReady?: () => void;
 }
 
 export function MainInvestigationCanvas({
@@ -81,6 +83,7 @@ export function MainInvestigationCanvas({
   onSelectSuspectInspector,
   onSelectFollowupInspector,
   onSelectPinInspector,
+  onBoardReady,
 }: MainInvestigationCanvasProps) {
   const isBoardGameMode =
     isBoardGame !== undefined
@@ -857,12 +860,65 @@ export function MainInvestigationCanvas({
     ],
   );
 
-  const isBoardReady = Boolean(
+  const isBoardDataReady = Boolean(
     state.isProgressLoaded &&
       !state.isCheckpointsLoading &&
       !isEvidenceLoading &&
-      displayPins.length > 0,
+      !layout.isLoading,
   );
+
+  const isBoardReady = Boolean(isBoardDataReady && displayPins.length > 0);
+
+  const hasNotifiedBoardReadyRef = useRef(false);
+
+  useEffect(() => {
+    if (!isBoardDataReady || hasNotifiedBoardReadyRef.current) return;
+
+    let cancelled = false;
+    const bgUrl =
+      customBgImage || "/images/backgrounds/corkboard_vertical_empty.jpg";
+    const frameUrl = "/images/hero/evidence-board-frame.png";
+    const pinIcons = [
+      "/images/pins/pin-red.png",
+      "/images/pins/pin-yellow.png",
+      "/images/pins/pin-green.png",
+      "/images/pins/pin-blue.png",
+      "/images/pins/pin-white.png",
+      "/images/pins/pin-brass.png",
+    ];
+
+    const pinPhotos = displayPins
+      .map((p) => p.photoUrl)
+      .filter((url): url is string => Boolean(url));
+    const charAvatars = characters
+      .map((c) => c.avatar_url)
+      .filter((url): url is string => Boolean(url));
+
+    const allUrls = [
+      bgUrl,
+      frameUrl,
+      ...pinIcons,
+      ...pinPhotos,
+      ...charAvatars,
+    ];
+
+    preloadImages(allUrls, 3500).then(() => {
+      if (!cancelled && !hasNotifiedBoardReadyRef.current) {
+        hasNotifiedBoardReadyRef.current = true;
+        if (onBoardReady) onBoardReady();
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    isBoardDataReady,
+    customBgImage,
+    displayPins,
+    characters,
+    onBoardReady,
+  ]);
 
   return (
     <div

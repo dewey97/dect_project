@@ -6,6 +6,7 @@ import { caseStorageKey, normalizeCaseId } from "@/lib/cases/case-id";
 import { useCheckpoints } from "@/components/investigation/checkpoints-context";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { BoardGameCompanionView } from "@/components/investigation/evidence/board-game-companion-view";
+import { GameplayLoadingScreen } from "@/components/investigation/gameplay-loading-screen";
 import {
   PhaseUnlockedModal,
   type UnlockedModalData,
@@ -75,7 +76,13 @@ function BoardGameCompanionContent() {
     setActiveModal("reinvestigate"),
   );
 
-  const { pdfs: casePdfs, evidence: caseEvs } = useCaseEvidence(caseId);
+  const {
+    pdfs: casePdfs,
+    evidence: caseEvs,
+    loading: isLoadingEvidence,
+  } = useCaseEvidence(caseId);
+
+  const [isBoardReady, setIsBoardReady] = useState(false);
 
   useEffect(() => {
     setStorageItem("play_experience", "boardgame");
@@ -96,6 +103,8 @@ function BoardGameCompanionContent() {
     window.location.reload();
   };
 
+  const isGameplayReady = !isLoadingEvidence && isBoardReady;
+
   return (
     <div
       suppressHydrationWarning
@@ -110,6 +119,19 @@ function BoardGameCompanionContent() {
         onOpenEpilogue={() => setActiveModal("epilogue")}
         onOpenPhoneSimulator={() => setActiveModal("phone")}
         onOpenReinvestigation={() => setActiveModal("reinvestigate")}
+        onBoardReady={() => setIsBoardReady(true)}
+      />
+
+      {/* MÀN HÌNH CHỜ NẠP DỮ LIỆU & ẢNH BÀN ĐIỀU TRA TRƯỚC KHI VÀO GAMEPLAY */}
+      <GameplayLoadingScreen
+        caseId={caseId}
+        isReady={isGameplayReady}
+        statusText={
+          !isBoardReady
+            ? "Đang bố trí bàn chứng cứ & ảnh hiện trường..."
+            : "Bàn điều tra đã sẵn sàng!"
+        }
+        progress={!isBoardReady ? 70 : 100}
       />
 
       {/* PHASE UNLOCKED CINEMATIC STORY MODAL */}
