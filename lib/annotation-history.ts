@@ -45,10 +45,3 @@ export function popAnnotationRedo(): AnnotationHistoryEntry | null {
   return null;
 }
 
-export function canUndoAnnotation(): boolean {
-  return undoStack.length > 0;
-}
-
-export function canRedoAnnotation(): boolean {
-  return redoStack.length > 0;
-}

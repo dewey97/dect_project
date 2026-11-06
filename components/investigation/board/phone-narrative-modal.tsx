@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { Search } from "lucide-react";
 import { TypewriterNarrator } from "@/components/investigation/evidence/typewriter-narrator";
 import { detectiveAudio } from "@/lib/investigation-audio";

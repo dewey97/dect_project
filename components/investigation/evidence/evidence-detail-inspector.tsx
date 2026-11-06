@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import type { SelectedView } from "./evidence-types";
 import { normalizeImageUrl } from "@/lib/utils";
 import { useDossierDocuments } from "@/lib/hooks/use-dossier-documents";

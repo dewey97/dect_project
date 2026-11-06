@@ -1,6 +1,6 @@
 "use client";
 
-import { Trash2, Eye, EyeOff, Bot, ChevronDown, Save } from "lucide-react";
+import { Trash2, Eye, EyeOff, Bot, ChevronDown } from "lucide-react";
 import type {
   DbCaseCheckpoint,
   DbCaseDossier,

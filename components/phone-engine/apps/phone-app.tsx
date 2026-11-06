@@ -5,15 +5,12 @@ import {
   Clock,
   Grid3X3,
   User,
-  Voicemail,
-  ChevronLeft,
   Loader2,
   Delete,
   Search,
   Phone as PhoneIcon,
   MessageSquare,
   ArrowLeft,
-  Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";

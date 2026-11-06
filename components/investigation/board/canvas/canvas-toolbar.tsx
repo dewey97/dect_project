@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Volume2,
   VolumeX,
@@ -8,7 +8,6 @@ import {
   Users,
   PenLine,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import type { PinPoint } from "@/components/investigation/hero-interactive";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { cn } from "@/lib/utils";

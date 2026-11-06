@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { CheckCircle2, AlertCircle, X, Info } from 'lucide-react'
 
 export type ToastMessage = {

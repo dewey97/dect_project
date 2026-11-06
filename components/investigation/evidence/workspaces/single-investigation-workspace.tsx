@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { X, ExternalLink, FolderOpen } from "lucide-react";
 import { MainInvestigationCanvas } from "@/components/investigation/board/main-investigation-canvas";

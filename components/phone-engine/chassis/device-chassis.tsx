@@ -305,11 +305,3 @@ export function DeviceChassis({
   );
 }
 
-// Legacy exports để giữ tương thích ngược
-export function IPhoneClassicChassis(props: ChassisProps) {
-  return <DeviceChassis {...props} preset="iphone_classic" />;
-}
-
-export function ModernPhoneChassis(props: ChassisProps) {
-  return <DeviceChassis {...props} preset="iphone_15" />;
-}

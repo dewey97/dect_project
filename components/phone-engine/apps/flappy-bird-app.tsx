@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { ArrowLeft, RotateCcw, Trophy } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { RotateCcw, Trophy } from "lucide-react";
 
 interface FlappyBirdProps {
   onBackToHome: () => void;

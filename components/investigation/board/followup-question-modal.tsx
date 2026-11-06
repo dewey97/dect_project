@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, HelpCircle } from "lucide-react";
 import { detectiveAudio } from "@/lib/investigation-audio";
-import { getStorageItem, setStorageItem, getStorageJson } from "@/lib/storage";
+import { getStorageItem, setStorageItem } from "@/lib/storage";
 import { normalizeImageUrl, cn } from "@/lib/utils";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";

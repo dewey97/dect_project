@@ -369,10 +369,3 @@ export function isAnswerKind(kind?: string | null): boolean {
   return (ANSWER_KINDS as readonly string[]).includes(kind || "");
 }
 
-/** Kiểm tra giá trị có phải kind hợp lệ. */
-export function isValidKind(value: unknown): value is CheckpointKind {
-  return (
-    typeof value === "string" &&
-    (CHECKPOINT_KINDS as readonly string[]).includes(value)
-  );
-}

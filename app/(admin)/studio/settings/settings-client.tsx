@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { Save, Settings2, Bell, Shield, Users } from "lucide-react";
 import type { DbAppSettings } from "@/lib/types/database";
 import { updateAppSettings } from "@/lib/actions/settings-actions";

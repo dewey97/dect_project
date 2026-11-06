@@ -1,19 +1,16 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
 import {
   Users,
   Activity,
   Target,
   Clock,
-  AlertCircle,
   CheckCircle2,
   Map,
   FileText,
   ListChecks,
   ArrowRight,
-  Sparkles,
 } from "lucide-react";
 import {
   AreaChart,

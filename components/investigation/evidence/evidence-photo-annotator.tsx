@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import {
   ZoomIn,
   ZoomOut,
@@ -9,7 +9,6 @@ import {
   Highlighter,
   Eraser,
   MousePointer,
-  Trash2,
   Target,
   PenLine,
   Volume2,

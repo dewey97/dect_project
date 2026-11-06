@@ -5,7 +5,6 @@ import React, {
   useContext,
   useState,
   useCallback,
-  useRef,
 } from "react";
 
 export interface EvidenceAnchor {

@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import type { CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
 import type { DbCaseCharacter } from "@/lib/types/database";
 import type { BoardConfig } from "@/lib/types/database";

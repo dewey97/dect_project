@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Users, Copy, Check, ShieldCheck, Share2 } from 'lucide-react'
+import { Users, Copy, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useRoomSync } from '@/components/investigation/room-sync-context'
 import { DetectiveAvatar } from '@/components/investigation/detective-avatar'

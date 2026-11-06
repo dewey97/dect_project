@@ -267,58 +267,6 @@ export async function getPhoneMessages(caseId: string) {
   }
 }
 
-export async function upsertPhoneMessage(
-  msg: Partial<DbPhoneMessage> & {
-    case_slug: string;
-    thread_key: string;
-    thread_name: string;
-    sender: string;
-    body: string;
-  },
-) {
-  try {
-    await requireAdminAuth();
-    const slug = normalizeCaseId(msg.case_slug);
-    const supabase = await createClient();
-
-    const payload = {
-      ...msg,
-      case_slug: slug,
-      updated_at: new Date().toISOString(),
-    };
-
-    const { data, error } = await supabase
-      .from("phone_messages")
-      .upsert(payload)
-      .select()
-      .single();
-
-    if (error) throw error;
-    revalidatePath("/(admin)/studio/phone", "page");
-    return { success: true, data: data as DbPhoneMessage };
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : String(error);
-    return { success: false, error: msg };
-  }
-}
-
-export async function deletePhoneMessage(id: string) {
-  try {
-    await requireAdminAuth();
-    const supabase = await createClient();
-    const { error } = await supabase
-      .from("phone_messages")
-      .delete()
-      .eq("id", id);
-    if (error) throw error;
-    revalidatePath("/(admin)/studio/phone", "page");
-    return { success: true };
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : String(error);
-    return { success: false, error: msg };
-  }
-}
-
 export interface BatchMessageItemInput {
   id?: string;
   sender?: string;

@@ -3,7 +3,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type {
   DbCase,
-  CaseStatus,
   DbCaseCheckpoint,
   DbCaseDossier,
   DbCaseCharacter,

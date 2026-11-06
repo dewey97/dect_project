@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import type { DbDossierDocument } from '@/lib/actions/dossier-actions'
 import type { LoiKhaiData, LyLichData } from '@/lib/types/dossier'
 import { DossierLoiKhaiSheet } from '@/components/admin/dossier-studio/dossier-loi-khai-sheet'
@@ -13,8 +13,6 @@ import {
   Highlighter,
   Eraser,
   MousePointer,
-  Trash2,
-  Users,
   Target,
   PenLine,
   Volume2,

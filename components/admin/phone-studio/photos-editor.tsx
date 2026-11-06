@@ -8,10 +8,8 @@ import {
   Upload,
   Key,
   Calendar,
-  MapPin,
   CheckCircle,
   AlertCircle,
-  Eye,
 } from "lucide-react";
 import type { DbPhonePhoto } from "@/lib/types/database";
 import {

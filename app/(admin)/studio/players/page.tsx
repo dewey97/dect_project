@@ -1,4 +1,3 @@
-import React from 'react'
 import { getPlayers } from '@/lib/actions/player-actions'
 import { PlayersListClient } from './players-client'
 

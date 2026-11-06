@@ -1,17 +1,15 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { useRoomSync } from "@/components/investigation/room-sync-context";
 import {
   getCanonicalSuspectKey,
-  findValidCaseCharacter,
 } from "@/lib/cases/characters";
 import {
   getStorageItem,
   setStorageItem,
   removeStorageItem,
-  clearInvestigationStorage,
   getStorageJson,
   setStorageJson,
 } from "@/lib/storage";

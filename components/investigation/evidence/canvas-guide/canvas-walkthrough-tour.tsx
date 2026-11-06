@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -8,11 +8,8 @@ import {
   ChevronLeft,
   Check,
   X,
-  Compass,
   Sparkles,
-  HelpCircle,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import {
   CANVAS_TOUR_STEPS,

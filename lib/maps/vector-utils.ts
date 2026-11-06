@@ -1,5 +1,5 @@
-import type { Point, MapVectorData, WaterFeature, RoadFeature, RailwayFeature, ZoneFeature, PoiFeature, LabelFeature, PoiCategory } from '@/lib/types/map-vector'
-import type { CaseLocation, LocationCategory } from '@/lib/case-locations-data'
+import type { Point, MapVectorData, PoiFeature, PoiCategory } from '@/lib/types/map-vector'
+import type { CaseLocation, LocationCategory } from '@/lib/maps/locations'
 
 /**
  * Catmull-Rom to Cubic Bezier curve path converter for organic smooth rivers, lakes, and roads.

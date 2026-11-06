@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { X, FileText, ImageIcon, ShieldCheck } from 'lucide-react'
+import { X, FileText, ImageIcon } from 'lucide-react'
 import type { SelectedView } from '@/components/investigation/evidence/evidence-types'
 import { normalizeImageUrl } from '@/lib/utils'
 import { useDossierDocuments } from '@/lib/hooks/use-dossier-documents'

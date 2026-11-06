@@ -1,9 +1,7 @@
 "use client";
 
-import React from "react";
 import dynamic from "next/dynamic";
-import { cn } from "@/lib/utils";
-import { ShieldCheck, X, EyeOff, Home, ArrowLeft } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import type {
   Device,
   Conversation,

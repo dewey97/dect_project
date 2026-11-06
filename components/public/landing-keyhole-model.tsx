@@ -6,20 +6,15 @@ import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import {
-  PLATE_W,
-  PLATE_H,
   PLATE_DEPTH,
   BEVEL_THICKNESS,
   BEVEL_SIZE,
   SLOT_CX,
   SLOT_CY,
-  SLOT_POINTS,
   SLOT_PATH,
   KEYWAY_BOUNDS,
   CAMERA_FOV,
   REST_DISTANCE,
-  END_DISTANCE,
-  PITCH_REST,
 } from "./landing-keyhole-geometry";
 
 const ALBEDO = "/images/cases/case_000/euro_cylinder_albedo_clean.png";

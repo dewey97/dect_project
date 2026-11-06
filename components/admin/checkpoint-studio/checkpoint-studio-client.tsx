@@ -38,7 +38,6 @@ import {
 import { isAnswerKind } from "@/lib/checkpoints/kinds";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
-import { CheckpointListSidebar } from "./checkpoint-list-sidebar";
 import { CheckpointEditor } from "./checkpoint-editor";
 import { CheckpointFlowView } from "./checkpoint-flow-view";
 import { FloatingBoardPanel } from "./floating-board-panel";
@@ -48,7 +47,6 @@ import { useBoardEditor } from "./board/use-board-editor";
 import { BoardNodeForm } from "./board/board-node-form";
 import { Button } from "@/components/ui/button";
 import {
-  Users,
   Save,
   Plus,
   Play,

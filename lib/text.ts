@@ -62,10 +62,3 @@ export function cleanList(values: string[], transform = (v: string) => v): strin
   );
 }
 
-/** Tách chuỗi đã chuẩn hóa thành các từ a-z0-9. */
-export function toWords(str: string): string[] {
-  return normalizeForMatch(str)
-    .replace(/[^a-z0-9\s]/g, " ")
-    .split(/\s+/)
-    .filter(Boolean);
-}

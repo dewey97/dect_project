@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { InvestigationMobileNav } from "@/components/investigation/evidence/investigation-mobile-nav";
 import { MainInvestigationCanvas } from "@/components/investigation/board/main-investigation-canvas";
 import { DossierTray } from "@/components/investigation/evidence/dossier-tray";

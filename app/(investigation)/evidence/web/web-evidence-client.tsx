@@ -9,28 +9,8 @@ import {
   Suspense,
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  FileText,
-  ImageIcon,
-  Volume2,
-  VolumeX,
-  Box,
-  X,
-  Home,
-  ChevronLeft,
-  GripVertical,
-  Eye,
-  Layers,
-  FolderOpen,
-  Search,
-  PenLine,
-  Target,
-  ExternalLink,
-} from "lucide-react";
-import Link from "next/link";
 import { PDFViewerModal } from "@/components/investigation/pdf-viewer-modal";
 import { detectiveAudio } from "@/lib/investigation-audio";
-import { cn } from "@/lib/utils";
 import { useRoomSync } from "@/components/investigation/room-sync-context";
 
 import type {
@@ -48,17 +28,14 @@ import { CanvasInvestigationWorkspace } from "@/components/investigation/evidenc
 import { SingleInvestigationWorkspace } from "@/components/investigation/evidence/workspaces/single-investigation-workspace";
 import { MobileInvestigationWorkspace } from "@/components/investigation/evidence/workspaces/mobile-investigation-workspace";
 import { GameDesktopHeader } from "@/components/investigation/evidence/game-desktop-header";
-import { DossierTray } from "@/components/investigation/evidence/dossier-tray";
 import { EpilogueModal } from "@/components/investigation/epilogue-modal";
 import { IndictmentModal } from "@/components/investigation/board/indictment-modal";
 import { JumpscareEndgame } from "@/components/investigation/jumpscare-endgame";
 import { QuickActionFab } from "@/components/investigation/evidence/quick-action-fab";
 import { PhoneModal } from "@/components/investigation/evidence/phone-modal";
-import { PhoneSimulator } from "@/components/phone-engine/phone-simulator";
 import nextDynamic from "next/dynamic";
 import { HintModal } from "@/components/investigation/hint-modal";
 import { DetectiveNotebookModal } from "@/components/investigation/detective-notebook-modal";
-import { MainInvestigationCanvas } from "@/components/investigation/board/main-investigation-canvas";
 import { GameplayLoadingScreen } from "@/components/investigation/gameplay-loading-screen";
 import { useDossierDocuments } from "@/lib/hooks/use-dossier-documents";
 import { getDossierSlot, useCaseDossiers } from "@/lib/hooks/use-case-dossiers";
@@ -68,12 +45,9 @@ import {
   isDossierSlotOpen,
   normalizeDossierRef,
 } from "@/lib/progress/case-progress";
-import { normalizeImageUrl } from "@/lib/utils";
 import {
   getStorageItem,
   setStorageItem,
-  clearInvestigationStorage,
-  getStorageJson,
 } from "@/lib/storage";
 import { caseStorageKey, normalizeCaseId, clearCaseProgress } from "@/lib/cases/case-id";
 import { useInvestigationEvent } from "@/lib/investigation-events";

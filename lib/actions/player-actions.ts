@@ -1,7 +1,6 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import type { DbProfile } from "@/lib/types/database";
 import { requireAdminAuth } from "@/lib/auth/admin";
 
 export async function getPlayers() {

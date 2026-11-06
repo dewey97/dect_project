@@ -4,16 +4,6 @@ import React, { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
-  Volume2,
-  ChevronLeft,
-  ChevronRight,
-  Settings2,
-  Plus,
-  Trash2,
-  Check,
-  RefreshCw,
-  Search,
-  Save,
   Move,
   Link2,
   FileText,

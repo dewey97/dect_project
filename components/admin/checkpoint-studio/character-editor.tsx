@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   User,
   Trash2,
   X,
-  FileText,
   Link2,
   Flame,
 } from "lucide-react";
@@ -14,9 +13,8 @@ import type {
   DbCaseCharacter,
   DbCaseCheckpoint,
 } from "@/lib/types/database";
-import { Button } from "@/components/ui/button";
 import { AutoGrowTextarea } from "@/components/ui/auto-grow-textarea";
-import { cn, normalizeImageUrl } from "@/lib/utils";
+import { normalizeImageUrl } from "@/lib/utils";
 import { SuspectInterrogationConfigForm } from "./sections/suspect-interrogation-config-form";
 import { toDraft, createEmptyDraft, type CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
 

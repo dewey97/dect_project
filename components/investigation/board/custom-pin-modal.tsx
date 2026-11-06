@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   X,
   FileText,
@@ -24,7 +24,6 @@ import {
   verifyCheckpointOnServer,
   VERIFY_UNAVAILABLE_MESSAGE,
 } from "@/lib/checkpoints/client-verify";
-import { CheckpointHintSection } from "@/components/investigation/checkpoint-hint-section";
 
 interface CustomPinModalProps {
   isOpen: boolean;

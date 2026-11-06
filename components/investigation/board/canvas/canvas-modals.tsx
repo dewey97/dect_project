@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import type { PinPoint } from "@/components/investigation/hero-interactive";
 import { AddSuspectModal } from "../add-suspect-modal";
 import { PhoneLookupModal } from "../phone-lookup-modal";

@@ -7,7 +7,6 @@ import {
 } from "react";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import type {
-  CaseConnection,
   CaseData,
   PinPoint,
   Point,

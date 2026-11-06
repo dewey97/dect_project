@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import {
   Search,
-  Filter,
   MoreHorizontal,
   User,
-  Download,
   Activity,
   CheckCircle2,
 } from "lucide-react";

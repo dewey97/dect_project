@@ -7,7 +7,7 @@ import { RoomPresenceBar } from "@/components/investigation/room-presence-bar";
 import { RoomModal } from "@/components/investigation/room-modal";
 import { emitInvestigationEvent } from "@/lib/investigation-events";
 import { cn } from "@/lib/utils";
-import { FileText, Layers, ChevronDown, Eye } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 interface GameDesktopHeaderProps {
   className?: string;

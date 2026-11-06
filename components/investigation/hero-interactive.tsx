@@ -1,22 +1,18 @@
 "use client";
 
 import {
-  Fragment,
   useCallback,
   useEffect,
   useRef,
   useState,
-  type CSSProperties,
 } from "react";
 import { cn } from "@/lib/utils";
 import type {
-  BoardBounds,
   CaseConnection,
   CaseData,
   HeroInteractiveProps,
   PinPoint,
   Size,
-  TooltipState,
   UserConnection,
   UserPin,
 } from "./hero-interactive/types";
@@ -25,7 +21,6 @@ import {
   CASES_LIST,
   MAX_DEVICE_PIXEL_RATIO,
 } from "./hero-interactive/constants";
-import { getInnerBoardBounds } from "./hero-interactive/utils";
 import {
   getCompositeCard as getCompositeCardHelper,
   getLoadedImage as getLoadedImageHelper,

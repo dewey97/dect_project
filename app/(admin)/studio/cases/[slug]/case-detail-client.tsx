@@ -6,8 +6,6 @@ import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Save,
-  CheckCircle,
-  AlertCircle,
   ExternalLink,
   Upload,
   Eye,

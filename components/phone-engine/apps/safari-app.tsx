@@ -3,19 +3,15 @@
 import { useState } from "react";
 import {
   Globe,
-  Search,
   BookOpen,
   Share,
   Layers,
   ArrowLeft,
-  ChevronLeft,
   ArrowRight,
   RotateCw,
   Clock,
-  ExternalLink,
   ShieldCheck,
   Loader2,
-  Sparkles,
   RefreshCw,
 } from "lucide-react";
 import type { BrowserHistory } from "@/lib/types";

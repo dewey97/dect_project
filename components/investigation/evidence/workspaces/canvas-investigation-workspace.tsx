@@ -30,7 +30,7 @@ import { RoomModal } from "@/components/investigation/room-modal";
 import { cn } from "@/lib/utils";
 import { MainInvestigationCanvas } from "@/components/investigation/board/main-investigation-canvas";
 import { DossierCanvasBoard } from "@/components/investigation/evidence/dossier-canvas-board";
-import { DossierTray, type ActiveInspectorInfo } from "@/components/investigation/evidence/dossier-tray";
+import { DossierTray } from "@/components/investigation/evidence/dossier-tray";
 import { PhoneSimulator } from "@/components/phone-engine/phone-simulator";
 import { useInvestigationEvent, emitInvestigationEvent } from "@/lib/investigation-events";
 import { AddSuspectModal } from "@/components/investigation/board/add-suspect-modal";

@@ -1,21 +1,16 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import {
   FolderOpen,
   X,
   Search,
   Check,
   Plus,
-  Trash2,
   Loader2,
-  FileText,
-  UserCheck,
-  ShieldAlert,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import type { DbCaseDossier } from "@/lib/types/database";
 import type { AvailableDocumentItem } from "@/lib/actions/dossier-config-actions";

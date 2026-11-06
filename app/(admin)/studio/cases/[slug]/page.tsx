@@ -1,4 +1,3 @@
-import React from "react";
 import { notFound } from "next/navigation";
 import { getCaseBySlug } from "@/lib/actions/case-actions";
 import { CaseDetailClient } from "./case-detail-client";

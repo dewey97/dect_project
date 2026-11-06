@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { ArrowLeft, RotateCcw, Flag } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { RotateCcw, Flag } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface MinesweeperProps {

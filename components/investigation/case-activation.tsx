@@ -8,7 +8,6 @@ import {
   KeyRound,
   X,
   ShieldAlert,
-  ScanLine,
   Paperclip,
   FileCheck2,
   FileText,
@@ -16,7 +15,6 @@ import {
   UserCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BrandMark } from "@/components/investigation/brand-mark";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/toast";
 import { normalizeCaseId } from "@/lib/cases/case-id";

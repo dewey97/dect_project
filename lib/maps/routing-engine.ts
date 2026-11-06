@@ -5,7 +5,7 @@
  */
 
 import type { Point, RoadFeature, MapVectorData } from '@/lib/types/map-vector'
-import type { CaseLocation, RouteResult, RouteStep, TransportMode } from '@/lib/case-locations-data'
+import type { CaseLocation, RouteResult, RouteStep, TransportMode } from '@/lib/maps/locations'
 
 export const BBOX_SOUTH = 21.010
 export const BBOX_WEST = 105.820
@@ -28,17 +28,6 @@ export function canvasXYToLatLng(x: number, y: number): [number, number] {
   const lon = BBOX_WEST + ((x - CANVAS_PADDING) / activeW) * (BBOX_EAST - BBOX_WEST)
   const lat = BBOX_NORTH - ((y - CANVAS_PADDING) / activeH) * (BBOX_NORTH - BBOX_SOUTH)
   return [Number(lat.toFixed(6)), Number(lon.toFixed(6))]
-}
-
-/**
- * Quy đổi tọa độ GPS thực tế (Latitude, Longitude) sang tọa độ Canvas (X, Y)
- */
-export function latLngToCanvasXY(lat: number, lon: number): Point {
-  const activeW = CANVAS_WIDTH - 2 * CANVAS_PADDING
-  const activeH = CANVAS_HEIGHT - 2 * CANVAS_PADDING
-  const x = CANVAS_PADDING + ((lon - BBOX_WEST) / (BBOX_EAST - BBOX_WEST)) * activeW
-  const y = CANVAS_PADDING + ((BBOX_NORTH - lat) / (BBOX_NORTH - BBOX_SOUTH)) * activeH
-  return { x: Math.round(x), y: Math.round(y) }
 }
 
 interface GraphEdge {

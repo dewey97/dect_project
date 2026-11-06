@@ -5,13 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
   ArrowRight,
-  CheckCircle2,
-  ArrowLeft,
-  Lightbulb,
 } from "lucide-react";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { cn } from "@/lib/utils";
-import { emitInvestigationEvent } from "@/lib/investigation-events";
 import {
   getStorageItem,
   setStorageItem,

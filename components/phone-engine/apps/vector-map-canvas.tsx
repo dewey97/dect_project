@@ -3,9 +3,9 @@
 import React from 'react'
 import { Circle, Compass, MapPin } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { isScannedMapLocation, type CaseLocation, type RouteResult } from '@/lib/case-locations-data'
+import { isScannedMapLocation, type CaseLocation, type RouteResult } from '@/lib/maps/locations'
 import type { MapVectorData } from '@/lib/types/map-vector'
-import { pointsToSvgPath, generateRailwayPaths } from '@/lib/maps/vector-utils'
+import { pointsToSvgPath } from '@/lib/maps/vector-utils'
 import { calculateVisibleBounds, renderVectorMapToCanvas } from '@/lib/maps/canvas-renderer'
 
 export interface VectorMapCanvasProps {

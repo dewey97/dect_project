@@ -2,9 +2,6 @@
 
 import { parseRuntimeHints } from "@/lib/checkpoints/runtime";
 import type { PublicCheckpointRow } from "@/lib/checkpoints/public-checkpoint";
-import { getStorageItem } from "@/lib/storage";
-import { caseStorageKey } from "@/lib/cases/case-id";
-import { getActiveCaseId } from "@/lib/cases/case-characters";
 
 interface HintModalProps {
   isOpen: boolean;
@@ -30,25 +27,6 @@ export interface CheckpointGroupData {
 export function normalizeCheckpointId(id?: string, caseId?: string): string {
   if (!id) return "";
   return id.trim();
-}
-
-/**
- * Tự động nhận diện checkpoint đang điều tra dở theo tương tác gần nhất và tiến trình thực tế.
- */
-export function getLatestActiveCheckpointId(): string {
-  if (typeof window !== "undefined") {
-    const winCp = (window as any).__ACTIVE_INVESTIGATION_CHECKPOINT__;
-    if (winCp) return normalizeCheckpointId(winCp);
-  }
-
-  // 1. Kiểm tra checkpoint người chơi vừa tương tác gần nhất
-  const activeCp = getStorageItem("active_investigation_checkpoint");
-  if (activeCp) return normalizeCheckpointId(activeCp);
-
-  const lastInteracted = getStorageItem("last_interacted_checkpoint");
-  if (lastInteracted) return normalizeCheckpointId(lastInteracted);
-
-  return "";
 }
 
 /**

@@ -2,7 +2,6 @@ import {
   BOARD_ASPECT,
   BOARD_BASE_HEIGHT,
   BOARD_BASE_WIDTH,
-  ZOOM_SCALE,
 } from "./constants";
 import type {
   BoardBounds,
@@ -280,16 +279,6 @@ export function getViewTransform(_zoom: ZoomState, _pan: Point): ViewTransform {
     scale: 1,
     translateX: 0,
     translateY: 0,
-  };
-}
-
-export function worldToScreen(
-  worldPoint: Point,
-  transform: ViewTransform,
-): Point {
-  return {
-    x: worldPoint.x * transform.scale + transform.translateX,
-    y: worldPoint.y * transform.scale + transform.translateY,
   };
 }
 

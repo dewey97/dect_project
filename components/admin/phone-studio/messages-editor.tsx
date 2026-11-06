@@ -6,7 +6,6 @@ import {
   Plus,
   Trash2,
   Save,
-  Upload,
   Key,
   CheckCircle,
   AlertCircle,
@@ -17,7 +16,6 @@ import {
   ClipboardPaste,
   X,
   Phone,
-  FileText,
   Paperclip,
 } from "lucide-react";
 import type { DbPhoneMessage } from "@/lib/types/database";

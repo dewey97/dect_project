@@ -6,7 +6,6 @@ import {
   FolderOpen,
   ChevronRight,
   ChevronLeft,
-  X,
 } from "lucide-react";
 import { cn, normalizeImageUrl } from "@/lib/utils";
 import { emitInvestigationEvent } from "@/lib/investigation-events";

@@ -4,23 +4,20 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import {
   ChevronLeft,
   Search,
-  ChevronRight,
   Info,
   BookmarkCheck,
   X,
   ShieldAlert,
   Loader2,
-  SquarePen,
   Play,
   Pause,
   Volume2,
   Maximize2,
   Film,
-  Image as ImageIcon,
 } from "lucide-react";
 import { cn, normalizeImageUrl, normalizeMediaUrl } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
-import { getActiveCaseId, getActiveVictim } from "@/lib/cases/case-characters";
+import { getActiveCaseId } from "@/lib/cases/case-characters";
 import { caseStorageKey } from "@/lib/cases/case-id";
 import { getStorageJson, setStorageJson } from "@/lib/storage";
 import { EvidenceAnchorItem } from "../core/evidence-anchor-item";

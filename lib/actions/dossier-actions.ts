@@ -69,50 +69,6 @@ export async function getDossierDocuments(
   }
 }
 
-/** Lưu hoặc cập nhật hồ sơ vào Supabase */
-export async function saveDossierDocument(params: {
-  caseId: string;
-  mode: DossierMode;
-  tagCode: string;
-  subjectName: string;
-  paperConfig: PaperConfig;
-  content: LoiKhaiData | LyLichData;
-}) {
-  try {
-    await requireAdminAuth();
-    const supabase = await createClient();
-    const caseId = params.caseId;
-    if (!caseId) return { success: false, error: "Thiếu mã vụ án (caseId)." };
-
-    const payload = {
-      case_id: caseId,
-      mode: params.mode,
-      tag_code: params.tagCode,
-      subject_name: params.subjectName,
-      paper_config: params.paperConfig,
-      content: params.content,
-      updated_at: new Date().toISOString(),
-    };
-
-    const { data, error } = await supabase
-      .from("dossier_documents")
-      .upsert(payload, { onConflict: "case_id,mode,tag_code" })
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    revalidatePath("/studio/dossier");
-    return { success: true, data: data as DbDossierDocument };
-  } catch (error: unknown) {
-    console.error("Error saving dossier document:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : String(error),
-    };
-  }
-}
-
 /** Lưu đồng loạt danh sách hồ sơ (Cả Lời Khai và Lý Lịch) vào Supabase */
 export async function saveDossierDocumentsBatch(
   documents: {
@@ -195,24 +151,3 @@ export async function reorderDossierDocuments(
   }
 }
 
-/** Xóa hồ sơ khỏi Supabase */
-export async function deleteDossierDocument(id: string) {
-  try {
-    await requireAdminAuth();
-    const supabase = await createClient();
-    const { error } = await supabase
-      .from("dossier_documents")
-      .delete()
-      .eq("id", id);
-
-    if (error) throw error;
-    revalidatePath("/studio/dossier");
-    return { success: true };
-  } catch (error: unknown) {
-    console.error("Error deleting dossier document:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : String(error),
-    };
-  }
-}

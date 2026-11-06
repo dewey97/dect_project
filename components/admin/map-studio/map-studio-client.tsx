@@ -7,39 +7,6 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import Link from "next/link";
-import {
-  MousePointer,
-  ChevronLeft,
-  Waves,
-  Milestone,
-  TrainTrack,
-  LandPlot,
-  MapPin,
-  Type,
-  Undo2,
-  Redo2,
-  Save,
-  Download,
-  Upload,
-  Layers,
-  Sliders,
-  ZoomIn,
-  ZoomOut,
-  RotateCcw,
-  Trash2,
-  ArrowUp,
-  ArrowDown,
-  Eye,
-  EyeOff,
-  Check,
-  AlertCircle,
-  Copy,
-  Sparkles,
-  RefreshCw,
-  Wrench,
-  Pencil,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type {
   Point,
@@ -64,9 +31,7 @@ import {
 } from "@/lib/maps/vector-utils";
 import { simplifyPolyline } from "@/lib/maps/simplify-polyline";
 import {
-  POI_CATEGORY_CONFIG,
   MemoWaterFeature,
-  MemoRoadFeature,
   RoadCasingItem,
   RoadSurfaceItem,
   MemoRailwayFeature,

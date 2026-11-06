@@ -2,11 +2,10 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Gavel, AlertTriangle, Lightbulb } from "lucide-react";
+import { X, Gavel, AlertTriangle } from "lucide-react";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { cn } from "@/lib/utils";
 import { setStorageItem } from "@/lib/storage";
-import { emitInvestigationEvent } from "@/lib/investigation-events";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { CheckpointHintSection } from "@/components/investigation/checkpoint-hint-section";
 import { trackEvent } from "@/lib/analytics";

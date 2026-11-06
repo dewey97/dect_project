@@ -4,9 +4,7 @@ import { useState, useEffect } from "react";
 import {
   Image as ImageIcon,
   ArrowLeft,
-  ChevronLeft,
   Info,
-  Trash2,
   CloudOff,
   Loader2,
   RefreshCw,

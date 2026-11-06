@@ -1,4 +1,3 @@
-import React from 'react'
 import { getFeedbacks } from '@/lib/actions/feedback-actions'
 import { FeedbacksClient } from './feedbacks-client'
 

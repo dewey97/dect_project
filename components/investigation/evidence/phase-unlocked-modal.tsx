@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React from "react";
+import { AnimatePresence } from "framer-motion";
 import { Search } from "lucide-react";
 import type { PDFDocument, PhysicalEvidence } from "./evidence-types";
 import { TypewriterNarrator } from "./typewriter-narrator";

@@ -4,20 +4,13 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
-  ArrowRight,
-  ArrowLeft,
   Trash2,
   Check,
-  AlertTriangle,
-  CheckCircle2,
-  Lightbulb,
 } from "lucide-react";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { cn } from "@/lib/utils";
-import { ClueCodePicker, type PendingClueInputs } from "./clue-code-picker";
-import { emitInvestigationEvent } from "@/lib/investigation-events";
+import { type PendingClueInputs } from "./clue-code-picker";
 import { setStorageItem } from "@/lib/storage";
-import { CheckpointHintSection } from "@/components/investigation/checkpoint-hint-section";
 import {
   SuspectEvaluationModal,
   type EvaluationModalState,

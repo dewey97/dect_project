@@ -1,4 +1,3 @@
-import React from 'react'
 import { getCases } from '@/lib/actions/case-actions'
 import { CasesListClient } from './cases-client'
 

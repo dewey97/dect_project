@@ -97,37 +97,6 @@ export function trackPhotoInspected(params: {
 }
 
 /**
- * Đo thời gian khám xét hiện trường 360 Panorama
- */
-export function trackScene360Viewed(params: {
-  caseId: string;
-  durationSeconds: number;
-  hotspotsVisitedCount: number;
-}) {
-  if (params.durationSeconds < 1) return;
-  trackEvent("scene_360_viewed", {
-    case_id: params.caseId,
-    duration_seconds: params.durationSeconds,
-    hotspots_visited_count: params.hotspotsVisitedCount,
-  });
-}
-
-/**
- * Đo tương tác click điểm nóng (hotspot) trong 360
- */
-export function trackScene360HotspotClick(params: {
-  hotspotId: string;
-  title?: string;
-  hasAudio?: boolean;
-}) {
-  trackEvent("scene_360_hotspot_clicked", {
-    hotspot_id: params.hotspotId,
-    title: params.title || "hotspot",
-    has_audio: !!params.hasAudio,
-  });
-}
-
-/**
  * Đo thời lượng sử dụng 1 App cụ thể trong Phone Simulator
  */
 export function trackPhoneAppUsed(params: {
@@ -144,38 +113,6 @@ export function trackPhoneAppUsed(params: {
 }
 
 /**
- * Đo nộp câu trả lời suy luận Checkpoint (Thử sai & Độ khó)
- */
-export function trackCheckpointAttempt(params: {
-  checkpointId: string;
-  isCorrect: boolean;
-  attemptNumber?: number;
-  selectedCluesCount?: number;
-}) {
-  trackEvent("checkpoint_attempt", {
-    checkpoint_id: params.checkpointId,
-    is_correct: params.isCorrect,
-    attempt_number: params.attemptNumber || 1,
-    selected_clues_count: params.selectedCluesCount || 0,
-  });
-}
-
-/**
- * Đo khi giải thành công Checkpoint
- */
-export function trackCheckpointSolved(params: {
-  checkpointId: string;
-  totalAttempts?: number;
-  timeToSolveSeconds?: number;
-}) {
-  trackEvent("checkpoint_solved", {
-    checkpoint_id: params.checkpointId,
-    total_attempts: params.totalAttempts || 1,
-    time_to_solve_seconds: params.timeToSolveSeconds || 0,
-  });
-}
-
-/**
  * Đo khi người chơi bấm xem gợi ý
  */
 export function trackHintViewed(params: {
@@ -185,22 +122,6 @@ export function trackHintViewed(params: {
   trackEvent("hint_viewed", {
     checkpoint_id: params.checkpointId,
     hint_tier: params.hintTier,
-  });
-}
-
-/**
- * Đo tiến độ hoàn thành Phase (Vẽ phễu Drop-off)
- */
-export function trackPhaseProgress(params: {
-  caseId: string;
-  phaseNumber: number;
-  action: "started" | "completed";
-  durationSeconds?: number;
-}) {
-  trackEvent(params.action === "started" ? "phase_started" : "phase_completed", {
-    case_id: params.caseId,
-    phase_number: params.phaseNumber,
-    duration_seconds: params.durationSeconds || 0,
   });
 }
 

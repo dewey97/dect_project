@@ -1,10 +1,10 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { DbFeedback } from '@/lib/types/database'
 import { updateFeedbackStatus } from '@/lib/actions/feedback-actions'
-import { MessageSquare, CheckCircle, XCircle, Clock, Star, Mail } from 'lucide-react'
+import { MessageSquare, XCircle, Clock, Star, Mail } from 'lucide-react'
 
 export function FeedbacksClient({ initialFeedbacks, currentFilter }: { initialFeedbacks: DbFeedback[], currentFilter: string }) {
   const router = useRouter()

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { AnimatePresence } from "framer-motion";
 import { BookOpen, X } from "lucide-react";
 import { TypewriterNarrator } from "./evidence/typewriter-narrator";

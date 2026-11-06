@@ -31,61 +31,7 @@ export async function getCaseEvidence(caseId: string) {
   }
 }
 
-export async function getCaseEvidenceByCode(caseId: string, code: string) {
-  try {
-    const slug = normalizeCaseId(caseId);
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("case_evidence")
-      .select("*")
-      .eq("case_slug", slug)
-      .eq("code", code)
-      .maybeSingle();
-
-    if (error) throw error;
-    return { success: true, data: data as DbCaseEvidence | null };
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : String(error);
-    return { success: false, error: msg, data: null };
-  }
-}
-
 // ── 2. Thêm / Cập nhật chứng cứ ──
-
-export async function upsertCaseEvidence(
-  evidence: Partial<DbCaseEvidence> & {
-    case_slug: string;
-    code: string;
-    title: string;
-  },
-) {
-  try {
-    await requireAdminAuth();
-    const slug = normalizeCaseId(evidence.case_slug);
-    const supabase = await createClient();
-
-    const payload = {
-      ...evidence,
-      case_slug: slug,
-      metadata: evidence.metadata || {},
-      updated_at: new Date().toISOString(),
-    };
-
-    const { data, error } = await supabase
-      .from("case_evidence")
-      .upsert(payload, { onConflict: "case_slug,code" })
-      .select()
-      .single();
-
-    if (error) throw error;
-    revalidatePath("/(admin)/studio/evidence", "page");
-    return { success: true, data: data as DbCaseEvidence };
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : String(error);
-    return { success: false, error: msg };
-  }
-}
-
 
 /** Lưu đồng loạt danh sách chứng cứ vào Supabase */
 export async function upsertMultipleCaseEvidence(

@@ -1,12 +1,9 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   CAMERA_FOV,
-  END_DISTANCE,
-  PITCH_REST,
-  PLATE_DEPTH,
   REST_DISTANCE,
   SLOT_CX,
   SLOT_CY,

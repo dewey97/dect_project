@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
   X,
   Keyboard,
@@ -11,10 +11,8 @@ import {
   Layers,
   ChevronRight,
   BookOpen,
-  MousePointer,
   Highlighter,
   StickyNote,
-  Maximize2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { detectiveAudio } from '@/lib/investigation-audio'

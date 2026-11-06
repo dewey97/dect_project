@@ -126,60 +126,6 @@ export function buildDependencyEdges(
   return dedupeEdges(edges);
 }
 
-/**
- * Gợi ý cạnh từ dữ liệu CMS hiện có. Chỉ trả về cạnh chưa tồn tại và
- * không tạo cycle; người dùng phải bấm áp dụng mới ghi vào `depends_on`.
- */
-export function suggestDependencyEdges(
-  checkpoints: DbCaseCheckpoint[],
-): CheckpointGraphEdge[] {
-  const existing = new Set(buildDependencyEdges(checkpoints).map(edgeKey));
-  const suggestions: CheckpointGraphEdge[] = [];
-
-  const add = (source?: string, target?: string) => {
-    if (!source || !target || source === target) return;
-    const edge = { source, target, inferred: true };
-    const key = edgeKey(edge);
-    if (existing.has(key)) return;
-    if (
-      wouldCreateCycle(
-        [...buildDependencyEdges(checkpoints), ...suggestions],
-        edge,
-      )
-    ) {
-      return;
-    }
-    existing.add(key);
-    suggestions.push(edge);
-  };
-
-  for (const checkpoint of checkpoints) {
-    if (checkpoint.followup_of) {
-      const parent = findReferencedCheckpoint(
-        checkpoints,
-        checkpoint.followup_of,
-        checkpoint.checkpoint_id,
-      );
-      add(parent?.checkpoint_id, checkpoint.checkpoint_id);
-    }
-
-    const required = readStringArray(
-      checkpoint.answer_config,
-      "requiredEvidenceIds",
-    );
-    for (const requirement of required) {
-      const parent = findReferencedCheckpoint(
-        checkpoints,
-        requirement,
-        checkpoint.checkpoint_id,
-      );
-      add(parent?.checkpoint_id, checkpoint.checkpoint_id);
-    }
-  }
-
-  return suggestions;
-}
-
 function hasCycle(edges: CheckpointGraphEdge[]): boolean {
   const adjacency = new Map<string, string[]>();
   for (const edge of edges) {
@@ -403,11 +349,3 @@ export function getCheckpointIssues(
   return issues;
 }
 
-export function getDependents(
-  checkpoints: DbCaseCheckpoint[],
-  checkpointId: string,
-): string[] {
-  return checkpoints
-    .filter((checkpoint) => checkpoint.depends_on?.includes(checkpointId))
-    .map((checkpoint) => checkpoint.checkpoint_id);
-}

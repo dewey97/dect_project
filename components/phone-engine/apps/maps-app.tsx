@@ -10,15 +10,13 @@ import {
   MapPin,
   Bookmark,
   Phone,
-  ExternalLink,
-  Compass
-} from 'lucide-react'
+  ExternalLink} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
   type CaseLocation,
   type RouteResult,
   type TransportMode
-} from '@/lib/case-locations-data'
+} from '@/lib/maps/locations'
 import { calculateVectorRoute, METERS_PER_PIXEL } from '@/lib/maps/routing-engine'
 import type { MapVectorData } from '@/lib/types/map-vector'
 import { transformPoiToCaseLocation } from '@/lib/maps/vector-utils'

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -15,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type {
   CaseLintResult,
-  CaseLintIssue,
 } from "@/lib/checkpoints/case-linter";
 
 interface CaseLintModalProps {

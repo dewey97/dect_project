@@ -190,21 +190,8 @@ export const CASES_LIST: CaseData[] = [
 export const ZOOM_SCALE = 2.2;
 export const MAX_DEVICE_PIXEL_RATIO = 2;
 
-// Precise inner bounds of the transparent region in evidence-board-frame.png
-// (ratios 0-1 relative to the frame image dimensions, derived from alpha-channel analysis)
-export const FRAME_INNER_LEFT = 0.3879;
-export const FRAME_INNER_TOP = 0.2079;
-export const FRAME_INNER_WIDTH = 0.5284;
-export const FRAME_INNER_HEIGHT = 0.5461;
-
-export const PIN_HIT_RADIUS = 38;
-export const PIN_GLOW_RADIUS = 50;
-
-export const FLASHLIGHT_RADIUS = 260;
-export const CENTER_LIGHT_RADIUS_RATIO = 0.75;
-
 export const DRAG_THRESHOLD = 5;
-export const MAX_PAN_RATIO = 0.45;
+
 export const PIN_COLORS = [
   { base: "#cc2222", highlight: "#ff6666" },
   { base: "#2255cc", highlight: "#6699ff" },

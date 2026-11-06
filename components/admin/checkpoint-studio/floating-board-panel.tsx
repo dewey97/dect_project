@@ -7,13 +7,11 @@ import {
   RotateCw,
   Minus,
   Plus,
-  Move,
   Edit3,
   Play,
   X,
   ArrowDown,
   ArrowUp,
-  Layers,
 } from "lucide-react";
 import {
   HeroInteractive,

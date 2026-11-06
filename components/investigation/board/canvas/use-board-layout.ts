@@ -1,11 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import type {
-  CaseConnection,
-  PinPoint,
-} from "@/components/investigation/hero-interactive";
-import type { DbCaseBoardNode } from "@/lib/types/database";
+import { useRef, useState } from "react";
 import { useBoardModel } from "./use-board-model";
 
 /**

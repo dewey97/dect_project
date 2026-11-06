@@ -28,13 +28,6 @@ export function isValidCaseId(raw?: string | null): boolean {
   return CASE_ID_PATTERN.test(value);
 }
 
-/** Các dạng mã có thể còn nằm trong dữ liệu cũ (`case_000`, `case-000`). */
-export function caseIdVariants(raw?: string | null): string[] {
-  const id = normalizeCaseId(raw);
-  const dashed = id.replace(/_/g, "-");
-  return dashed === id ? [id] : [id, dashed];
-}
-
 /**
  * Key localStorage theo vụ án.
  * case_000 giữ key không tiền tố để không mất tiến trình của người chơi cũ.

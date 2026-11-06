@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { useEvidenceAnchors } from "./evidence-anchor-context";
 
 /**

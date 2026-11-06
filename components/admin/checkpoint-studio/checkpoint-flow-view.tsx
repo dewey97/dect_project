@@ -18,15 +18,13 @@ import {
   useEdgesState,
   useNodesState,
 } from "@xyflow/react";
-import { AlertTriangle, FolderOpen, Layers, Sparkles } from "lucide-react";
+import { FolderOpen } from "lucide-react";
 import type { DbCaseCheckpoint } from "@/lib/types/database";
 import {
   buildDependencyEdges,
   getCheckpointIssues,
   layoutCheckpointGraph,
-  wouldCreateCycle,
 } from "@/lib/checkpoints/graph";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 // ── 1. Node Data & Component ──

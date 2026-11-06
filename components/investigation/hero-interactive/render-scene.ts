@@ -5,7 +5,6 @@ import type {
   Point,
   UserConnection,
   UserPin,
-  ViewTransform,
   ZoomState,
 } from "./types";
 import { BOARD_BASE_WIDTH } from "./constants";

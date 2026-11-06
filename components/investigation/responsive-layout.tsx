@@ -3,7 +3,6 @@
 import { ReactNode } from 'react'
 import { usePathname } from 'next/navigation'
 import { PageTransition } from '@/components/investigation/page-transition'
-import { cn } from '@/lib/utils'
 import type { Case, EvidenceDevice, Evidence, TraceCard } from '@/lib/types'
 
 interface ResponsiveLayoutProps {

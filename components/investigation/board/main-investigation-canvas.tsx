@@ -2,7 +2,7 @@
 
 import { getActiveVictim } from "@/lib/cases/case-characters";
 import { isAnswerKind } from "@/lib/checkpoints/kinds";
-import React, {
+import {
   useState,
   useEffect,
   useCallback,

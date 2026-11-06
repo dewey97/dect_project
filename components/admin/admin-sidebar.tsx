@@ -14,7 +14,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Smartphone,
-  Archive,
   ShoppingCart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";

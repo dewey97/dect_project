@@ -8,8 +8,6 @@ import {
   Save,
   RotateCcw,
   Eye,
-  Layers,
-  Sparkles,
 } from "lucide-react";
 import {
   updateCase360Config,
