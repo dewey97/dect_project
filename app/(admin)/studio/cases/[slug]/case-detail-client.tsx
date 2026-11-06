@@ -8,23 +8,17 @@ import {
   Save,
   ExternalLink,
   Upload,
-  Eye,
 } from "lucide-react";
 import type { DbCase, CaseStatus } from "@/lib/types/database";
 import { updateCase } from "@/lib/actions/case-actions";
 import { uploadEvidenceAsset } from "@/lib/actions/evidence-actions";
 import { toast } from "@/components/ui/toast";
-import { Scene360Viewer } from "@/components/investigation/scene-360-viewer";
 
 export function CaseDetailClient({ initialCase }: { initialCase: DbCase }) {
   const router = useRouter();
   const [caseData, setCaseData] = useState<DbCase>(initialCase);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
-  const [isUploadingBg, setIsUploadingBg] = useState(false);
-  const [isUploading360, setIsUploading360] = useState(false);
-  const [isUploadingPano, setIsUploadingPano] = useState(false);
-  const [showPreview360, setShowPreview360] = useState(false);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,9 +31,6 @@ export function CaseDetailClient({ initialCase }: { initialCase: DbCase }) {
         difficulty: caseData.difficulty,
         status: caseData.status,
         cover_image_url: caseData.cover_image_url,
-        panorama_url: caseData.panorama_url,
-        scene_360_url: caseData.scene_360_url,
-        reinvestigation_bg_url: caseData.reinvestigation_bg_url,
       });
 
       if (res.success && res.data) {
@@ -58,7 +49,7 @@ export function CaseDetailClient({ initialCase }: { initialCase: DbCase }) {
 
   const handleFileUpload = async (
     file: File,
-    field: "cover_image_url" | "reinvestigation_bg_url" | "scene_360_url" | "panorama_url",
+    field: "cover_image_url",
     setLoading: (val: boolean) => void
   ) => {
     setLoading(true);
@@ -66,7 +57,7 @@ export function CaseDetailClient({ initialCase }: { initialCase: DbCase }) {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("caseId", caseData.slug);
-      formData.append("type", field.includes("360") || field.includes("panorama") ? "scene_360" : "evidence");
+      formData.append("type", "evidence");
 
       const res = await uploadEvidenceAsset(formData);
       if (res.success && res.url) {
@@ -82,7 +73,7 @@ export function CaseDetailClient({ initialCase }: { initialCase: DbCase }) {
     }
   };
 
-  const isBusy = isSaving || isUploadingCover || isUploadingBg || isUploading360 || isUploadingPano;
+  const isBusy = isSaving || isUploadingCover;
 
   return (
     <div
@@ -132,7 +123,7 @@ export function CaseDetailClient({ initialCase }: { initialCase: DbCase }) {
         {/* Nhóm 1: Thông tin cơ bản & Trạng thái */}
         <div className="bg-zinc-900/60 border border-white/10 rounded-xl p-5 space-y-4">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300 border-b border-white/5 pb-2">
-            1. Thông tin Vụ án & Trạng thái
+            Thông tin Vụ án & Trạng thái
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -238,124 +229,13 @@ export function CaseDetailClient({ initialCase }: { initialCase: DbCase }) {
           </div>
         </div>
 
-        {/* Nhóm 2: Không gian hiện trường & Khám xét 2D / 360 */}
-        <div className="bg-zinc-900/60 border border-white/10 rounded-xl p-5 space-y-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300 border-b border-white/5 pb-2">
-            2. Hiện trường Khám xét (2D & 360 Panorama)
-          </h2>
-
-          {/* 2D Crime Scene Background */}
-          <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1">
-              Ảnh nền Khám xét hiện trường 2D (Reinvestigation 2D Scene Background)
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={caseData.reinvestigation_bg_url || ""}
-                onChange={(e) => setCaseData({ ...caseData, reinvestigation_bg_url: e.target.value })}
-                placeholder="VD: /images/cases/case_000/crime_scene_360.jpg hoặc URL ảnh"
-                className="flex-1 bg-zinc-950 border border-white/10 rounded-md px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-amber-500 font-mono text-xs"
-              />
-              <label className="cursor-pointer inline-flex items-center px-3 py-2 bg-zinc-800 border border-white/10 hover:bg-zinc-700 rounded-md text-xs font-medium text-zinc-200">
-                <Upload className="size-3.5 mr-1" />
-                {isUploadingBg ? "..." : "Upload"}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) handleFileUpload(f, "reinvestigation_bg_url", setIsUploadingBg);
-                  }}
-                />
-              </label>
-            </div>
-            <p className="text-[11px] text-zinc-500 mt-1">
-              Ảnh này dùng làm phông nền khi người chơi mở giao diện &quot;Khám xét lại hiện trường&quot; để click các điểm hotspot.
-            </p>
-          </div>
-
-          {/* 360 Sphere URL */}
-          <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1">
-              Ảnh cầu 360 (Equirectangular 360 URL)
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={caseData.scene_360_url || ""}
-                onChange={(e) => setCaseData({ ...caseData, scene_360_url: e.target.value })}
-                placeholder="VD: /images/cases/case_000/crime_scene_360.jpg"
-                className="flex-1 bg-zinc-950 border border-white/10 rounded-md px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-amber-500 font-mono text-xs"
-              />
-              <label className="cursor-pointer inline-flex items-center px-3 py-2 bg-zinc-800 border border-white/10 hover:bg-zinc-700 rounded-md text-xs font-medium text-zinc-200">
-                <Upload className="size-3.5 mr-1" />
-                {isUploading360 ? "..." : "Upload"}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) handleFileUpload(f, "scene_360_url", setIsUploading360);
-                  }}
-                />
-              </label>
-            </div>
-          </div>
-
-          {/* Panorama Cylindrical URL */}
-          <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1">
-              Ảnh Panorama phẳng / dải trụ (Cylindrical Panorama URL)
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={caseData.panorama_url || ""}
-                onChange={(e) => setCaseData({ ...caseData, panorama_url: e.target.value })}
-                placeholder="VD: /images/cases/case_000/PANORAMA.webp"
-                className="flex-1 bg-zinc-950 border border-white/10 rounded-md px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-amber-500 font-mono text-xs"
-              />
-              <label className="cursor-pointer inline-flex items-center px-3 py-2 bg-zinc-800 border border-white/10 hover:bg-zinc-700 rounded-md text-xs font-medium text-zinc-200">
-                <Upload className="size-3.5 mr-1" />
-                {isUploadingPano ? "..." : "Upload"}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) handleFileUpload(f, "panorama_url", setIsUploadingPano);
-                  }}
-                />
-              </label>
-            </div>
-          </div>
-
-          {/* Nút xem thử 360 */}
-          {caseData.scene_360_url && (
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={() => setShowPreview360(!showPreview360)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 text-zinc-300 hover:text-white rounded text-xs border border-white/10"
-              >
-                <Eye className="size-3.5" />
-                {showPreview360 ? "Ẩn xem thử 360" : "Xem thử không gian 360"}
-              </button>
-
-              {showPreview360 && (
-                <div className="mt-3 aspect-video w-full rounded-lg overflow-hidden border border-white/20">
-                  <Scene360Viewer
-                    imageUrl={caseData.scene_360_url}
-                  />
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+        <p className="text-xs text-zinc-500">
+          Ảnh khám xét hiện trường (360 và panorama) sửa ở mục{" "}
+          <a href={`/studio/scene-360?case=${caseData.slug}`} className="text-amber-400 underline-offset-4 hover:underline">
+            Hiện Trường 360
+          </a>
+          .
+        </p>
       </form>
     </div>
   );

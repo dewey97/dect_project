@@ -48,9 +48,8 @@ Có thể nhân bản cả vụ (gồm nhân vật, checkpoint, bảng, hotspot,
 | Cốt truyện đầy đủ   | `full_story`             | Dòng thời gian, sự thật vụ án (cho GM)                                                                                 |
 | Trạng thái          | `status`                 | `DRAFT` / `PUBLISHED`                                                                                                  |
 | Ảnh bìa             | `cover_image_url`        | Đường dẫn `/images/...` hoặc URL, có nút tải lên                                                                       |
-| Ảnh 360 hiện trường | `scene_360_url`          | Ảnh cầu equirectangular cho `Scene360Viewer`                                                                           |
-| Ảnh panorama        | `panorama_url`           | Ảnh toàn cảnh dự phòng; gameplay dùng `scene_360_url` trước, thiếu thì dùng panorama (`reinvestigation-modal.tsx:233`) |
-| Nền khám xét lại    | `reinvestigation_bg_url` |                                                                                                                        |
+
+Ảnh 360 và panorama của vụ sửa ở mục Hiện Trường 360 (mục 5b), không còn ở trang này. Cột `reinvestigation_bg_url` (nền khám xét 2D) không được gameplay đọc nên đã bỏ khỏi Studio.
 
 ## 4. Checkpoints — `/studio/checkpoints?case=<slug>`
 
