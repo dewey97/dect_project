@@ -8,12 +8,7 @@ import React, {
   useMemo,
 } from "react";
 import {
-  DOSSIER_CANVAS_PRESETS,
   buildCanvasBackground,
-  createCustomCanvasTheme,
-  type CanvasThemeConfig,
-  type GridType,
-  type LampTone,
 } from "./dossier-canvas-themes";
 import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import {
@@ -37,15 +32,11 @@ import {
 import { CASE_000_DOSSIER_MAP } from "@/lib/hooks/use-dossier-documents";
 import { useRoomSync } from "@/components/investigation/room/room-sync-context";
 import type { CanvasStickyNote } from "@/lib/types/room";
-import {
-  HIGHLIGHTER_SIZES,
-  PEN_PALETTE,
-  PEN_SIZES,
-  STICKY_NOTE_COLORS,
-} from "./dossier-canvas/presets";
 import { DossierCanvasToolbar } from "./dossier-canvas/toolbar";
 import { DossierCanvasThemePopup } from "./dossier-canvas/theme-popup";
 import { DossierCanvasSurface } from "./dossier-canvas/surface";
+import { useCanvasTheme } from "./dossier-canvas/use-canvas-theme";
+import { useStickyNotes } from "./dossier-canvas/use-sticky-notes";
 
 
 export type { CanvasStickyNote };
@@ -148,7 +139,7 @@ export function DossierCanvasBoard({
 
   // Annotation states (Công cụ vẽ vời ở dưới màn hình)
   const [activeTool, setActiveTool] = useState<AnnotationTool>("cursor");
-  const [clearTrigger] = useState<number>(0);
+  const clearTrigger = 0;
 
   // Bút vẽ riêng biệt (Pen)
   const [penColor, setPenColor] = useState<string>("#dc2626");
@@ -189,140 +180,22 @@ export function DossierCanvasBoard({
       setIsNotePopupOpen(false);
     }, 300);
   }, []);
-  const storageNotesKey = `dect_dossier_canvas_notes_${caseId}`;
 
-  // Canvas Theme states (Tùy chọn màu & ánh sáng mặt bàn hồ sơ)
-  const [canvasTheme, setCanvasTheme] = useState<CanvasThemeConfig>(DOSSIER_CANVAS_PRESETS[0]);
-
-  // Tự động căn chỉnh mặt bàn hồ sơ phù hợp với chế độ Sáng / Tối khi đổi UI Theme
-  useEffect(() => {
-    if (uiTheme === "light") {
-      setCanvasTheme((prev) => {
-        if (prev.id === "mahogany-warm" || prev.id === "noir-leather" || prev.id === "obsidian-minimal") {
-          const lightPreset = DOSSIER_CANVAS_PRESETS.find((p) => p.id === "light-linen");
-          return lightPreset || prev;
-        }
-        return prev;
-      });
-    } else if (uiTheme === "dark") {
-      setCanvasTheme((prev) => {
-        if (prev.id === "light-linen" || prev.id === "architect-vellum") {
-          return DOSSIER_CANVAS_PRESETS[0];
-        }
-        return prev;
-      });
-    }
-  }, [uiTheme]);
-  const [isThemePopupOpen, setIsThemePopupOpen] = useState<boolean>(false);
-  const [themeActiveTab, setThemeActiveTab] = useState<"presets" | "custom">("presets");
-  const [customBaseColor, setCustomBaseColor] = useState<string>("#130f0b");
-  const [customLampTone, setCustomLampTone] = useState<LampTone>("warm");
-  const [customLampIntensity, setCustomLampIntensity] = useState<number>(1);
-  const [customGridType, setCustomGridType] = useState<GridType>("crosses");
-  const themePopupRef = useRef<HTMLDivElement>(null);
-
-  // Nạp theme đã lưu từ localStorage sau khi mount
-  useEffect(() => {
-    try {
-      const savedTheme = localStorage.getItem("dect_dossier_canvas_theme");
-      if (savedTheme) {
-        const parsed = JSON.parse(savedTheme) as CanvasThemeConfig;
-        if (parsed && parsed.baseColor) {
-          setCanvasTheme(parsed);
-          if (parsed.isCustom) {
-            setCustomBaseColor(parsed.baseColor);
-            setCustomLampTone(parsed.lampTone || "warm");
-            setCustomLampIntensity(parsed.lampIntensity ?? 1);
-            setCustomGridType(parsed.gridType || "crosses");
-            setThemeActiveTab("custom");
-          }
-        }
-      }
-    } catch {
-      // Ignore
-    }
-  }, []);
-
-  const handleApplyTheme = useCallback((theme: CanvasThemeConfig) => {
-    setCanvasTheme(theme);
-    try {
-      localStorage.setItem("dect_dossier_canvas_theme", JSON.stringify(theme));
-    } catch {
-      // Ignore
-    }
-  }, []);
-
-  const handleUpdateCustomTheme = useCallback(
-    (base: string, lamp: LampTone, intensity: number, grid: GridType) => {
-      setCustomBaseColor(base);
-      setCustomLampTone(lamp);
-      setCustomLampIntensity(intensity);
-      setCustomGridType(grid);
-      const customTheme = createCustomCanvasTheme(base, lamp, intensity, grid);
-      handleApplyTheme(customTheme);
-    },
-    [handleApplyTheme]
-  );
-
-  const handleResetDefaultTheme = useCallback(() => {
-    handleApplyTheme(DOSSIER_CANVAS_PRESETS[0]);
-    setCustomBaseColor("#130f0b");
-    setCustomLampTone("warm");
-    setCustomLampIntensity(1);
-    setCustomGridType("crosses");
-  }, [handleApplyTheme]);
-
-  const [stickyNotes, setStickyNotes] = useState<CanvasStickyNote[]>([]);
-  const stickyNotesRef = useRef<CanvasStickyNote[]>(stickyNotes);
-  const typingNoteIdRef = useRef<string | null>(null);
-  const saveNoteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    stickyNotesRef.current = stickyNotes;
-  }, [stickyNotes]);
-
-  // Nạp sticky notes từ localStorage khi chơi đơn
-  useEffect(() => {
-    if (!roomCode) {
-      try {
-        const saved = localStorage.getItem(storageNotesKey);
-        if (saved) {
-          setStickyNotes(JSON.parse(saved));
-        }
-      } catch {
-        // Ignore
-      }
-    }
-  }, [storageNotesKey, roomCode]);
-
-  // Đồng bộ sticky notes theo thời gian thực từ Room Group Play
-  useEffect(() => {
-    if (roomCode && roomState.canvasNotes !== undefined) {
-      setStickyNotes((prev) => {
-        const remote = roomState.canvasNotes || [];
-        const editingId = typingNoteIdRef.current;
-        if (editingId) {
-          return remote.map((rn) => {
-            if (rn.id === editingId) {
-              const currentLocal = prev.find((n) => n.id === editingId);
-              return currentLocal ? { ...rn, content: currentLocal.content } : rn;
-            }
-            return rn;
-          });
-        }
-        return remote;
-      });
-    }
-  }, [roomCode, roomState.canvasNotes]);
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (saveNoteTimeoutRef.current) {
-        clearTimeout(saveNoteTimeoutRef.current);
-      }
-    };
-  }, []);
+  const {
+    canvasTheme,
+    isThemePopupOpen,
+    setIsThemePopupOpen,
+    themeActiveTab,
+    setThemeActiveTab,
+    customBaseColor,
+    customLampTone,
+    customLampIntensity,
+    customGridType,
+    themePopupRef,
+    handleApplyTheme,
+    handleUpdateCustomTheme,
+    handleResetDefaultTheme,
+  } = useCanvasTheme(uiTheme);
 
   // Đóng toàn bộ popup công cụ khi xem bảng điều tra toàn màn hình
   useEffect(() => {
@@ -336,139 +209,35 @@ export function DossierCanvasBoard({
     }
   }, [isBoardFullscreen]);
 
-  const saveStickyNotes = useCallback((notes: CanvasStickyNote[]) => {
-    setStickyNotes(notes);
-    try {
-      localStorage.setItem(storageNotesKey, JSON.stringify(notes));
-    } catch {
-      // Ignore
-    }
-  }, [storageNotesKey]);
-
   // Màu và kích thước nét vẽ đang áp dụng cho canvas
   const activeAnnotationColor = activeTool === "highlighter" ? highlighterColor : penColor;
   const activeAnnotationSize = activeTool === "highlighter" ? highlighterSize : penSize;
 
-  // Thêm một giấy dán note mới
-  const handleAddStickyNote = useCallback(
-    (color = "#fef08a") => {
-      const container = containerRef.current;
-      const zoom = zoomScaleRef.current;
-      const currentPan = panRef.current;
-      const rect = container?.getBoundingClientRect() || {
-        width: 1000,
-        height: 700,
-        left: 0,
-        top: 0,
-      };
-
-      const screenCenterX = rect.width / 2;
-      const screenCenterY = rect.height / 2;
-      const jitterX = (Math.random() - 0.5) * 60;
-      const jitterY = (Math.random() - 0.5) * 60;
-      const canvasX = Math.round((screenCenterX - currentPan.x) / zoom - 110 + jitterX);
-      const canvasY = Math.round((screenCenterY - currentPan.y) / zoom - 110 + jitterY);
-
-      const newId = `note_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
-      const newNote: CanvasStickyNote = {
-        id: newId,
-        x: canvasX,
-        y: canvasY,
-        content: "",
-        color,
-        createdAt: Date.now(),
-        authorName: nickname || "Thám tử",
-      };
-
-      setCustomPositions((prev) => {
-        const next = { ...prev, [newId]: { x: canvasX, y: canvasY } };
-        try {
-          localStorage.setItem(storagePosKey, JSON.stringify(next));
-        } catch {}
-        return next;
-      });
-
-      const nextNotes = [...stickyNotesRef.current, newNote];
-      saveStickyNotes(nextNotes);
-      if (roomCode) {
-        syncUpdate({ canvasNotes: nextNotes }, "vừa dán một mẩu note lên bàn");
-      }
+  const {
+    stickyNotes,
+    typingNoteIdRef,
+    moveStickyNote,
+    handleAddStickyNote,
+    handleUpdateStickyNote,
+    handleBlurStickyNote,
+    handleChangeNoteColor,
+    handleDeleteStickyNote,
+  } = useStickyNotes({
+    caseId,
+    roomCode,
+    remoteNotes: roomState.canvasNotes,
+    syncUpdate,
+    nickname,
+    containerRef,
+    zoomScaleRef,
+    panRef,
+    storagePosKey,
+    setCustomPositions,
+    onAdded: () => {
       setIsNotePopupOpen(false);
       setActiveTool("cursor");
     },
-    [saveStickyNotes, storagePosKey, roomCode, syncUpdate, nickname]
-  );
-
-  const handleUpdateStickyNote = useCallback(
-    (id: string, content: string) => {
-      typingNoteIdRef.current = id;
-      const nextNotes = stickyNotesRef.current.map((n) => (n.id === id ? { ...n, content } : n));
-      setStickyNotes(nextNotes);
-      try {
-        localStorage.setItem(storageNotesKey, JSON.stringify(nextNotes));
-      } catch {}
-
-      if (saveNoteTimeoutRef.current) {
-        clearTimeout(saveNoteTimeoutRef.current);
-      }
-      saveNoteTimeoutRef.current = setTimeout(() => {
-        if (roomCode) {
-          syncUpdate({ canvasNotes: nextNotes }, "vừa cập nhật ghi chú");
-        }
-        typingNoteIdRef.current = null;
-      }, 500);
-    },
-    [storageNotesKey, roomCode, syncUpdate]
-  );
-
-  const handleBlurStickyNote = useCallback(
-    (id: string) => {
-      if (saveNoteTimeoutRef.current) {
-        clearTimeout(saveNoteTimeoutRef.current);
-        saveNoteTimeoutRef.current = null;
-      }
-      typingNoteIdRef.current = null;
-      if (roomCode) {
-        syncUpdate({ canvasNotes: stickyNotesRef.current }, "vừa cập nhật ghi chú");
-      }
-    },
-    [roomCode, syncUpdate]
-  );
-
-  const handleChangeNoteColor = useCallback(
-    (id: string) => {
-      const nextNotes = stickyNotesRef.current.map((n) => {
-        if (n.id !== id) return n;
-        const currentIdx = STICKY_NOTE_COLORS.findIndex((c) => c.color === n.color);
-        const nextIdx = (currentIdx + 1) % STICKY_NOTE_COLORS.length;
-        return { ...n, color: STICKY_NOTE_COLORS[nextIdx].color };
-      });
-      saveStickyNotes(nextNotes);
-      if (roomCode) {
-        syncUpdate({ canvasNotes: nextNotes }, "vừa đổi màu giấy note");
-      }
-    },
-    [saveStickyNotes, roomCode, syncUpdate]
-  );
-
-  const handleDeleteStickyNote = useCallback(
-    (id: string) => {
-      const nextNotes = stickyNotesRef.current.filter((n) => n.id !== id);
-      saveStickyNotes(nextNotes);
-      if (roomCode) {
-        syncUpdate({ canvasNotes: nextNotes }, "vừa gỡ một mẩu note");
-      }
-      setCustomPositions((prev) => {
-        const copy = { ...prev };
-        delete copy[id];
-        try {
-          localStorage.setItem(storagePosKey, JSON.stringify(copy));
-        } catch {}
-        return copy;
-      });
-    },
-    [saveStickyNotes, roomCode, syncUpdate, storagePosKey]
-  );
+  });
 
   // Tìm kiếm nội dung văn bản trong toàn bộ hồ sơ vụ án (Ctrl+F)
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -724,22 +493,8 @@ export function DossierCanvasBoard({
             localStorage.setItem(storagePosKey, JSON.stringify(latest));
           } catch {}
 
-          // Nếu đây là sticky note, đồng bộ toạ độ mới x, y vào stickyNotes và sync qua Group Play
-          if (key.startsWith("note_") || stickyNotesRef.current.some((n) => n.id === key)) {
-            const finalPos = latest[key];
-            if (finalPos) {
-              const updatedNotes = stickyNotesRef.current.map((n) =>
-                n.id === key ? { ...n, x: finalPos.x, y: finalPos.y } : n
-              );
-              setStickyNotes(updatedNotes);
-              try {
-                localStorage.setItem(storageNotesKey, JSON.stringify(updatedNotes));
-              } catch {}
-              if (roomCode) {
-                syncUpdate({ canvasNotes: updatedNotes });
-              }
-            }
-          }
+          // Sticky note: lưu toạ độ mới và đồng bộ qua Group Play
+          if (latest[key]) moveStickyNote(key, latest[key]);
 
           return latest;
         });
@@ -749,7 +504,7 @@ export function DossierCanvasBoard({
       window.addEventListener("pointerup", onGlobalPointerUp);
       window.addEventListener("pointercancel", onGlobalPointerUp);
     },
-    [getItemPosition, checkAndTriggerEdgePan, storagePosKey, storageNotesKey, roomCode, syncUpdate]
+    [getItemPosition, checkAndTriggerEdgePan, storagePosKey, moveStickyNote]
   );
 
   const handleItemPointerMove = useCallback((_e: React.PointerEvent) => {

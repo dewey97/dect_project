@@ -64,7 +64,7 @@ export function SingleInvestigationWorkspace({
   setActiveModal,
   onBoardReady,
 }: SingleInvestigationWorkspaceProps) {
-  const [dossierWidth] = useState<number>(340);
+  const dossierWidth = 340;
   const [isDossierCollapsed, setIsDossierCollapsed] = useState<boolean>(false);
 
   return (

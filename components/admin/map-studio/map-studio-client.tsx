@@ -90,7 +90,6 @@ export function MapStudioClient() {
 
   // In-progress Drawing State
   const [drawingPoints, setDrawingPoints] = useState<Point[]>([]);
-  const [] = useState<Point>({ x: 0, y: 0 });
 
   // Tool Sub-options
   const [waterType, setWaterType] = useState<WaterType>("river");
@@ -100,7 +99,7 @@ export function MapStudioClient() {
 
   // Canvas Settings
   const [showGrid, setShowGrid] = useState(false);
-  const [gridSize] = useState(25);
+  const gridSize = 25;
   const [hiddenFeatureIds, setHiddenFeatureIds] = useState<
     Record<string, boolean>
   >({});

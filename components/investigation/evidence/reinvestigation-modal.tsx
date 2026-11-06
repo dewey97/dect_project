@@ -85,11 +85,10 @@ export function ReinvestigationModal({
   const [hotspots, setHotspots] = useState<ReinvestigationHotspot2D[]>([]);
   const [selectedSpot, setSelectedSpot] =
     useState<ReinvestigationHotspot2D | null>(null);
-  const [] = useState<string | null>(null);
   const dragDistanceRef = useRef(0);
 
   // Infinite horizontal pan state & refs
-  const [offsetX] = useState(0);
+  const offsetX = 0;
   const animFrameRef = useRef<number | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);

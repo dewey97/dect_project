@@ -19,31 +19,22 @@ import {
 } from "@/lib/types/checkpoint-studio";
 import {
   deleteCheckpoint,
-  getCheckpointsByCase,
   saveCheckpoint,
-  updateCheckpointDependencies,
-  updateCheckpointPositions,
 } from "@/lib/actions/checkpoint-actions";
-import { updateCheckpointBoardConfig } from "@/lib/actions/board-actions";
 import { getCharactersByCase } from "@/lib/actions/character-actions";
 import {
-  getCaseDossiers,
-  getAllCaseDocumentsCatalog,
   type AvailableDocumentItem,
 } from "@/lib/actions/dossier-config-actions";
-import {
-  buildDependencyEdges,
-  wouldCreateCycle,
-} from "@/lib/checkpoints/graph";
 import { isAnswerKind } from "@/lib/checkpoints/kinds";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { CheckpointFlowView } from "./checkpoint-flow-view";
 import { FloatingBoardPanel } from "./floating-board-panel";
-import type { CaseConnection } from "@/components/investigation/board/renderer/hero-interactive";
 import { useBoardEditor } from "./board/use-board-editor";
 import { CheckpointStudioInspector } from "./studio-inspector";
 import { CheckpointStudioHeader } from "./studio-header";
+import { useResizableSidebar } from "./use-resizable-sidebar";
+import { useFlowDependencies } from "./use-flow-dependencies";
 
 interface CheckpointStudioClientProps {
   initialCaseId: string;
@@ -92,95 +83,9 @@ export function CheckpointStudioClient({
   }, [caseId, activeView]);
 
   const [isFloatingBoardOpen, setIsFloatingBoardOpen] = useState(true);
-  const [flowWidth, setFlowWidth] = useState<number>(440);
-  useEffect(() => {
-    const saved = Number(localStorage.getItem("checkpoint_studio_flow_width"));
-    if (saved) setFlowWidth(Math.max(300, Math.min(800, saved)));
-  }, []);
-  const [isResizingFlow, setIsResizingFlow] = useState(false);
-
-
-  useEffect(() => {
-    if (!isResizingFlow) return;
-    document.body.style.cursor = "col-resize";
-    document.body.style.userSelect = "none";
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const newWidth = e.clientX;
-      if (newWidth >= 280 && newWidth <= 800) {
-        setFlowWidth(newWidth);
-      }
-    };
-
-    const handleMouseUp = () => {
-      setIsResizingFlow(false);
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-      try {
-        localStorage.setItem("checkpoint_studio_flow_width", String(flowWidth));
-      } catch {}
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-    return () => {
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isResizingFlow, flowWidth]);
-
-  const [sidebarWidth, setSidebarWidth] = useState<number>(420);
-  useEffect(() => {
-    const saved = Number(
-      localStorage.getItem("checkpoint_studio_sidebar_width"),
-    );
-    if (saved) setSidebarWidth(Math.max(320, Math.min(800, saved)));
-  }, []);
-  const [isResizing, setIsResizing] = useState(false);
-
-  const startResizing = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsResizing(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isResizing) return;
-    document.body.style.cursor = "col-resize";
-    document.body.style.userSelect = "none";
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const newWidth = window.innerWidth - e.clientX;
-      if (newWidth >= 320 && newWidth <= 900) {
-        setSidebarWidth(newWidth);
-      }
-    };
-
-    const handleMouseUp = () => {
-      setIsResizing(false);
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-      try {
-        localStorage.setItem(
-          "checkpoint_studio_sidebar_width",
-          String(sidebarWidth),
-        );
-      } catch {}
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-    return () => {
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isResizing, sidebarWidth]);
+  const { sidebarWidth, isResizing, startResizing } = useResizableSidebar();
 
   const router = useRouter();
-  const [] = useState<DbCase[]>(initialCases);
   const [rows, setRows] = useState<DbCaseCheckpoint[]>(initialRows);
   const [dossiers] = useState<DbCaseDossier[]>(initialDossiers);
   const [availableDocs] = useState<AvailableDocumentItem[]>(
@@ -196,11 +101,9 @@ export function CheckpointStudioClient({
     initialRows[0] ? JSON.stringify(toDraft(initialRows[0])) : "",
   );
   const [isSaving, setIsSaving] = useState(false);
-  const [isLoading] = useState(false);
   const [characters, setCharacters] =
     useState<DbCaseCharacter[]>(initialCharacters);
   const [isLintModalOpen, setIsLintModalOpen] = useState(false);
-  const [isCreatingCustomNode] = useState(false);
   const [inspectorTab, setInspectorTab] = useState<
     "checkpoints" | "characters" | "indictment" | "epilogue"
   >("checkpoints");
@@ -228,8 +131,6 @@ export function CheckpointStudioClient({
     );
   }, [rows]);
 
-  // Chế độ "Lớp logic" (Logic Overlay)
-  const [isLogicLayerActive] = useState(false);
 
   // Live Checkpoints: kết hợp giữa rows, draft đang chỉnh sửa và modifiedCheckpoints
   // để Bảng điều tra (Board Canvas) cập nhật tức thì (0s delay) khi đổi display_mode, note_color, label, scale, v.v.
@@ -1161,102 +1062,11 @@ export function CheckpointStudioClient({
     }
   };
 
-  const handleConnectDependencyFromFlow = async (
-    sourceCpId: string,
-    targetCpId: string,
-  ) => {
-    const targetCp = rows.find((r) => r.checkpoint_id === targetCpId);
-    const sourceCp = rows.find((r) => r.checkpoint_id === sourceCpId);
-
-    if (!targetCp || !sourceCp) return;
-
-    const currentDeps = targetCp.depends_on || [];
-    if (currentDeps.includes(sourceCp.checkpoint_id)) {
-      toast.info("Quan hệ phụ thuộc này đã tồn tại.");
-      return;
-    }
-
-    const currentEdges = buildDependencyEdges(rows);
-    if (
-      wouldCreateCycle(currentEdges, {
-        source: sourceCp.checkpoint_id,
-        target: targetCp.checkpoint_id,
-      })
-    ) {
-      toast.error("Liên kết tạo chu trình vòng lặp phụ thuộc.");
-      return;
-    }
-
-    const nextDeps = [...currentDeps, sourceCp.checkpoint_id];
-    setRows((prev) =>
-      prev.map((r) =>
-        r.checkpoint_id === targetCp.checkpoint_id
-          ? { ...r, depends_on: nextDeps }
-          : r,
-      ),
-    );
-    if (draft && draft.checkpointId === targetCp.checkpoint_id) {
-      setDraft((d) => (d ? { ...d, dependsOn: nextDeps } : d));
-    }
-
-    const res = await updateCheckpointDependencies(caseId, [
-      { checkpointId: targetCp.checkpoint_id, dependsOn: nextDeps },
-    ]);
-
-    if (res.success) {
-      toast.success(
-        `Đã nối phụ thuộc: "${targetCp.title || targetCp.checkpoint_id}" phụ thuộc vào "${sourceCp.title || sourceCp.checkpoint_id}"`,
-      );
-    } else {
-      toast.error(res.error || "Lỗi khi lưu quan hệ phụ thuộc.");
-    }
-  };
-
-  const handleDeleteDependencyFromFlow = async (
-    sourceCpId: string,
-    targetCpId: string,
-  ) => {
-    const targetCp = rows.find((r) => r.checkpoint_id === targetCpId);
-    if (!targetCp) return;
-
-    const nextDeps = (targetCp.depends_on || []).filter(
-      (id) => id !== sourceCpId,
-    );
-    setRows((prev) =>
-      prev.map((r) =>
-        r.checkpoint_id === targetCpId ? { ...r, depends_on: nextDeps } : r,
-      ),
-    );
-    if (draft && draft.checkpointId === targetCpId) {
-      setDraft((d) => (d ? { ...d, dependsOn: nextDeps } : d));
-    }
-
-    await updateCheckpointDependencies(caseId, [
-      { checkpointId: targetCpId, dependsOn: nextDeps },
-    ]);
-    toast.info("Đã xóa quan hệ phụ thuộc.");
-  };
-
-  const handleFlowNodePositionChange = useCallback(
-    async (checkpointId: string, pos: { x: number; y: number }) => {
-      setRows((prev) =>
-        prev.map((r) =>
-          r.checkpoint_id === checkpointId ? { ...r, flow_position: pos } : r,
-        ),
-      );
-      try {
-        const res = await updateCheckpointPositions(caseId, [
-          { checkpointId, position: pos },
-        ]);
-        if (!res.success) {
-          console.error("Lỗi khi lưu vị trí flow:", res.error);
-        }
-      } catch (err) {
-        console.error("Lỗi khi lưu vị trí flow:", err);
-      }
-    },
-    [caseId],
-  );
+  const {
+    handleConnectDependencyFromFlow,
+    handleDeleteDependencyFromFlow,
+    handleFlowNodePositionChange,
+  } = useFlowDependencies({ caseId, rows, setRows, draft, setDraft });
 
   const handleSelectPinOnBoard = (pinId: string | null) => {
     setSelectedNodeId(pinId);
@@ -1411,187 +1221,6 @@ export function CheckpointStudioClient({
 
 
 
-  // Mũi tên quan hệ phụ thuộc depends_on trong Lớp logic (B23-4)
-  const dependencyConnections: CaseConnection[] = useMemo(() => {
-    if (!isLogicLayerActive) return [];
-    const conns: CaseConnection[] = [];
-
-    const findPinForCheckpoint = (cp: DbCaseCheckpoint) => {
-      return displayPins.find(
-        (p) =>
-          p.checkpointId === cp.id ||
-          p.checkpointId === cp.checkpoint_id ||
-          (cp.kind === "phone_lookup" && p.nodeKind === "phone_lookup") ||
-          (cp.kind === "suspect_interrogation" &&
-            p.nodeKind === "suspect" &&
-            p.subjectKey === cp.subject_key) ||
-          (cp.kind === "followup" &&
-            p.nodeKind === "followup" &&
-            (!cp.subject_key ||
-              p.subjectKey === cp.subject_key ||
-              p.id === cp.checkpoint_id)) ||
-          (cp.kind === "indictment" && p.nodeKind === "indictment"),
-      );
-    };
-
-    for (const cp of rows) {
-      if (!cp.depends_on || !Array.isArray(cp.depends_on)) continue;
-      const targetPin = findPinForCheckpoint(cp);
-      if (!targetPin) continue;
-
-      for (const depId of cp.depends_on) {
-        const sourceCp = rows.find(
-          (r) => r.id === depId || r.checkpoint_id === depId,
-        );
-        if (!sourceCp) continue;
-        const sourcePin = findPinForCheckpoint(sourceCp);
-        if (!sourcePin) continue;
-
-        conns.push({
-          id: `dep:${sourceCp.checkpoint_id}:to:${cp.checkpoint_id}`,
-          fromPinId: sourcePin.id,
-          toPinId: targetPin.id,
-          isDependency: true,
-        });
-      }
-    }
-    return conns;
-  }, [isLogicLayerActive, rows, displayPins]);
-
-  const activeConnections = useMemo(() => {
-    return [...connections, ...dependencyConnections];
-  }, [connections, dependencyConnections]);
-
-  const handleConnectPinsWithLogic = async (
-    fromPinId: string,
-    toPinId: string,
-  ) => {
-    if (!isLogicLayerActive) {
-      handleConnectPins(fromPinId, toPinId);
-      return;
-    }
-
-    // Ở chế độ logic layer: nối fromPin -> toPin biểu diễn quan hệ toPin phụ thuộc vào fromPin
-    const findCpByPinId = (pinId: string) => {
-      const pin = displayPins.find((p) => p.id === pinId);
-      if (!pin) return null;
-      if (pin.checkpointId) {
-        const cp = rows.find(
-          (r) =>
-            r.id === pin.checkpointId || r.checkpoint_id === pin.checkpointId,
-        );
-        if (cp) return cp;
-      }
-      if (pin.nodeKind === "phone_lookup") {
-        return rows.find((r) => r.kind === "phone_lookup") || null;
-      }
-      if (pin.nodeKind === "suspect" && pin.subjectKey) {
-        return (
-          rows.find(
-            (r) =>
-              r.kind === "suspect_interrogation" &&
-              r.subject_key === pin.subjectKey,
-          ) || null
-        );
-      }
-      if (pin.nodeKind === "followup") {
-        return rows.find((r) => r.kind === "followup") || null;
-      }
-      if (pin.nodeKind === "indictment") {
-        return rows.find((r) => r.kind === "indictment") || null;
-      }
-      return null;
-    };
-
-    const sourceCp = findCpByPinId(fromPinId);
-    const targetCp = findCpByPinId(toPinId);
-
-    if (!sourceCp || !targetCp) {
-      toast.info("Chỉ có thể tạo quan hệ phụ thuộc giữa các node Checkpoint.");
-      return;
-    }
-
-    if (sourceCp.checkpoint_id === targetCp.checkpoint_id) {
-      toast.error("Checkpoint không thể phụ thuộc chính nó.");
-      return;
-    }
-
-    const currentDeps = targetCp.depends_on || [];
-    if (currentDeps.includes(sourceCp.checkpoint_id)) {
-      toast.info("Quan hệ phụ thuộc này đã tồn tại.");
-      return;
-    }
-
-    const currentEdges = buildDependencyEdges(rows);
-    if (
-      wouldCreateCycle(currentEdges, {
-        source: sourceCp.checkpoint_id,
-        target: targetCp.checkpoint_id,
-      })
-    ) {
-      toast.error("Liên kết tạo chu trình vòng lặp phụ thuộc.");
-      return;
-    }
-
-    const nextDeps = [...currentDeps, sourceCp.checkpoint_id];
-    setRows((prev) =>
-      prev.map((r) =>
-        r.checkpoint_id === targetCp.checkpoint_id
-          ? { ...r, depends_on: nextDeps }
-          : r,
-      ),
-    );
-    if (draft && draft.checkpointId === targetCp.checkpoint_id) {
-      setDraft((d) => (d ? { ...d, dependsOn: nextDeps } : d));
-    }
-
-    const res = await updateCheckpointDependencies(caseId, [
-      { checkpointId: targetCp.checkpoint_id, dependsOn: nextDeps },
-    ]);
-
-    if (res.success) {
-      toast.success(
-        `Đã nối phụ thuộc: "${targetCp.title || targetCp.checkpoint_id}" phụ thuộc vào "${sourceCp.title || sourceCp.checkpoint_id}"`,
-      );
-    } else {
-      toast.error(res.error || "Lỗi khi lưu quan hệ phụ thuộc.");
-    }
-  };
-
-  const handleDeleteConnectionWithLogic = async (connId: string) => {
-    if (connId.startsWith("dep:")) {
-      const parts = connId.split(":");
-      const sourceCpId = parts[1];
-      const targetCpId = parts[3];
-
-      if (!sourceCpId || !targetCpId) return;
-
-      const targetCp = rows.find((r) => r.checkpoint_id === targetCpId);
-      if (!targetCp) return;
-
-      const nextDeps = (targetCp.depends_on || []).filter(
-        (id) => id !== sourceCpId,
-      );
-      setRows((prev) =>
-        prev.map((r) =>
-          r.checkpoint_id === targetCpId ? { ...r, depends_on: nextDeps } : r,
-        ),
-      );
-      if (draft && draft.checkpointId === targetCpId) {
-        setDraft((d) => (d ? { ...d, dependsOn: nextDeps } : d));
-      }
-
-      await updateCheckpointDependencies(caseId, [
-        { checkpointId: targetCpId, dependsOn: nextDeps },
-      ]);
-      toast.info("Đã xóa quan hệ phụ thuộc.");
-      return;
-    }
-
-    handleDeleteConnection(connId);
-  };
-
-
   const isEditingBoardNode = Boolean(
     selectedNode &&
     !("checkpoint_id" in selectedNode && selectedNode.checkpoint_id) &&
@@ -1609,12 +1238,7 @@ export function CheckpointStudioClient({
           selectedNode.nodeKind === "reinvestigate"))),
   );
 
-  const isBusy =
-    isLoading ||
-    isBoardLoading ||
-    isSaving ||
-    isBoardSaving ||
-    isCreatingCustomNode;
+  const isBusy = isBoardLoading || isSaving || isBoardSaving;
 
   return (
     <div
@@ -1657,15 +1281,15 @@ export function CheckpointStudioClient({
           <FloatingBoardPanel
             caseId={caseId}
             displayPins={displayPins}
-            activeConnections={activeConnections}
+            activeConnections={connections}
             selectedNodeId={selectedNodeId}
             selectedNode={selectedNode}
             isOpen={isFloatingBoardOpen}
             onClose={() => setIsFloatingBoardOpen(false)}
             onSelectPin={handleSelectPinOnBoard}
             onPinPositionChange={handlePositionChange}
-            onConnectPins={handleConnectPinsWithLogic}
-            onDeleteConnection={handleDeleteConnectionWithLogic}
+            onConnectPins={handleConnectPins}
+            onDeleteConnection={handleDeleteConnection}
             onAdjustNodeTransform={onAdjustNodeTransformUnified}
             onAdjustNodeZIndex={handleAdjustNodeZIndex}
           />
