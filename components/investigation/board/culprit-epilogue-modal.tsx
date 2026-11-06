@@ -82,16 +82,26 @@ export function CulpritEpilogueModal({
     isQuestionSolved &&
     !internalChoice;
 
-  const matchedCp = checkpoints.find(
-    (c) =>
-      (c.subjectKey &&
-        (c.subjectKey.toLowerCase() === targetCulprit.toLowerCase() ||
-          c.subjectKey.toLowerCase() ===
-            matchedCharacter?.key.toLowerCase())) ||
-      c.id.toLowerCase() === targetCulprit.toLowerCase() ||
-      c.id.toLowerCase().includes(targetCulprit.toLowerCase()) ||
-      c.title?.toLowerCase().includes(targetCulprit.toLowerCase()),
-  );
+  const matchedCp = checkpoints.find((c) => {
+    const sKey = (c.subjectKey || "").toLowerCase().trim();
+    if (sKey) {
+      return (
+        sKey === targetCulprit.toLowerCase() ||
+        (matchedCharacter?.key && sKey === matchedCharacter.key.toLowerCase())
+      );
+    }
+    const cId = c.id.toLowerCase();
+    const tLow = targetCulprit.toLowerCase();
+    if (
+      cId === tLow ||
+      cId.endsWith(`-${tLow}`) ||
+      cId.endsWith(`:${tLow}`)
+    ) {
+      return true;
+    }
+    const titleWords = (c.title || "").toLowerCase().split(/[^a-z0-9_]+/);
+    return titleWords.includes(tLow);
+  });
 
   const suspectName =
     matchedCharacter?.name ||

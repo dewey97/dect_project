@@ -439,11 +439,31 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     // Tìm checkpoint thẩm tra tương ứng (ưu tiên kind === suspect_interrogation)
     let matchCp = allCheckpoints.find((cp) => {
       if (cp.kind !== "suspect_interrogation") return false;
+
+      // 1. Khớp dứt khoát theo subject_key / subjectKey nếu có
       const sKey = (cp.subjectKey || cp.subject_key || "").trim().toLowerCase();
-      if (sKey && sKey === s.key) return true;
+      if (sKey) {
+        return sKey === s.key;
+      }
+
+      // 2. Khớp theo checkpoint ID định danh
+      const cpIdLower = (cp.id || (cp as any).checkpoint_id || "").toLowerCase();
+      if (
+        cpIdLower.endsWith(`:${s.key}`) ||
+        cpIdLower.endsWith(`-${s.key}`) ||
+        cpIdLower.includes(`:${s.key}:`) ||
+        cpIdLower.includes(`-${s.key}-`)
+      ) {
+        return true;
+      }
+
+      // 3. Fallback chỉ khi hoàn toàn không có subject_key: khớp theo tên đầy đủ không dấu hoặc từ nguyên vẹn
       const titleClean = removeDiacritics(cp.title || "").toLowerCase();
       const sNameClean = removeDiacritics(s.name || "").toLowerCase();
-      return titleClean.includes(s.key) || titleClean.includes(sNameClean);
+      if (sNameClean && titleClean.includes(sNameClean)) return true;
+
+      const titleWords = titleClean.split(/[^a-z0-9_]+/);
+      return titleWords.includes(s.key);
     });
     if (!matchCp) {
       matchCp = allCheckpoints.find((cp) => {
@@ -544,7 +564,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       const isFollowup =
         isAnswerKind(cp.kind) ||
         cp.id.toLowerCase().includes("followup") ||
-        (cp.followupOf && String(cp.followupOf).toLowerCase().includes(s.key));
+        Boolean(cp.followupOf);
       if (!isFollowup) return false;
 
       // 1. Khớp ưu tiên: subjectKey / subject_key
@@ -553,17 +573,28 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         return sKey === s.key;
       }
 
-      // 2. Khớp qua followupOf
-      if (cp.followupOf && String(cp.followupOf).toLowerCase().includes(s.key)) {
-        return true;
+      // 2. Khớp qua followupOf với ranh giới từ dứt khoát
+      if (cp.followupOf) {
+        const fOf = String(cp.followupOf).toLowerCase().trim();
+        if (
+          fOf === s.key ||
+          fOf.endsWith(`-${s.key}`) ||
+          fOf.endsWith(`:${s.key}`) ||
+          fOf.includes(`-${s.key}-`) ||
+          fOf.includes(`:${s.key}:`)
+        ) {
+          return true;
+        }
       }
 
-      // 3. Khớp qua checkpoint id định danh (vd: cp-000-1c-followup hoặc followup-ha)
+      // 3. Khớp qua checkpoint id định danh với ranh giới rõ ràng
       const cpIdLower = (cp.id || (cp as any).checkpoint_id || "").toLowerCase();
       if (
+        cpIdLower.endsWith(`-${s.key}`) ||
+        cpIdLower.endsWith(`:${s.key}`) ||
         cpIdLower.includes(`followup-${s.key}`) ||
-        cpIdLower.includes(`:${s.key}`) ||
-        cpIdLower.endsWith(`-${s.key}`)
+        cpIdLower.includes(`:${s.key}:`) ||
+        cpIdLower.includes(`-${s.key}-`)
       ) {
         return true;
       }
@@ -979,10 +1010,20 @@ export function applyLayoutOverrides(
     const override = findMatchingOverride(pin, customPinPositions);
     const tf = findMatchingOverride(pin, pinTransforms);
 
-    // Ưu tiên rotation và scale được định cấu hình tường minh trong pin (từ board_config của checkpoint hoặc board_node).
-    // Chỉ fallback sang tf (từ boardgame_pins) nếu pin chưa có scale/rotation
-    const finalRot = typeof pin.rotation === "number" ? pin.rotation : tf?.rotation ?? 0;
-    const finalScale = typeof pin.scale === "number" && pin.scale > 0 ? pin.scale : tf?.scale ?? 1.0;
+    // Ưu tiên transform được kéo chỉnh trên bảng (tf từ boardgame_pins) làm override,
+    // sau đó mới fallback sang rotation và scale gốc từ pin/board_config
+    const finalRot =
+      typeof tf?.rotation === "number"
+        ? tf.rotation
+        : typeof pin.rotation === "number"
+          ? pin.rotation
+          : 0;
+    const finalScale =
+      typeof tf?.scale === "number" && tf.scale > 0
+        ? tf.scale
+        : typeof pin.scale === "number" && pin.scale > 0
+          ? pin.scale
+          : 1.0;
 
     return {
       ...pin,

@@ -35,6 +35,8 @@ export function useBoardLayout(caseId: string) {
     selectedPinId,
     setSelectedPinId,
     canvasWrapperRef,
+    isLoading: boardModel.isLoading,
+    pins: boardModel.pins,
     // Null-op handlers for backward compatibility
     handlePinPositionChange: (_pinId: string, _x: number, _y: number) => {},
     handleConnectPins: (_from: string, _to: string) => {},

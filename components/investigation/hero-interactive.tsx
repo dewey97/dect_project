@@ -456,13 +456,18 @@ export function HeroInteractive({
   useEffect(() => {
     const frameImage = new Image();
     frameImage.src = BOARD_FRAME_SRC;
-    frameImage.onload = () => {
+    if (frameImage.complete && frameImage.naturalWidth > 0) {
       boardFrameRef.current = frameImage;
       requestRenderRef.current();
-    };
-    frameImage.onerror = () => {
-      console.error(`Không thể tải ảnh khung gỗ bối cảnh: ${BOARD_FRAME_SRC}`);
-    };
+    } else {
+      frameImage.onload = () => {
+        boardFrameRef.current = frameImage;
+        requestRenderRef.current();
+      };
+      frameImage.onerror = () => {
+        console.error(`Không thể tải ảnh khung gỗ bối cảnh: ${BOARD_FRAME_SRC}`);
+      };
+    }
   }, []);
 
   const bgImageToUse = customBgImage ?? activeCase.bgImage;
@@ -475,17 +480,22 @@ export function HeroInteractive({
 
     const boardImage = new Image();
     boardImage.src = bgImageToUse;
-    boardImage.onload = () => {
-      if (cancelled) return;
+    if (boardImage.complete && boardImage.naturalWidth > 0) {
       boardImageRef.current = boardImage;
       requestRenderRef.current();
-    };
-    boardImage.onerror = () => {
-      if (cancelled) return;
-      console.error(`Không thể tải ảnh bản đồ vụ án: ${bgImageToUse}`);
-      boardImageRef.current = null;
-      requestRenderRef.current();
-    };
+    } else {
+      boardImage.onload = () => {
+        if (cancelled) return;
+        boardImageRef.current = boardImage;
+        requestRenderRef.current();
+      };
+      boardImage.onerror = () => {
+        if (cancelled) return;
+        console.error(`Không thể tải ảnh bản đồ vụ án: ${bgImageToUse}`);
+        boardImageRef.current = null;
+        requestRenderRef.current();
+      };
+    }
 
     return () => {
       cancelled = true;

@@ -116,7 +116,9 @@ export function FollowupQuestionModal({
       checkpoints.find((cp) => {
         const titleLower = (cp.title || "").toLowerCase();
         const qLower = (cp.question || "").toLowerCase();
-        return titleLower.includes(cLow) || qLower.includes(cLow);
+        const titleWords = titleLower.split(/[^a-z0-9_]+/);
+        const qWords = qLower.split(/[^a-z0-9_]+/);
+        return titleWords.includes(cLow) || qWords.includes(cLow);
       }) ||
       null
     );

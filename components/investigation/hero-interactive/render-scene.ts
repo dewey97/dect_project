@@ -790,16 +790,17 @@ export function renderScene({
       let fontSize =
         (isIndictment ? 15.5 : isWhiteNote ? 14.5 : 14.0) *
         scaleFactor *
+        scaleMod *
         textScaleMod;
       context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
       let lines = wrapText(context, pin.label, maxTextWidth, 3);
 
-      const minFontSize = 7.0 * scaleFactor * textScaleMod;
+      const minFontSize = 7.0 * scaleFactor * scaleMod * textScaleMod;
       while (
         fontSize > minFontSize &&
         (lines.some((l) => context.measureText(l).width > maxTextWidth) ||
           lines.length *
-            ((fontSize + 1.5 * scaleFactor * textScaleMod) / transform.scale) >
+            ((fontSize + 1.5 * scaleFactor * scaleMod * textScaleMod) / transform.scale) >
             availableHeight)
       ) {
         fontSize -= 0.5 * scaleFactor;
@@ -808,7 +809,7 @@ export function renderScene({
       }
 
       const lineHeight =
-        (fontSize + 1.5 * scaleFactor * textScaleMod) / transform.scale;
+        (fontSize + 1.5 * scaleFactor * scaleMod * textScaleMod) / transform.scale;
       const textBlockHeight = lines.length * lineHeight;
 
       context.save();

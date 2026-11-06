@@ -152,17 +152,15 @@ export function AddSuspectModal({
       const cleanSKey = normalizeForMatch(sKey);
       return (
         cleanSKey === cleanNorm ||
-        cleanNorm.includes(cleanSKey) ||
-        cleanSKey.includes(cleanNorm) ||
         (charId && cleanSKey === charId)
       );
     });
     if (kindMatch) return kindMatch.id;
 
-    // 1. Khớp theo followupOf hoặc theo tên nhân vật trong tiêu đề
+    // 1. Khớp theo followupOf
     const directMatch = checkpoints.find((cp) => {
       const fOf = (cp.followupOf || "").toLowerCase().trim();
-      return fOf && (norm === fOf || norm.includes(fOf) || fOf.includes(norm));
+      return fOf && (norm === fOf || (charId && fOf === charId));
     });
     if (directMatch) return directMatch.id;
 
@@ -175,9 +173,10 @@ export function AddSuspectModal({
       const foundCp = checkpoints.find((cp) => {
         const titleLower = (cp.title || "").toLowerCase();
         const questionLower = (cp.question || "").toLowerCase();
+        const titleWords = titleLower.split(/[^a-z0-9_]+/);
         return (
           (cp.followupOf || "").toLowerCase() === charId ||
-          titleLower.includes(charId) ||
+          titleWords.includes(charId) ||
           titleLower.includes(charName) ||
           questionLower.includes(charName) ||
           charAliases.some((alias) => titleLower.includes(alias))

@@ -84,11 +84,12 @@ export function CustomPinModal({
 
       const text =
         `${pid} ${pin.label || ""} ${pin.detail || ""}`.toLowerCase();
+      const textWords = text.split(/[^a-z0-9_]+/);
       const titleMatch = checkpoints.find(
         (c) =>
           (c.title && text.includes(c.title.toLowerCase())) ||
           (c.dossier && text.includes(`hồ sơ ${c.dossier.toLowerCase()}`)) ||
-          (c.subjectKey && text.includes(c.subjectKey.toLowerCase())),
+          (c.subjectKey && textWords.includes(c.subjectKey.toLowerCase())),
       );
       if (titleMatch) return titleMatch.id;
 
