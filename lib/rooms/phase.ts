@@ -15,10 +15,15 @@ export function isRoomPhase(value: unknown): value is RoomPhase {
   );
 }
 
-/** Phase kế tiếp, null nếu đã ở cuối. */
+/**
+ * Phase kế tiếp:
+ * Hợp nhất màn bối cảnh ban đầu và bàn giao hồ sơ thành 1 màn duy nhất.
+ * Từ lobby -> intro_scene -> nhảy thẳng sang investigating!
+ */
 export function nextPhase(phase: RoomPhase): RoomPhase | null {
-  const i = ORDER.indexOf(phase);
-  return i >= 0 && i < ORDER.length - 1 ? ORDER[i + 1] : null;
+  if (phase === "lobby") return "intro_scene";
+  if (phase === "intro_scene" || phase === "intro_handover") return "investigating";
+  return null;
 }
 
 /**
