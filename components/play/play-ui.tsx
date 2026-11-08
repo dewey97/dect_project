@@ -3,7 +3,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-/** Khối giao diện dùng chung cho màn vào game và phòng chờ (phong cách hồ sơ trinh thám). */
+/** Khối giao diện dùng chung cho màn vào game và phòng chờ (phong cách hồ sơ trinh thám cao cấp). */
 
 export function PlayShell({
   children,
@@ -15,11 +15,21 @@ export function PlayShell({
   className?: string;
 }) {
   return (
-    <div className="h-full w-full overflow-y-auto bg-[#0d0c0a] text-zinc-100">
+    <div className="min-h-screen w-full overflow-y-auto bg-[#0d0c0a] bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(180,120,40,0.12),rgba(0,0,0,0))] text-zinc-100 relative">
+      {/* Lớp hạt mờ tinh tế */}
+      <div
+        className="pointer-events-none fixed inset-0 opacity-[0.02] mix-blend-overlay"
+        style={{
+          backgroundImage:
+            "radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)",
+          backgroundSize: "20px 20px",
+        }}
+        aria-hidden
+      />
       <div
         className={cn(
-          "mx-auto flex min-h-full w-full flex-col gap-5 px-4 py-6 sm:py-8",
-          wide ? "max-w-6xl" : "max-w-[30rem]",
+          "relative mx-auto flex min-h-screen w-full flex-col justify-center px-4 py-8 sm:py-12",
+          wide ? "max-w-4xl" : "max-w-2xl",
           className,
         )}
       >
@@ -40,14 +50,19 @@ export function PlayLabel({ children }: { children: ReactNode }) {
 export function PlayCard({
   children,
   className,
+  highlight = false,
 }: {
   children: ReactNode;
   className?: string;
+  highlight?: boolean;
 }) {
   return (
     <section
       className={cn(
-        "rounded-xl border border-zinc-800 bg-zinc-950/80 p-4 sm:p-5",
+        "rounded-3xl border bg-[#18181b]/95 p-5 sm:p-7 md:p-8 backdrop-blur-xl shadow-2xl transition",
+        highlight
+          ? "border-amber-500/70 shadow-amber-500/10 ring-1 ring-amber-500/20"
+          : "border-amber-500/30",
         className,
       )}
     >
@@ -56,7 +71,7 @@ export function PlayCard({
   );
 }
 
-type Variant = "primary" | "secondary" | "danger" | "ghost";
+type Variant = "primary" | "secondary" | "danger" | "ghost" | "amber-gradient";
 
 export function PlayButton({
   variant = "primary",
@@ -68,15 +83,17 @@ export function PlayButton({
       type="button"
       {...props}
       className={cn(
-        "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400 disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 text-sm font-bold tracking-wide transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.99] cursor-pointer",
         variant === "primary" &&
-          "bg-amber-500 text-zinc-950 hover:bg-amber-400",
+          "bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-zinc-950 shadow-lg shadow-amber-500/20 hover:brightness-105",
+        variant === "amber-gradient" &&
+          "bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-zinc-950 shadow-lg shadow-amber-500/20 hover:brightness-105",
         variant === "secondary" &&
-          "border border-zinc-700 bg-zinc-900 text-zinc-100 hover:bg-zinc-800",
+          "border border-zinc-700/80 bg-zinc-900/90 text-zinc-100 hover:bg-zinc-800 hover:border-zinc-600",
         variant === "danger" &&
-          "border border-red-900/60 bg-red-950/30 text-red-200 hover:bg-red-900/40",
+          "border border-red-900/60 bg-red-950/40 text-red-200 hover:bg-red-900/50",
         variant === "ghost" &&
-          "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100",
+          "text-zinc-400 hover:bg-zinc-900/60 hover:text-zinc-100",
         className,
       )}
     />
@@ -88,7 +105,7 @@ export function PlayError({ children }: { children: ReactNode }) {
   return (
     <p
       role="alert"
-      className="rounded-lg border border-red-900/50 bg-red-950/30 px-3 py-2 text-sm text-red-200"
+      className="rounded-xl border border-red-900/50 bg-red-950/30 px-3.5 py-2.5 text-sm text-red-200"
     >
       {children}
     </p>
@@ -96,4 +113,4 @@ export function PlayError({ children }: { children: ReactNode }) {
 }
 
 export const inputClass =
-  "w-full min-h-11 rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-base text-zinc-100 placeholder-zinc-500 focus:border-amber-500 focus:outline-none";
+  "w-full min-h-12 rounded-xl border border-zinc-700 bg-zinc-900 px-4 text-base text-zinc-100 placeholder-zinc-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 focus:outline-none transition";
