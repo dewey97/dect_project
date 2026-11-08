@@ -1,11 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
-import { BrandMark } from "@/components/investigation/brand-mark";
 import { LandingHeroBackdrop } from "@/components/public/landing-hero-backdrop";
-import { UserNav } from "@/components/auth/user-nav";
-import { LandingBanner } from "@/components/public/landing-banner";
+import { HeroCaseCarousel } from "@/components/public/hero-case-carousel";
+import { LandingNavbar } from "@/components/public/landing-navbar";
 import { cn } from "@/lib/utils";
 
 const DETECTIVE_QUOTES = [
@@ -31,7 +29,19 @@ const DETECTIVE_QUOTES = [
   },
 ];
 
-export function LandingHero() {
+interface LandingHeroProps {
+  activePoster?: number;
+  setActivePoster?: (update: number | ((prev: number) => number)) => void;
+}
+
+export function LandingHero({
+  activePoster: externalActive,
+  setActivePoster: externalSetActive,
+}: LandingHeroProps = {}) {
+  const [internalActive, setInternalActive] = useState(0);
+  const activePoster = externalActive !== undefined ? externalActive : internalActive;
+  const setActivePoster = externalSetActive || setInternalActive;
+
   const [quoteIndex, setQuoteIndex] = useState(0);
   const [isFading, setIsFading] = useState(false);
 
@@ -49,48 +59,14 @@ export function LandingHero() {
 
   return (
     <>
-      {/* TOP ANNOUNCEMENT TAPE BANNER (DYNAMIC FROM DB) */}
-      <LandingBanner />
+      {/* SYNCHRONIZED TOP HEADER NAV (Includes Dynamic Banner & UserNav) */}
+      <LandingNavbar active="home" />
 
-      {/* STICKY HEADER NAV */}
-      <header className="sticky top-0 w-full z-50 border-b border-border/10 bg-card/90 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 lg:py-4 flex items-center justify-between">
-          <BrandMark href="/" />
-
-          {/* Quick links navigation on the right side */}
-          <nav className="hidden md:flex items-center gap-6 font-sans text-sm font-medium text-muted-foreground">
-            <a href="#bocanh" className="hover:text-primary transition-colors">
-              Bối cảnh
-            </a>
-            <a href="#vuan" className="hover:text-primary transition-colors">
-              Vụ án
-            </a>
-            <a href="#trai-nghiem-dieu-tra" className="hover:text-primary transition-colors">
-              Trải nghiệm phá án
-            </a>
-            <Link
-              href="/how-to-play"
-              className="hover:text-primary transition-colors"
-            >
-              Cách chơi
-            </Link>
-            <a href="#danhgia" className="hover:text-primary transition-colors">
-              Đánh giá
-            </a>
-            <a href="#faq" className="hover:text-primary transition-colors">
-              Hỏi & Đáp
-            </a>
-          </nav>
-
-          {/* Action controls (LogIn / User Profile) */}
-          <div className="flex items-center gap-3 text-muted-foreground">
-            <UserNav />
-          </div>
-        </div>
-      </header>
-
-      {/* HERO SECTION — FULL VIEWPORT ON MOBILE (FITS PHONE SCREEN EXACTLY) + FLASHLIGHT ON DESKTOP */}
-      <section className="relative w-full h-[calc(100svh-3.5rem)] min-h-[500px] lg:h-[85vh] flex items-center justify-center overflow-hidden">
+      {/* HERO SECTION — DESKTOP 50/50 SPLIT, MOBILE CENTER STACK */}
+      <section
+        id="vuan"
+        className="relative w-full min-h-[calc(100svh-3.5rem)] lg:h-[90vh] flex items-center justify-center overflow-hidden py-8 sm:py-10 lg:py-0"
+      >
         {/* Background static image + flashlight */}
         <div className="absolute inset-0 w-full h-full z-0">
           <LandingHeroBackdrop
@@ -99,20 +75,20 @@ export function LandingHero() {
           />
         </div>
 
-        {/* Foreground Content overlay */}
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-5 sm:px-6 flex justify-start lg:pl-0 pointer-events-none">
-          <div className="w-full max-w-md flex flex-col items-start gap-4 sm:gap-5 pointer-events-auto lg:translate-x-[-1.5rem]">
-            <h1 className="text-balance text-2xl sm:text-3xl lg:text-4xl font-black leading-tight tracking-tight uppercase">
-              Những vụ án chưa có lời giải...
+        {/* Foreground Content overlay: Desktop 50/50, Mobile Stack */}
+        <div className="relative z-10 w-full max-w-6xl xl:max-w-7xl mx-auto px-5 sm:px-6 flex flex-col lg:flex-row items-center justify-between gap-6 sm:gap-8 lg:gap-10 pointer-events-none">
+          {/* CỘT TRÁI (Desktop) / PHẦN TRÊN (Mobile): Title, Quote */}
+          <div className="w-full max-w-md lg:max-w-[460px] xl:max-w-[500px] flex flex-col items-center lg:items-start text-center lg:text-left gap-4 sm:gap-5 pointer-events-auto">
+            {/* TIÊU ĐỀ CHÍNH H1 */}
+            <h1 className="text-balance text-xl sm:text-2xl lg:text-3xl xl:text-[2.05rem] font-black leading-[1.25] tracking-tight uppercase font-sans">
+              Nền Tảng Phá Án Đa Hình Thức:{" "}
+              <span className="block mt-1.5 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-200 to-amber-500">
+                Trực Tuyến Online × Boardgame Hồ Sơ Vật Lý
+              </span>
             </h1>
 
-            {/* Subtitle value prop */}
-            <p className="text-xs sm:text-sm text-zinc-300 font-sans leading-relaxed">
-              Trải nghiệm hồ sơ trinh thám vật lý cao cấp kết hợp bàn điều tra trực tuyến.
-            </p>
-
             {/* Animated Rotating Detective Quote */}
-            <div className="w-full min-h-[52px] sm:min-h-[52px] flex items-center">
+            <div className="w-full min-h-[48px] sm:min-h-[52px] flex items-center justify-center lg:justify-start">
               <p
                 className={cn(
                   "text-pretty text-xs lg:text-sm leading-relaxed text-muted-foreground font-mono italic transition-all duration-400 ease-in-out",
@@ -125,17 +101,14 @@ export function LandingHero() {
                 </span>
               </p>
             </div>
+          </div>
 
-            {/* Primary Hero CTA: Phá Án Ngay */}
-            <div className="w-full mt-1 sm:mt-2 flex items-center">
-              <Link
-                href="/cases/case_000"
-                className="group inline-flex items-center justify-center gap-2.5 h-12 sm:h-13 px-8 sm:px-10 font-mono text-sm sm:text-base font-black uppercase tracking-wider rounded-md bg-amber-500 hover:bg-amber-400 text-black shadow-[0_0_25px_rgba(245,158,11,0.35)] hover:shadow-[0_0_35px_rgba(245,158,11,0.6)] border border-amber-300 transition-all duration-300 active:scale-[0.98] cursor-pointer"
-              >
-                <span>Phá Án Ngay</span>
-                <ChevronRight className="size-4.5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
+          {/* CỘT PHẢI (Desktop) / PHẦN DƯỚI (Mobile): HeroCaseCarousel */}
+          <div className="w-full max-w-lg lg:max-w-[560px] xl:max-w-[620px] flex flex-col items-center justify-center pointer-events-auto">
+            <HeroCaseCarousel
+              activePoster={activePoster}
+              setActivePoster={setActivePoster}
+            />
           </div>
         </div>
       </section>

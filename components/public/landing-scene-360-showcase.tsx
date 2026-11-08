@@ -44,8 +44,11 @@ export function LandingScene360Showcase() {
       const el = sectionRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
-      const scrollable = el.clientHeight - window.innerHeight;
-      setProgress(scrollable <= 0 ? 0 : clamp01(-rect.top / scrollable));
+      const viewportH = window.innerHeight;
+      const start = viewportH * 0.85;
+      const end = viewportH * 0.25;
+      const p = (start - rect.top) / (start - end);
+      setProgress(clamp01(p));
       if (portalRef.current) {
         const portalRect = portalRef.current.getBoundingClientRect();
         setSize({ w: portalRect.width, h: portalRect.height });
@@ -150,48 +153,31 @@ export function LandingScene360Showcase() {
   }
 
   return (
-    <section
+    <div
       ref={sectionRef}
       id="hien-truong-360"
-      aria-label="Hiện trường vụ án 000 — nhìn qua kính lúp thám tử"
-      className={
-        reduced ? "relative h-[100dvh] w-full" : "relative h-[280vh] w-full"
-      }
+      aria-label="Hiện trường vụ án 000 — không gian 360 độ"
+      className="relative w-full rounded-2xl border border-cyan-500/25 bg-gradient-to-br from-cyan-950/20 via-zinc-900/60 to-zinc-950/80 p-5 sm:p-7 shadow-[0_12px_32px_rgba(0,0,0,0.5)] overflow-hidden transition-all duration-300 hover:border-cyan-500/40 select-none"
     >
-      <div className="sticky top-0 h-[100dvh] w-full overflow-hidden bg-background flex items-center justify-center px-6 sm:px-8 select-none">
-        {/* Ambient backlight glow */}
-        <div
-          aria-hidden="true"
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full bg-amber-500/[0.05] blur-[160px] pointer-events-none"
-        />
-
-        <div className="relative w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-center z-10">
-          {/* Left Column: Story / Context */}
-          <div className="flex flex-col items-start text-left gap-4 max-w-lg">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black uppercase text-foreground tracking-tight font-sans text-balance leading-tight">
-              Ánh Mắt Nhìn Thấu Qua Khe Cửa
-            </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground font-mono leading-relaxed">
-              Căn phòng nơi nạn nhân tử vong bị khóa trái từ bên trong. Ghé mắt qua kính lúp quang học để soi chiếu từng góc cạnh hiện trường 360 độ và phát hiện các dấu vết chưa từng được ghi nhận.
-            </p>
-
-            {/* Sleek Progress Line */}
-            <div className="w-full max-w-xs mt-3 flex flex-col gap-1.5 font-mono">
-              <div className="flex items-center justify-between text-[0.7rem] text-muted-foreground tracking-wider uppercase">
-                <span>Tiến độ phóng đại kính lúp</span>
-                <span className="text-amber-400 font-semibold">{Math.round(progress * 100)}%</span>
-              </div>
-              <div className="w-full h-1 bg-zinc-800/80 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all duration-150 rounded-full"
-                  style={{ width: `${Math.max(2, Math.min(100, progress * 100))}%` }}
-                />
-              </div>
-            </div>
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+        {/* Right Column: Story / Context (Mobile: order-1, Desktop: order-2) */}
+        <div className="flex flex-col items-start text-left gap-3 max-w-lg z-10 order-1 md:order-2">
+          <div>
+            <h3 className="text-lg sm:text-xl font-bold uppercase tracking-tight text-cyan-200 font-sans">
+              Hiện Trường 360°
+            </h3>
+            <span className="text-[0.68rem] font-mono text-cyan-400/70 uppercase tracking-wider">
+              Khám nghiệm hiện trường phòng kín khóa trái
+            </span>
           </div>
 
-          {/* Right Column: Detective Magnifying Glass Stage */}
-          <div className="relative w-full flex items-center justify-center lg:justify-end py-6">
+          <p className="text-xs sm:text-[0.84rem] text-muted-foreground font-sans leading-relaxed">
+            Căn phòng án mạng bị khóa trái từ bên trong. Ghé mắt nhìn vào không gian hiện trường 360 độ: xoay chuyển góc nhìn, soi tìm từng vết máu ẩn và lật mở cơ chế phòng kín bí ẩn.
+          </p>
+        </div>
+
+        {/* Left Column: Detective Magnifying Glass Stage (Mobile: order-2, Desktop: order-1) */}
+        <div className="relative w-full flex items-center justify-center md:justify-start py-2 order-2 md:order-1">
             <div
               className="relative transition-transform duration-150 ease-out"
               style={{
@@ -201,7 +187,7 @@ export function LandingScene360Showcase() {
               {/* 1. Circular Magnifying Glass Lens Portal (Khung nhìn tròn qua thấu kính) */}
               <div
                 ref={portalRef}
-                className="relative z-10 w-[310px] h-[310px] sm:w-[420px] sm:h-[420px] lg:w-[480px] lg:h-[480px] xl:w-[520px] xl:h-[520px] rounded-full overflow-hidden bg-[#070503]"
+                className="relative z-10 w-[260px] h-[260px] sm:w-[340px] sm:h-[340px] lg:w-[390px] lg:h-[390px] xl:w-[420px] xl:h-[420px] rounded-full overflow-hidden bg-[#070503]"
                 style={{
                   boxShadow: "0 0 50px rgba(245,158,11,0.12)",
                 }}
@@ -307,6 +293,5 @@ export function LandingScene360Showcase() {
           </div>
         </div>
       </div>
-    </section>
   );
 }
