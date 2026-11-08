@@ -1,0 +1,1152 @@
+# =============================================================================
+# CASE BIBLE — FORM MẪU (điền theo thứ tự 7 bước, xem rules/01_solution_graph.md)
+# =============================================================================
+# Quy ước chung:
+# - Sự thật chỉ nằm ở MỘT chỗ: `timeline` + `evidence`. Mọi phần khác tham chiếu bằng mã.
+# - Mã nhân vật: chữ thường không dấu (vu, ha). Mã sự kiện: T-xx. Mã vật chứng: <bộ>-xx.
+#   Mã suy luận: D-xx. Mã checkpoint: cp-<số vụ>-<tên>.
+# - Giờ dạng "HH:MM" 24h. Ngày dạng "YYYY-MM-DD".
+# - `status` mỗi bước: draft | approved. Không sang bước sau khi bước trước chưa approved.
+# =============================================================================
+
+# ---------------------------------------------------------------- BƯỚC 0: Ý TƯỞNG MỞ
+# Tự do. Bung 3-5 premise, mỗi cái một cấu trúc khác nhau (library/skeletons.md).
+ideas:
+  seed: >
+    Tàu đêm đang chạy. Khoang 4 giường nằm mềm, 1 người chết. Ngoài 4 người trong khoang
+    còn vài người ra vào (tiếp viên toa, xe đẩy bán hàng, khách khoang bên, người lên ở ga giữa).
+    Độ khó vừa (3/5).
+  setting_facts_to_verify: # kiểm ở Bước 1 trước khi viết timeline
+    - "Giờ tàu SE Hà Nội – Sài Gòn qua các ga và đoạn đèo Hải Vân (giờ tàu thật của năm chọn)"
+    - "Đoạn đường sắt qua đèo Hải Vân có nhiều hầm ngắn, mất sóng điện thoại từng đoạn"
+    - "Vé tàu ghi họ tên + số giấy tờ; khách tự đổi giường trong khoang không qua nhà ga"
+    - "Khoang có chốt trong; tiếp viên toa giữ chìa mở khoang"
+  premises:
+    - id: P1
+      title: "Giường số 3"
+      skeleton: "Hai lớp sự thật"
+      victim: "Ông Lâm, 68 tuổi, khách giường tầng trên số 4"
+      culprit: "Người đàn ông giường số 2"
+      motive: >
+        Hung thủ định giết người đứng tên giường 3 (một nữ kiểm toán sắp tố cáo hắn).
+        Trước đó bà xin đổi giường với ông Lâm vì ông lớn tuổi không trèo lên tầng trên được.
+        Hung thủ ra tay trong bóng tối, giết nhầm ông Lâm.
+      twist: "Nạn nhân chết vì một lần đổi giường. Người chơi tìm kẻ thù của ông Lâm và không thấy ai đủ động cơ."
+      why_suspect_wrong_person: >
+        Con gái ông Lâm (khoang bên) có tranh chấp tiền với bố, ra vào khoang nhiều lần trong đêm.
+      layer_2_reveal: "Vé tàu và danh sách khách lệch với người nằm thực tế, kéo theo câu hỏi: ai là mục tiêu thật?"
+
+    - id: P2
+      title: "Tin nhắn sau hầm"
+      skeleton: "Xoắn ốc"
+      victim: "Chị Trâm, 34 tuổi, chủ chuỗi spa"
+      culprit: "Chồng sắp cưới của Trâm, nằm cùng khoang"
+      motive: "Trâm phát hiện anh ta lừa tiền và định hủy hôn khi xuống ga Đà Nẵng."
+      twist: >
+        Tin nhắn "Em ngủ đây, mai gặp" gửi đi lúc 03:12 khiến mọi người tin Trâm còn sống sau hầm.
+        Thực ra hung thủ soạn tin trên máy Trâm trong đoạn mất sóng lúc 02:40. Tin nằm chờ và tự gửi
+        khi tàu ra khỏi hầm. Lúc 03:12 hung thủ đang ngồi ở toa ăn có người làm chứng.
+      why_suspect_wrong_person: "Người phụ nữ giường đối diện có mâu thuẫn làm ăn với Trâm, và thức cả đêm."
+      spiral: "Mỗi vòng thẩm tra chồng sắp cưới lộ một lớp: nói dối giờ ngủ → nói dối chuyện tiền → nói dối chuyện điện thoại."
+
+    - id: P3
+      title: "Ga Đông Hà, 4 phút"
+      skeleton: "Đếm ngược"
+      victim: "Ông Phát, chủ thầu xây dựng"
+      culprit: "Một người không có vé khoang này: lên tàu ở ga trước, giả làm nhân viên xe đẩy"
+      motive: "Trả thù cho người anh chết trong vụ sập giàn giáo công trình của ông Phát."
+      twist: "Hung thủ không phải ai trong 4 người khoang. Hắn sẽ xuống ở ga kế tiếp. Người chơi phải chỉ ra hắn và ga hắn xuống trước khi tàu đến đó."
+      why_suspect_wrong_person: "Thư ký của ông Phát nằm cùng khoang, giữ két tiền và nói dối về giờ đi vệ sinh."
+      needs_dev_hint: "Không cần đồng hồ thật; mốc ga là áp lực trong truyện. Đáp án cuối = tên + ga xuống."
+
+    - id: P4
+      title: "Người con nhận tội"
+      skeleton: "Ngược dòng"
+      victim: "Bà Hạnh, 60 tuổi, bị bệnh tim"
+      culprit: "Con dâu, nằm giường dưới đối diện"
+      motive: "Bà Hạnh định sửa di chúc, gạch tên vợ chồng con trai trong lần lên Sài Gòn gặp luật sư."
+      twist: "Con trai bà tự nhận ngay đã đổi thuốc tim của mẹ. Câu hỏi không phải 'ai' mà là 'anh ta đang che cho ai, và vì sao lời tự thú sai một chi tiết'."
+      why_suspect_wrong_person: "Lời tự thú có sẵn, người chơi dễ chấp nhận ngay."
+
+    - id: P5
+      title: "Không ai giết ông Toàn"
+      skeleton: "Không có tội phạm"
+      victim: "Ông Toàn, 55 tuổi, chết do đột quỵ lúc 01:30"
+      culprit: "none (chết tự nhiên). Người dàn dựng: em vợ ông, cùng khoang"
+      motive: "Em vợ dàn hiện trường thành án mạng để đổ tội cho tình nhân của ông Toàn ở khoang bên, giành phần thừa kế cho chị gái."
+      twist: "Không có án mạng; có một tội khác (dàn dựng, vu khống) che sau."
+      why_suspect_wrong_person: "Tình nhân có dấu vân tay và vết son trên cốc của ông Toàn."
+      needs_dev_hint: "Kết luận cần cho phép đáp án 'không có hung thủ' + chỉ ra người dàn dựng."
+  recommendation: "P1, ghép thêm cơ chế tin nhắn chờ sau hầm của P2 làm ngoại phạm giả cho hung thủ"
+  chosen: "P1 + P2: giết nhầm do đổi giường, ngoại phạm bằng tin nhắn tự gửi khi tàu ra khỏi hầm"
+
+# ---------------------------------------------------------------- BƯỚC 1: PREMISE
+meta:
+  slug: case_001
+  title: "Đổi Giường"
+  synopsis: >
+    Rạng sáng 18/10/2025, tàu Thống Nhất vào ga Đà Nẵng sau khi vượt đèo Hải Vân trong mưa.
+    Ở khoang số 5 toa 7, ông Lâm, 68 tuổi, nằm chết trên giường dưới. Ông không có kẻ thù nào
+    đủ để giết mình. Cả ba người cùng khoang đều nói đêm đó họ ngủ say.
+  difficulty: 3
+  duration_minutes: 30
+  setting:
+    city: "Tàu Thống Nhất chiều Bắc – Nam, đoạn Huế – Đà Nẵng"
+    main_location: khoang_5_toa_7
+    date: "2025-10-17" # tối thứ Sáu 17/10, án mạng rạng sáng thứ Bảy 18/10 (đã kiểm)
+    weekday: "Thứ Sáu (đêm sang thứ Bảy)"
+    season_notes: >
+      Giữa mùa mưa miền Trung. Đèo Hải Vân mưa và sương mù về đêm. Tàu chạy chậm qua đèo.
+    train: >
+      Số hiệu hư cấu SE31 (không dùng số hiệu tàu thật để tránh lệch giờ tàu thật).
+      Giờ chạy hư cấu nhưng khớp thời gian thật của đoạn Huế – Đà Nẵng (103 km, 2,5–4 giờ).
+  axes:
+    case_type: "Án mạng"
+    skeleton: "Hai lớp sự thật" # lớp 1: ai muốn giết ông Lâm? lớp 2: ông Lâm không phải mục tiêu
+    culprit_count: 1
+    twist: ["Giết nhầm người (đổi giường)", "Thời điểm giả (tin nhắn chờ gửi sau hầm)"]
+    false_alibi: ["Tin nhắn hẹn giờ ngầm do mất sóng", "Nhân chứng tiếp viên toa (thật nhưng sau giờ chết)"]
+    opening_gate: "Đọc hiện trường: ai nằm giường nào"
+    tone: "Hồ sơ lạnh, không gian kín, mưa đêm"
+    main_clue_source: "Điện thoại nạn nhân + danh sách hành khách + lời khai"
+  diff_from_previous: # luật chống nhàm, so với case_000
+    - "Cấu trúc: Hai lớp sự thật (case_000: Phễu loại trừ)"
+    - "Twist: Giết nhầm + Thời điểm giả (case_000: Mồi nhử + Hai bàn tay)"
+    - "Ngoại phạm giả: tin nhắn chờ gửi (case_000: âm thanh nền + lịch TV)"
+    - "Cửa mở đầu: đọc hiện trường (case_000: tra SĐT)"
+    - "Bối cảnh: không gian kín đang di chuyển, 2025 (case_000: xóm ven sông, 2016)"
+  player_role: >
+    Bạn là điều tra viên đang nghỉ phép, đi toa 8 cùng chuyến. 03:50 trưởng tàu nhờ bạn giúp
+    trong lúc chờ công an ga Đà Nẵng (trực đêm, 05:00 mới đến).
+  deadline: >
+    05:00. Tàu chỉ được giữ ở ga Đà Nẵng đến lúc công an đến. Khải, Tú và Ngân có vé đến Đà Nẵng;
+    nếu chưa chỉ ra hung thủ, họ được rời tàu.
+  available_tools:
+    - "Hỏi chuyện từng người (lời kể, nói lại)"
+    - "Xem điện thoại nạn nhân; điện thoại của người tự nguyện đưa"
+    - "Sổ giao ca, danh sách khách, lịch chạy tàu (qua trưởng tàu)"
+    - "Trưởng tàu gọi trung tâm bán vé tra thông tin vé"
+    - "Bác sĩ đi cùng chuyến khám sơ bộ"
+    - "Kiểm tra tay, đồ đạc khi người đó đồng ý hoặc trưởng tàu yêu cầu"
+  ui_labels:
+    interrogation: "Hỏi chuyện"
+    motive: "Động cơ"
+    contradiction: "Chỗ vênh"
+    statement: "Lời kể"
+    indictment: "Chỉ mặt hung thủ"
+  breaks:
+    - { rule: "Vật chứng giám định (ADN, xét nghiệm)", reason: "Phá án trên tàu trong 70 phút; chỉ dùng thứ quan sát được tại chỗ" }
+  needs_dev:
+    - { mechanic: "ui_labels", why: "Chữ Thẩm tra / Lời khai / Kết luận đang viết cứng trong giao diện; vụ này cần Hỏi chuyện / Lời kể / Chỉ mặt hung thủ" }
+  status: draft
+
+truth:
+  victim: lam
+  culprit: khai
+  intended_victim: ngan # người hung thủ thật sự muốn giết
+  motive: >
+    Khải (giám đốc tài chính một công ty xây dựng) biết Ngân (kiểm toán viên) mang theo bằng chứng
+    hắn rút ruột 14 tỷ đồng, sáng 18/10 sẽ nộp cho đoàn thanh tra ở Đà Nẵng. Hắn mua vé cùng khoang
+    để giết cô trên tàu, lấy lại ổ cứng.
+  motive_code: silence-witness
+  method: >
+    Khoảng 02:35, khi tàu chạy trong các hầm qua đèo (tối, ồn), Khải dùng gối bịt mũi miệng người
+    nằm giường số 1, tin đó là Ngân (khăn quàng đỏ của Ngân còn để quên trên móc giường 1, người nằm trùm chăn kín đầu vì điều hòa lạnh). Người đó là ông Lâm: lúc 22:40, khi Khải đang ở toa ăn,
+    Ngân đã đổi giường số 1 (dưới) cho ông Lâm vì ông không trèo lên giường số 3 (trên) được.
+  weapon_evidence: "" # gối; chọn mã ở Bước 3
+  death_window: { from: "02:00", to: "03:00", best_estimate: "02:35" }
+  fake_time_trick: >
+    Sau khi giết, Khải cầm chiếc điện thoại không khóa trên gối giường 1 (tưởng của Ngân), mở cuộc
+    trò chuyện gần nhất, gõ "Em ngủ đây, mai nói chuyện nhé" rồi bấm gửi. Tàu đang trong hầm nên tin
+    nằm chờ. Khải ra phòng trực đầu toa 7 xin nước nóng lúc 02:50, ngồi nói chuyện với tiếp viên Sơn đến 03:15. Tàu ra khỏi hầm cuối lúc 03:05, tin tự gửi đi. Lúc đó Khải đang
+    ngồi trước mặt tiếp viên Sơn. Nhưng điện thoại là của ông Lâm, cuộc trò chuyện gần nhất là với
+    con gái ông, nên tin nhắn từ bố gửi con gái lại xưng "em".
+  twist: >
+    Lớp 1: người chơi tìm kẻ muốn giết ông Lâm. Con gái ông có tranh chấp tiền, cậu thanh niên giường 4
+    lấy trộm tiền của ông trong đêm, nhưng không ai đủ động cơ và thời cơ. Lớp 2: tin nhắn xưng "em"
+    và việc đổi giường cho thấy hung thủ nhắm người khác. Mục tiêu thật là Ngân, chính người phát hiện
+    thi thể.
+  backstory: >
+    Ngân làm kiểm toán độc lập cho công ty của Khải, phát hiện hợp đồng khống. Hai ngày trước,
+    Ngân báo sẽ gặp thanh tra ở Đà Nẵng. Khải mua vé ngay sau đó, chọn đúng khoang của Ngân.
+  weak_point_fixes: # đã duyệt ở cổng Bước 1
+    - "Không nhận ra ông già: khăn đỏ của Ngân để quên ở giường 1, nạn nhân trùm chăn kín đầu, khoang tối khi tàu trong hầm"
+    - "Ngân không thức: tàu trong hầm rất ồn; ông Lâm uống thuốc ngủ nhẹ Thảo đưa lúc 23:10 nên vùng vẫy yếu (thuốc này cũng là mồi nghi Thảo đầu độc)"
+    - "Ngoại phạm: phòng trực tiếp viên đầu toa thay cho toa ăn (toa ăn mở lúc 3 giờ sáng chưa chắc đúng thực tế)"
+  discovery: >
+    03:40 tàu vào ga Đà Nẵng. Ngân trèo xuống để chuẩn bị xuống tàu, phát hiện ông Lâm không thở,
+    gọi tiếp viên toa. Tàu được giữ lại ở ga. Công an ga trực đêm 05:00 mới đến; trưởng tàu nhờ người chơi (điều tra viên nghỉ phép, toa 8) giúp trong lúc chờ.
+  cast_draft: # chi tiết ở Bước 2
+    - { key: lam, role: victim, note: "Ông Lâm, 68 tuổi, hưu trí. Vé giường 3, ngủ giường 1. Điện thoại không đặt mật khẩu" }
+    - { key: ngan, role: suspect, note: "Ngân, 31 tuổi, kiểm toán viên. Vé giường 1, ngủ giường 3. Mục tiêu thật. Người phát hiện thi thể" }
+    - { key: khai, role: suspect, note: "Khải, 45 tuổi, giám đốc tài chính. Giường 2. Hung thủ" }
+    - { key: tu, role: suspect, note: "Tú, 24 tuổi, thợ điện. Giường 4. Lấy trộm tiền ông Lâm lúc 01:50; nói dối là ngủ suốt" }
+    - { key: thao, role: suspect, note: "Thảo, 40 tuổi, con gái ông Lâm, khoang bên. Tranh chấp tiền bán nhà; vào khoang đưa thuốc cho bố lúc 23:10" }
+    - { key: tiep_vien, role: witness, note: "Tiếp viên toa 7. Giữ chìa khoang. Giúp ông Lâm chuyển hành lý khi đổi giường lúc 22:40. Làm chứng Khải ngồi ở phòng trực 02:50–03:15" }
+  status: draft
+
+# ---------------------------------------------------------------- BƯỚC 2: SỰ THẬT
+characters:
+  - key: lam
+    name: "Nguyễn Văn Lâm"
+    aliases: ["lam", "ong lam", "nguyen van lam"]
+    role: victim
+    age: 68
+    occupation: "Giáo viên Toán nghỉ hưu"
+    relation_to_victim: "-"
+    phones: ["0913284417"]
+    address: "Ngõ Văn Chương, Hà Nội"
+    secret: "Không định chia tiền bán nhà cho Thảo; định đưa hết cho con trai ở Sài Gòn mở xưởng."
+    is_culprit: false
+    traits: "Người gầy nhỏ (1m58, 49 kg), đau khớp gối, không trèo được giường trên. Điện thoại đời cũ chỉ bắt 3G, không đặt mật khẩu. Đi tàu hay mang theo tiền mặt (đêm đó 5 triệu)."
+
+  - key: ngan
+    name: "Đỗ Thu Ngân"
+    aliases: ["ngan", "thu ngan", "do thu ngan"]
+    role: suspect
+    age: 31
+    occupation: "Kiểm toán viên, Công ty Kiểm toán Minh Tín (hư cấu)"
+    relation_to_victim: "Không quen. Người đổi giường cho ông Lâm. Người phát hiện thi thể."
+    phones: ["0985603312"]
+    address: "Cầu Giấy, Hà Nội"
+    secret: >
+      Mang theo ổ cứng chứa bằng chứng 14 tỷ hợp đồng khống của Công ty Xây dựng Hưng Phát.
+      08:00 sáng 18/10 gặp thanh tra ở Đà Nẵng. Lúc đầu giấu chuyện này vì cam kết bảo mật nghề nghiệp.
+    is_culprit: false
+    traits: "Cao 1m60, dáng nhỏ. Khăn quàng len đỏ."
+
+  - key: khai
+    name: "Phạm Đức Khải"
+    aliases: ["khai", "duc khai", "pham duc khai"]
+    role: suspect
+    age: 45
+    occupation: "Giám đốc tài chính, Công ty CP Xây dựng Hưng Phát (hư cấu)"
+    relation_to_victim: "Không quen ông Lâm. Là đối tượng Ngân đang kiểm toán."
+    phones: ["0903771950"]
+    address: "Long Biên, Hà Nội"
+    secret: "Rút ruột 14 tỷ qua hợp đồng khống. Mua vé cùng khoang để giết Ngân."
+    is_culprit: true
+    traits: "Bình tĩnh, nói nhiều với người lạ. Đeo đồng hồ thông minh dây rộng ở cổ tay trái (che vết cào sau án mạng)."
+
+  - key: tu
+    name: "Lê Văn Tú"
+    aliases: ["tu", "van tu", "le van tu"]
+    role: suspect
+    age: 24
+    occupation: "Thợ điện công trình"
+    relation_to_victim: "Không quen. Nằm giường 4."
+    phones: ["0377148265"]
+    address: "Thanh Hóa (lên tàu ở Hà Nội)"
+    secret: "Nợ cờ bạc online. 01:50 lấy trộm 2 triệu từ ví ông Lâm trong áo khoác treo ở giường 1."
+    is_culprit: false
+    traits: "Chơi game, đeo tai nghe đến gần sáng."
+
+  - key: thao
+    name: "Nguyễn Thị Thảo"
+    aliases: ["thao", "thi thao", "nguyen thi thao"]
+    role: suspect
+    age: 40
+    occupation: "Buôn bán quần áo online"
+    relation_to_victim: "Con gái. Nằm khoang 6 cùng toa (khoang 5 hết giường)."
+    phones: ["0912650388"]
+    address: "Hà Đông, Hà Nội"
+    secret: "Nợ 600 triệu, cần bố chia tiền bán nhà. Đêm đó cãi nhau với bố về chuyện này."
+    is_culprit: false
+    traits: "Lưu số bố là 'Bố'. Bố lưu số Thảo là 'Thảo' (không có chữ 'con')."
+
+  - key: son
+    name: "Hoàng Minh Sơn"
+    aliases: ["son", "minh son", "hoang minh son", "tiep vien"]
+    role: witness
+    age: 38
+    occupation: "Tiếp viên toa 7, tàu SE31"
+    relation_to_victim: "-"
+    phones: []
+    address: "-"
+    secret: "Ngủ gật ở phòng trực khoảng 01:10–02:45 (vi phạm ca trực), nên ban đầu khai là thức suốt."
+    is_culprit: false
+    traits: "Giữ chìa mở khoang. Ghi sổ giao ca."
+
+  - key: bac_si
+    name: "Bác sĩ Trần Quốc Bảo"
+    aliases: ["bao", "bac si", "bac si bao"]
+    role: witness
+    age: 52
+    occupation: "Bác sĩ đa khoa, khách toa 8"
+    relation_to_victim: "-"
+    phones: []
+    address: "Đà Nẵng"
+    secret: "-"
+    is_culprit: false
+    traits: "Được trưởng tàu nhờ khám sơ bộ lúc 03:55."
+
+locations:
+  - key: khoang_5
+    name: "Khoang 5, toa 7 (giường nằm mềm 4 chỗ)"
+    notes: >
+      Giường 1 dưới bên trái, giường 3 trên giường 1. Giường 2 dưới bên phải, giường 4 trên giường 2.
+      Móc treo đồ ở đầu mỗi giường. Cửa trượt, chốt trong; tiếp viên có chìa. Đèn ngủ tắt được.
+      Khi tàu vào hầm, cửa sổ tối hẳn và tiếng tàu dội lớn.
+  - key: khoang_6
+    name: "Khoang 6, toa 7"
+    notes: "Khoang sát bên. Thảo nằm giường 2, cùng ba khách lạ."
+  - key: phong_truc
+    name: "Phòng trực tiếp viên, đầu toa 7"
+    notes: "Có bình nước nóng, sổ giao ca. Đi bộ từ khoang 5 mất khoảng 20 giây."
+  - key: toa_an
+    name: "Toa ăn (toa 4)"
+    notes: "Phục vụ đến 23:30."
+  - key: ga_hue
+    name: "Ga Huế"
+    notes: "Dừng 10 phút."
+  - key: deo_hai_van
+    name: "Đoạn đường sắt qua đèo Hải Vân"
+    notes: "6 hầm (số 9 đến 14). Sóng điện thoại mất từng đoạn từ khi vào hầm đầu đến khi ra hầm cuối."
+  - key: ga_da_nang
+    name: "Ga Đà Nẵng"
+    notes: "Dừng 15 phút theo lịch; đêm 18/10 tàu bị giữ lại để công an làm việc."
+
+travel:
+  - {
+      from: khoang_5,
+      to: phong_truc,
+      distance_km: 0.01,
+      minutes: 0.3,
+      by: "đi bộ",
+    }
+  - {
+      from: khoang_5,
+      to: khoang_6,
+      distance_km: 0.003,
+      minutes: 0.1,
+      by: "đi bộ",
+    }
+  - {
+      from: khoang_5,
+      to: toa_an,
+      distance_km: 0.08,
+      minutes: 2,
+      by: "đi bộ qua 3 toa",
+    }
+  - {
+      from: ga_hue,
+      to: ga_da_nang,
+      distance_km: 103,
+      minutes: 160,
+      by: "tàu SE31 (01:00 đến 03:40)",
+    }
+
+# Lịch chạy hư cấu SE31: rời Hà Nội 12:00 (17/10), Đồng Hới 21:50, Đông Hà 23:35, Huế 00:50–01:00,
+# vào hầm đầu đèo Hải Vân 02:15, ra hầm cuối 03:05, ga Đà Nẵng 03:40.
+timeline:
+  # --- Trước chuyến tàu
+  - {
+      id: T-01,
+      date: "2025-10-14",
+      time: "09:12",
+      actors: [ngan],
+      location: "Hà Nội",
+      action: "Ngân gửi email hẹn thanh tra 08:00 ngày 18/10 tại Đà Nẵng, và nhờ phòng hành chính Hưng Phát (bên chi trả công tác phí) đặt vé.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-02,
+      date: "2025-10-14",
+      time: "14:30",
+      actors: [],
+      location: "Hà Nội",
+      action: "Phòng hành chính Hưng Phát đặt vé SE31 Hà Nội – Đà Nẵng cho Ngân: toa 7 khoang 5 giường 1. Email xác nhận CC kế toán trưởng và giám đốc tài chính.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-03,
+      date: "2025-10-14",
+      time: "21:47",
+      actors: [khai],
+      location: "Hà Nội",
+      action: "Khải tự mua vé online bằng tài khoản cá nhân: SE31 Hà Nội – Đà Nẵng, toa 7 khoang 5 giường 2.",
+      is_secret: true,
+      witnessed_by: [],
+    }
+  - {
+      id: T-04,
+      date: "2025-10-15",
+      time: "10:05",
+      actors: [thao],
+      location: "Hà Nội",
+      action: "Thảo mua vé Hà Nội – Sài Gòn cho bố (khoang 5 giường 3, giường dưới đã hết) và cho mình (khoang 6 giường 2).",
+      is_secret: false,
+      witnessed_by: [],
+    }
+
+  # --- Trên tàu, tối 17/10
+  - {
+      id: T-05,
+      date: "2025-10-17",
+      time: "12:00",
+      actors: [lam, ngan, khai, tu, thao],
+      location: "Ga Hà Nội",
+      action: "Tàu SE31 rời ga. Cả năm người lên tàu ở Hà Nội.",
+      is_secret: false,
+      witnessed_by: [son],
+    }
+  - {
+      id: T-06,
+      date: "2025-10-17",
+      time: "19:00",
+      end_time: "19:40",
+      actors: [lam, thao, tu],
+      location: toa_an,
+      action: "Ông Lâm và Thảo ăn tối. Ông Lâm rút tiền từ ví dày để trả. Tú ngồi bàn bên thấy.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-07,
+      date: "2025-10-17",
+      time: "22:30",
+      end_time: "23:30",
+      actors: [khai],
+      location: toa_an,
+      action: "Khải ra toa ăn uống bia đến khi toa ăn đóng.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-08,
+      date: "2025-10-17",
+      time: "22:40",
+      end_time: "22:50",
+      actors: [lam, ngan, son, tu],
+      location: khoang_5,
+      action: "Ông Lâm không trèo lên được giường 3. Ngân đề nghị đổi. Sơn giúp chuyển hành lý. Ông Lâm nằm giường 1, Ngân lên giường 3. Ngân để quên khăn quàng đỏ trên móc giường 1. Tú đeo tai nghe trên giường 4, có nhìn thấy.",
+      is_secret: true,
+      witnessed_by: [son, tu],
+    }
+  - {
+      id: T-09,
+      date: "2025-10-17",
+      time: "23:10",
+      end_time: "23:30",
+      actors: [thao, lam],
+      location: khoang_5,
+      action: "Thảo mang thuốc huyết áp và nửa viên thuốc ngủ ông vẫn dùng khi đi xa. Hai bố con cãi nhau nhỏ tiếng về tiền bán nhà; ông Lâm nói 'tiền đó bố cho thằng Hưng'. Thảo tắt đèn ngủ khi về.",
+      is_secret: false,
+      witnessed_by: [tu, ngan],
+    }
+  - {
+      id: T-10,
+      date: "2025-10-17",
+      time: "23:35",
+      actors: [],
+      location: "Ga Đông Hà",
+      action: "Tàu dừng 5 phút.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-11,
+      date: "2025-10-17",
+      time: "23:40",
+      actors: [khai],
+      location: khoang_5,
+      action: "Khải về khoang trong bóng tối. Thấy khăn đỏ trên móc giường 1 và người trùm chăn kín, tin là Ngân. Lên giường 2.",
+      is_secret: true,
+      witnessed_by: [],
+    }
+  - {
+      id: T-12,
+      date: "2025-10-17",
+      time: "23:40",
+      end_time: "03:41",
+      actors: [thao],
+      location: khoang_6,
+      action: "Thảo ngủ ở khoang 6. Một khách khoang 6 thức dậy lúc 01:00 (ga Huế) thấy Thảo đang ngủ. Sau 01:00 không ai xác nhận.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+
+  # --- Rạng sáng 18/10
+  - {
+      id: T-13,
+      date: "2025-10-18",
+      time: "00:50",
+      end_time: "01:00",
+      actors: [],
+      location: ga_hue,
+      action: "Tàu dừng ga Huế.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-14,
+      date: "2025-10-18",
+      time: "01:10",
+      end_time: "02:45",
+      actors: [son],
+      location: phong_truc,
+      action: "Sơn ngủ gật ở phòng trực.",
+      is_secret: true,
+      witnessed_by: [],
+    }
+  - {
+      id: T-15,
+      date: "2025-10-18",
+      time: "01:50",
+      actors: [tu, lam],
+      location: khoang_5,
+      action: "Tú trèo xuống, lấy 2 triệu trong ví ở túi áo khoác treo giường 1. Ông Lâm đang ngáy. Tú lên lại giường 4, ngủ với tai nghe khoảng 02:05.",
+      is_secret: true,
+      witnessed_by: [],
+    }
+  - {
+      id: T-16,
+      date: "2025-10-18",
+      time: "02:15",
+      actors: [],
+      location: deo_hai_van,
+      action: "Tàu vào hầm đầu tiên. Từ đây đến 03:05 máy 3G mất sóng hoàn toàn (mưa, đèo); máy 4G chập chờn giữa các hầm.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-17,
+      date: "2025-10-18",
+      time: "02:30",
+      end_time: "02:38",
+      actors: [khai, lam],
+      location: khoang_5,
+      action: "Tàu trong hầm, khoang tối, ồn. Khải dùng gối giường 1 đè mũi miệng người nằm đó. Ông Lâm buồn ngủ vì thuốc, vùng vẫy yếu, cào trúng cổ tay trái Khải. Ông Lâm tử vong.",
+      is_secret: true,
+      witnessed_by: [],
+    }
+  - {
+      id: T-18,
+      date: "2025-10-18",
+      time: "02:41",
+      actors: [khai],
+      location: khoang_5,
+      action: "Khải lấy điện thoại trên đầu giường 1 (không khóa), mở cuộc trò chuyện gần nhất tên 'Thảo', gõ 'Em ngủ đây, mai nói chuyện nhé' và bấm gửi. Không có sóng, tin ở trạng thái chờ.",
+      is_secret: true,
+      witnessed_by: [],
+    }
+  - {
+      id: T-19,
+      date: "2025-10-18",
+      time: "02:50",
+      end_time: "03:15",
+      actors: [khai, son],
+      location: phong_truc,
+      action: "Khải ra phòng trực đánh thức Sơn xin nước nóng, đứng nói chuyện về công trình ở Đà Nẵng. Sơn ghi giờ vào sổ giao ca vì khách hỏi giờ đến ga.",
+      is_secret: false,
+      witnessed_by: [son],
+    }
+  - {
+      id: T-20,
+      date: "2025-10-18",
+      time: "03:05",
+      actors: [],
+      location: deo_hai_van,
+      action: "Tàu ra khỏi hầm cuối. Có sóng. Tin chờ trên máy ông Lâm tự gửi đi. Điện thoại Tú và nhiều khách rung liên tục vì thông báo dồn.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-21,
+      date: "2025-10-18",
+      time: "03:15",
+      actors: [khai],
+      location: khoang_5,
+      action: "Khải về khoang, lên giường 2.",
+      is_secret: true,
+      witnessed_by: [],
+    }
+  - {
+      id: T-22,
+      date: "2025-10-18",
+      time: "03:30",
+      actors: [son],
+      location: khoang_5,
+      action: "Sơn gõ cửa các khoang báo sắp đến Đà Nẵng, bật đèn hành lang.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-23,
+      date: "2025-10-18",
+      time: "03:40",
+      actors: [ngan, lam],
+      location: ga_da_nang,
+      action: "Tàu vào ga Đà Nẵng. Ngân trèo xuống lấy khăn, chạm vào ông Lâm, thấy ông không thở. Gọi Sơn.",
+      is_secret: false,
+      witnessed_by: [khai, tu],
+    }
+  - {
+      id: T-24,
+      date: "2025-10-18",
+      time: "03:41",
+      actors: [thao],
+      location: khoang_6,
+      action: "Thảo bị đánh thức, đọc tin bố gửi lúc 03:05, chạy sang khoang 5.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-25,
+      date: "2025-10-18",
+      time: "03:45",
+      actors: [son],
+      location: ga_da_nang,
+      action: "Trưởng tàu báo công an ga, tàu bị giữ lại.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-26,
+      date: "2025-10-18",
+      time: "03:55",
+      actors: [bac_si],
+      location: khoang_5,
+      action: "Bác sĩ đi cùng chuyến khám sơ bộ: chết do ngạt, hàm bắt đầu cứng, ước khoảng 02:00–03:00; xuất huyết điểm ở mắt; sợi bông trong miệng; dưới móng tay phải có máu và vụn da.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - { id: T-27, date: "2025-10-17", time: "22:50", end_time: "03:40", actors: [ngan], location: khoang_5, action: "Ngân nằm giường 3 quay mặt vào vách, đeo bịt mắt, ngủ từ khoảng 23:45. Không nghe thấy gì vì tiếng tàu trong hầm.", is_secret: false, witnessed_by: [] }
+  - { id: T-28, date: "2025-10-17", time: "23:40", end_time: "02:30", actors: [khai], location: khoang_5, action: "Khải nằm giường 2, thức, chờ tàu vào đoạn hầm.", is_secret: true, witnessed_by: [] }
+  - { id: T-29, date: "2025-10-18", time: "02:05", end_time: "03:40", actors: [tu], location: khoang_5, action: "Tú ngủ trên giường 4, đeo tai nghe chống ồn.", is_secret: false, witnessed_by: [] }
+  - { id: T-30, date: "2025-10-18", time: "03:50", actors: [son], location: ga_da_nang, action: "Trưởng tàu biết có điều tra viên đi toa 8, nhờ người chơi giúp. Công an ga báo 05:00 mới đến.", is_secret: false, witnessed_by: [] }
+  - { id: T-31, date: "2025-10-18", time: "05:00", actors: [], location: ga_da_nang, action: "Hạn chót: công an ga đến; khách có vé Đà Nẵng được rời tàu.", is_secret: false, witnessed_by: [] }
+timeline_status: draft
+
+# ---------------------------------------------------------------- BƯỚC 3: DẤU VẾT
+evidence:
+  # ===== bo_a: Hồ sơ ban đầu (mở sẵn)
+  - {
+      code: A-01,
+      title: "Ghi chép sự việc của trưởng tàu",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-23, T-25],
+      content: "03:40 khách giường 3 khoang 5 toa 7 báo khách giường 1 không thở. Tàu giữ tại ga Đà Nẵng lúc 03:45, chờ công an ga đến 05:00.",
+      is_red_herring: false,
+    }
+  - {
+      code: A-02,
+      title: "Danh sách hành khách khoang 5 toa 7",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-02, T-03, T-04],
+      content: "Giường 1: Đỗ Thu Ngân, Hà Nội – Đà Nẵng. Giường 2: Phạm Đức Khải, Hà Nội – Đà Nẵng. Giường 3: Nguyễn Văn Lâm, Hà Nội – Sài Gòn. Giường 4: Lê Văn Tú, Hà Nội – Đà Nẵng.",
+      is_red_herring: false,
+    }
+  - {
+      code: A-03,
+      title: "Lịch chạy tàu SE31 và sơ đồ khoang",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-16, T-20],
+      content: "Huế 01:00, vào hầm số 9 khoảng 02:15, ra hầm số 14 khoảng 03:05, Đà Nẵng 03:40. Sơ đồ: giường 3 nằm trên giường 1, giường 4 nằm trên giường 2.",
+      is_red_herring: false,
+    }
+  - {
+      code: A-04,
+      title: "Nhận định của bác sĩ đi cùng chuyến",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-17, T-26],
+      content: "Tử vong do ngạt cơ học, khoảng 02:00–03:00. Xuất huyết điểm kết mạc. Sợi bông trắng trong khoang miệng. Dưới móng tay phải có máu và vụn da, ba móng gãy: nạn nhân đã cào kẻ tấn công. Đồng tử co, có thể đã uống thuốc an thần.",
+      is_red_herring: false,
+    }
+  - {
+      code: A-05,
+      title: "Lời kể của Ngân",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-08, T-09, T-23, T-27],
+      content: "S-01, S-02. Nghe hai bố con cãi nhau khoảng 23:15, ông Lâm nói 'tiền đó bố cho thằng Hưng'. Khoảng gần 2 giờ lơ mơ nghe ai trèo thang phía giường 2 – 4.",
+      is_red_herring: false,
+    }
+  - {
+      code: A-06,
+      title: "Lời kể của Khải",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-07, T-11, T-19],
+      content: "S-03, S-04. Ở toa ăn từ 22:30 đến khi toa đóng, về khoang khoảng 23:40 thì đèn đã tắt.",
+      is_red_herring: false,
+    }
+  - {
+      code: A-07,
+      title: "Lời kể của Tú",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-08],
+      content: "S-05. Có thấy mọi người đổi chỗ gì đó lúc tối nhưng không để ý.",
+      is_red_herring: false,
+    }
+  - {
+      code: A-08,
+      title: "Lời kể của Thảo",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-06, T-09, T-24],
+      content: "S-06, S-07. Bố mang theo 5 triệu tiền mặt. Lúc ăn tối có cậu thanh niên bàn bên cứ nhìn ví bố.",
+      is_red_herring: false,
+    }
+  - {
+      code: A-09,
+      title: "Lời kể của tiếp viên Sơn",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-08, T-19],
+      content: "S-08. 22:40 giúp ông Lâm và cô Ngân đổi giường 1 – 3. Khách giường 2 ra xin nước nóng 02:50 đến 03:15.",
+      is_red_herring: false,
+    }
+  - {
+      code: A-10,
+      title: "Sổ giao ca toa 7",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-08, T-14, T-19],
+      content: "22:45 hỗ trợ khách K5 đổi giường 1 ↔ 3. 01:05 kiểm tra toa. 02:52 khách K5 G2 hỏi giờ đến Đà Nẵng. 03:30 báo khách sắp đến ga. Không có dòng nào từ 01:05 đến 02:52.",
+      is_red_herring: false,
+    }
+
+  # ===== bo_hien_truong: hiện trường và điện thoại nạn nhân (mở sẵn)
+  - {
+      code: H-01,
+      title: "Ảnh hiện trường khoang 5",
+      kind: photo,
+      dossier: bo_hien_truong,
+      from_events: [T-17, T-23],
+      content: "Ông Lâm nằm giường 1, chăn kéo kín đến đầu, gối lệch xuống ngực. Vali của ông dưới gầm giường 1.",
+      is_red_herring: false,
+    }
+  - {
+      code: H-02,
+      title: "Gối giường 1",
+      kind: object,
+      dossier: bo_hien_truong,
+      from_events: [T-17],
+      content: "Vỏ gối bông trắng, vết ẩm nước bọt ở giữa.",
+      is_red_herring: false,
+    }
+  - {
+      code: H-03,
+      title: "Khăn quàng len đỏ trên móc giường 1",
+      kind: object,
+      dossier: bo_hien_truong,
+      from_events: [T-08],
+      content: "Khăn nữ. Ngân nhận là của mình, để quên khi đổi giường.",
+      is_red_herring: false,
+    }
+  - {
+      code: H-04,
+      title: "Áo khoác và ví ông Lâm",
+      kind: object,
+      dossier: bo_hien_truong,
+      from_events: [T-15],
+      content: "Treo móc giường 1. Ví còn 3 triệu.",
+      is_red_herring: false,
+    }
+  - {
+      code: H-05,
+      title: "Túi thuốc của ông Lâm",
+      kind: object,
+      dossier: bo_hien_truong,
+      from_events: [T-09],
+      content: "Vỉ thuốc huyết áp thiếu 1 viên. Vỉ thuốc ngủ thiếu nửa viên, nửa còn lại bẻ dở.",
+      is_red_herring: false,
+    }
+  - {
+      code: P-01,
+      title: "Thông tin máy ông Lâm",
+      kind: phone,
+      dossier: bo_hien_truong,
+      from_events: [],
+      content: "Máy đời cũ, chỉ hỗ trợ 3G. Không đặt mật khẩu.",
+      is_red_herring: false,
+    }
+  - {
+      code: P-02,
+      title: "Cuộc trò chuyện 'Thảo' trên máy ông Lâm",
+      kind: phone,
+      dossier: bo_hien_truong,
+      from_events: [T-18, T-20],
+      content: "12:05 'Bố lên tàu rồi'. 22:35 'Bố nằm giường trên, khó trèo quá'. 03:05 'Em ngủ đây, mai nói chuyện nhé'. Mọi tin trước đó ông đều xưng 'bố'.",
+      is_red_herring: false,
+    }
+
+  # ===== bo_b: Tuyến Tú (mở sau cp-001-tu)
+  - {
+      code: B-01,
+      title: "Lịch sử ví điện tử của Tú",
+      kind: document,
+      dossier: bo_b,
+      from_events: [T-15],
+      content: "01:56 nạp 2.000.000đ vào tài khoản game. Sau đó không có giao dịch nào đến 03:05.",
+      is_red_herring: false,
+    }
+  - {
+      code: B-02,
+      title: "Ảnh màn hình thông báo trên máy Tú",
+      kind: photo,
+      dossier: bo_b,
+      from_events: [T-20],
+      content: "14 thông báo cùng hiện lúc 03:05.",
+      is_red_herring: false,
+    }
+  - {
+      code: B-03,
+      title: "Tú nói lại",
+      kind: document,
+      dossier: bo_b,
+      from_events: [T-08, T-15, T-29],
+      content: "Thừa nhận lấy 2 triệu khoảng 01:50. Lúc đó ông Lâm đang ngáy to. Nhớ rõ ông Lâm và cô Ngân đổi giường lúc tối, khăn đỏ của cô để lại giường dưới.",
+      is_red_herring: false,
+    }
+  - {
+      code: B-04,
+      title: "Sơn nói lại",
+      kind: document,
+      dossier: bo_b,
+      from_events: [T-14],
+      content: "Thừa nhận ngủ gật ở phòng trực khoảng 01:10 đến khi khách giường 2 đánh thức.",
+      is_red_herring: false,
+    }
+
+  # ===== bo_c: Tuyến Thảo (mở sau cp-001-thao)
+  - {
+      code: C-01,
+      title: "Thảo nói lại",
+      kind: document,
+      dossier: bo_c,
+      from_events: [T-09, T-24],
+      content: "Thừa nhận đưa bố nửa viên thuốc ngủ như mọi lần đi xa, giấu vì sợ bị nghi đầu độc. Bố nhắn tin cho Thảo bao giờ cũng xưng 'bố'.",
+      is_red_herring: false,
+    }
+  - {
+      code: C-02,
+      title: "Nhãn vỉ thuốc ngủ và ý kiến bác sĩ",
+      kind: object,
+      dossier: bo_c,
+      from_events: [T-09],
+      content: "Nhãn: liều dùng 1 viên trước khi ngủ. Ông Lâm chỉ uống nửa viên. Bác sĩ: liều này chỉ làm buồn ngủ, không gây chết.",
+      is_red_herring: false,
+    }
+  - {
+      code: C-03,
+      title: "Kiểm tra tay Thảo, Tú, Ngân",
+      kind: document,
+      dossier: bo_c,
+      from_events: [T-26],
+      content: "Trưởng tàu và bạn xem tay ba người đã chạm vào nạn nhân hoặc đồ của nạn nhân (họ đồng ý): không có vết cào, vết xước.",
+      is_red_herring: false,
+    }
+
+  # ===== bo_n: Tuyến Ngân – mục tiêu thật (mở sau cp-001-target)
+  - {
+      code: N-01,
+      title: "Ngân nói lại",
+      kind: document,
+      dossier: bo_n,
+      from_events: [T-01],
+      content: "Kiểm toán Công ty Xây dựng Hưng Phát, phát hiện 14 tỷ hợp đồng khống. 08:00 sáng 18/10 gặp thanh tra ở Đà Nẵng. Chỉ làm việc với kế toán trưởng, chưa từng gặp mặt giám đốc tài chính.",
+      is_red_herring: false,
+    }
+  - {
+      code: N-02,
+      title: "Email xác nhận đặt vé của Ngân",
+      kind: document,
+      dossier: bo_n,
+      from_events: [T-02],
+      content: "Gửi 14/10 14:30 từ phòng hành chính Hưng Phát. SE31, toa 7, khoang 5, giường 1. CC: kế toán trưởng, Phạm Đức Khải (giám đốc tài chính).",
+      is_red_herring: false,
+    }
+  - {
+      code: N-03,
+      title: "Trung tâm bán vé trả lời trưởng tàu: vé giường 2",
+      kind: document,
+      dossier: bo_n,
+      from_events: [T-03],
+      content: "Phạm Đức Khải, tài khoản cá nhân, mua 14/10 lúc 21:47, chọn đích danh toa 7 khoang 5 giường 2.",
+      is_red_herring: false,
+    }
+
+  # ===== bo_k: Tuyến Khải (mở sau cp-001-khai)
+  - {
+      code: K-01,
+      title: "Kiểm tra tay Khải",
+      kind: document,
+      dossier: bo_k,
+      from_events: [T-17],
+      content: "Khải miễn cưỡng tháo đồng hồ theo yêu cầu của trưởng tàu. Dưới dây có 3 vết cào mới, còn rớm máu.",
+      is_red_herring: false,
+    }
+  - {
+      code: K-02,
+      title: "Mặt trong dây đồng hồ của Khải",
+      kind: object,
+      dossier: bo_k,
+      from_events: [T-17],
+      content: "Dính máu khô và vụn da. Ba vết cào song song khớp ba móng gãy của tay phải ông Lâm.",
+      is_red_herring: false,
+    }
+  - {
+      code: K-03,
+      title: "Khải nhận tội",
+      kind: document,
+      dossier: bo_k,
+      from_events: [T-17, T-18],
+      content: "Khai nhận. Tưởng người nằm giường 1 là Ngân vì thấy khăn đỏ.",
+      is_red_herring: false,
+    }
+evidence_status: draft
+
+deductions:
+  # --- Mở đầu: đọc hiện trường
+  - {
+      id: D-01,
+      type: scene,
+      subject: lam,
+      conclusion: "Ông Lâm chết ở giường 1 dù vé ghi giường 3: ông và Ngân đã đổi giường trước khi ngủ.",
+      required: [A-02, H-01],
+      optional: [A-05, A-09, A-10, P-02, H-03, A-07],
+      answer: "Ông Lâm và Ngân đổi giường 1 – 3",
+    }
+  # --- Lớp 1: Tú
+  - {
+      id: D-02,
+      type: motive,
+      subject: tu,
+      conclusion: "Ông Lâm mang 5 triệu, ví chỉ còn 3 triệu; Tú đã nhìn thấy ví lúc ăn tối.",
+      required: [A-08, H-04],
+      optional: [A-02],
+    }
+  - {
+      id: D-03,
+      type: contradiction,
+      subject: tu,
+      conclusion: "Tú nói ngủ suốt, nhưng Ngân nghe người trèo thang phía giường 2 – 4 khoảng 2 giờ.",
+      required: [A-07, A-05],
+      optional: [A-03, H-04],
+      breaks_statement: S-05,
+    }
+  - {
+      id: D-04,
+      type: time,
+      subject: tu,
+      conclusion: "Tú lấy tiền lúc 01:50 khi ông Lâm còn ngáy. Ông Lâm còn sống lúc 01:50.",
+      required: [B-03, B-01],
+      optional: [A-05],
+      answer: "01:50",
+    }
+  # --- Lớp 1: Thảo
+  - {
+      id: D-05,
+      type: motive,
+      subject: thao,
+      conclusion: "Thảo cần tiền bán nhà nhưng bố nói sẽ cho người khác.",
+      required: [A-08, A-05],
+      optional: [A-07],
+    }
+  - {
+      id: D-06,
+      type: contradiction,
+      subject: thao,
+      conclusion: "Thảo nói chỉ đưa thuốc huyết áp, nhưng vỉ thuốc ngủ thiếu nửa viên và bác sĩ thấy dấu hiệu đã uống thuốc an thần.",
+      required: [A-08, H-05],
+      optional: [A-04],
+      breaks_statement: S-06,
+    }
+  # --- Hội tụ lớp 1
+  - {
+      id: D-07,
+      type: elimination,
+      subject: "",
+      conclusion: "Thuốc ngủ không giết ông Lâm; ông chết vì ngạt và đã cào kẻ tấn công. Thảo, Tú, Ngân không có vết cào.",
+      required: [C-02, C-03, A-04],
+      optional: [H-02, C-01, B-03],
+    }
+  # --- Bước ngoặt: tin nhắn giả
+  - {
+      id: D-08,
+      type: contradiction,
+      subject: "",
+      conclusion: "Tin 03:05 không do ông Lâm viết: ông luôn xưng 'bố' với Thảo; ông chết trước 03:00; 03:05 là lúc tàu ra hầm cuối và máy 3G có sóng trở lại. Tin được soạn trong hầm, sau khi ông chết.",
+      required: [P-02, A-04, A-03],
+      optional: [P-01, B-02, C-01, A-08],
+    }
+  - {
+      id: D-09,
+      type: target,
+      subject: ngan,
+      conclusion: "Người soạn tin xưng 'em', tưởng chủ máy là phụ nữ trẻ. Người đó tin giường 1 là của Ngân (vé và khăn đỏ). Mục tiêu thật là Ngân.",
+      required: [P-02, A-02],
+      optional: [H-03, A-05, A-10, B-03],
+    }
+  # --- Lớp 2: Khải
+  - {
+      id: D-10,
+      type: motive,
+      subject: khai,
+      conclusion: "Khải là giám đốc tài chính công ty Ngân đang kiểm toán, được CC email vé của Ngân và mua vé giường 2 cùng khoang 7 giờ sau.",
+      required: [N-01, N-02, N-03],
+      optional: [A-02, A-06],
+      breaks_statement: S-03,
+    }
+  - {
+      id: D-11,
+      type: contradiction,
+      subject: khai,
+      conclusion: "Khải gọi người nằm giường 1 lúc 02:50 là 'cô gái'. Lúc đó giường 1 là ông Lâm. Khải ở toa ăn khi đổi giường nên là người duy nhất trong khoang vẫn tin Ngân nằm giường 1, đúng như người soạn tin.",
+      required: [A-06, A-10, P-02],
+      optional: [A-05, A-09, N-02],
+      breaks_statement: S-04,
+    }
+  - {
+      id: D-12,
+      type: culprit,
+      subject: khai,
+      conclusion: "Khải giết ông Lâm vì tưởng là Ngân, rồi soạn tin chờ gửi để tạo ngoại phạm sau 03:00.",
+      required: [K-01, K-02],
+      optional: [P-02, A-04, N-02, N-03, A-10, A-06, A-03, B-02, K-03],
+      answer: "Phạm Đức Khải",
+    }
+  # --- Phụ: tiếp viên
+  - {
+      id: D-13,
+      type: contradiction,
+      subject: son,
+      conclusion: "Sơn nói thức suốt ca, nhưng sổ giao ca trống từ 01:05 đến 02:52 và Khải kể phải đánh thức Sơn.",
+      required: [A-09, A-10, A-06],
+      optional: [B-04],
+      breaks_statement: S-08,
+    }
+deductions_status: draft
+
+statements:
+  - {
+      id: S-01,
+      character: ngan,
+      document: A-05,
+      claim: "Đổi giường với ông Lâm lúc 22:40 vì ông không trèo được.",
+      truthful: true,
+    }
+  - {
+      id: S-02,
+      character: ngan,
+      document: A-05,
+      claim: "Đi Đà Nẵng công tác bình thường, không quen ai trong khoang.",
+      truthful: false,
+      why_lie: "Cam kết bảo mật nghề nghiệp về cuộc gặp thanh tra.",
+      exposed_by: D-09,
+    }
+  - {
+      id: S-03,
+      character: khai,
+      document: A-06,
+      claim: "Không quen ai trong khoang, đi Đà Nẵng xem công trình.",
+      truthful: false,
+      why_lie: "Che giấu liên hệ với Ngân.",
+      exposed_by: D-10,
+    }
+  - {
+      id: S-04,
+      character: khai,
+      document: A-06,
+      claim: "02:50 ra phòng trực xin nước, anh tiếp viên đang ngủ gật phải gọi dậy. Lúc ra, cô gái giường 1 vẫn ngủ yên.",
+      truthful: false,
+      why_lie: "Củng cố ngoại phạm; lỡ lời vì vẫn tin giường 1 là Ngân.",
+      exposed_by: D-11,
+    }
+  - {
+      id: S-05,
+      character: tu,
+      document: A-07,
+      claim: "Ngủ suốt từ 23:30 đến khi tàu vào ga.",
+      truthful: false,
+      why_lie: "Giấu việc lấy trộm tiền.",
+      exposed_by: D-03,
+    }
+  - {
+      id: S-06,
+      character: thao,
+      document: A-08,
+      claim: "Chỉ đưa bố thuốc huyết áp.",
+      truthful: false,
+      why_lie: "Sợ bị nghi đầu độc bố.",
+      exposed_by: D-06,
+    }
+  - {
+      id: S-07,
+      character: thao,
+      document: A-08,
+      claim: "Tin bố nhắn lúc 03:05 xưng 'em', rất lạ.",
+      truthful: true,
+    }
+  - {
+      id: S-08,
+      character: son,
+      document: A-09,
+      claim: "Thức suốt ca, không ai ra vào hành lang trước 02:50.",
+      truthful: false,
+      why_lie: "Sợ kỷ luật vì ngủ gật.",
+      exposed_by: D-13,
+    }
+red_herrings:
+  - {
+      target: thao,
+      lure: "Tranh chấp tiền, đưa thuốc ngủ, nói dối về thuốc, không có ngoại phạm sau 01:00.",
+      resolved_by: D-07,
+    }
+  - {
+      target: tu,
+      lure: "Lấy trộm tiền nạn nhân, nói dối là ngủ suốt.",
+      resolved_by: D-04,
+    }
+  - {
+      target: ngan,
+      lure: "Người đổi giường, người phát hiện thi thể, giấu mục đích chuyến đi.",
+      resolved_by: D-09,
+    }
+  - {
+      target: son,
+      lure: "Giữ chìa khoang, nói dối về ca trực.",
+      resolved_by: D-13,
+    }
+surface_status: draft
+
+dossiers: # nháp, chốt ở Bước 6
+  - { key: bo_a, title: "Hồ sơ ban đầu", slot: 0, unlocked_by: "" }
+  - {
+      key: bo_hien_truong,
+      title: "Hiện trường và điện thoại nạn nhân",
+      slot: 1,
+      unlocked_by: "",
+    }
+  - { key: bo_b, title: "Tuyến Tú", slot: 2, unlocked_by: cp-001-tu }
+  - { key: bo_c, title: "Tuyến Thảo", slot: 3, unlocked_by: cp-001-thao }
+  - { key: bo_n, title: "Mục tiêu thật", slot: 4, unlocked_by: cp-001-target }
+  - { key: bo_k, title: "Tuyến Khải", slot: 5, unlocked_by: cp-001-khai }
+documents_status: draft
+
+# ---------------------------------------------------------------- BƯỚC 7: CHECKPOINT
+checkpoints:
+  - id: cp-xxx-0
+    kind: phone_lookup # xem rules/02_gameplay_constraints.md
+    title: ""
+    question: ""
+    subject: "" # mã nhân vật (thẩm tra)
+    depends_on: []
+    tests: [] # D-xx; đáp án sinh từ suy luận, không gõ tay
+    unlocks_dossier: ""
+    hints: [] # 3 cấp: hướng nhìn → tài liệu cụ thể → gần lời giải
+    narrative: "" # lời dẫn khi mở khóa
+epilogues:
+  - id: ""
+    title: ""
+    text: ""
+checkpoints_status: draft

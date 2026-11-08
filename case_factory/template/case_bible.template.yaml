@@ -1,0 +1,164 @@
+# =============================================================================
+# CASE BIBLE — FORM MẪU (điền theo thứ tự 7 bước, xem rules/01_solution_graph.md)
+# =============================================================================
+# Quy ước chung:
+# - Sự thật chỉ nằm ở MỘT chỗ: `timeline` + `evidence`. Mọi phần khác tham chiếu bằng mã.
+# - Mã nhân vật: chữ thường không dấu (vu, ha). Mã sự kiện: T-xx. Mã vật chứng: <bộ>-xx.
+#   Mã suy luận: D-xx. Mã checkpoint: cp-<số vụ>-<tên>.
+# - Giờ dạng "HH:MM" 24h. Ngày dạng "YYYY-MM-DD".
+# - `status` mỗi bước: draft | approved. Không sang bước sau khi bước trước chưa approved.
+# =============================================================================
+
+# ---------------------------------------------------------------- BƯỚC 0: Ý TƯỞNG MỞ
+# Tự do. Bung 3-5 premise, mỗi cái một cấu trúc khác nhau (library/skeletons.md).
+ideas:
+  seed: "" # hình ảnh / thủ pháp / bối cảnh / câu hỏi đạo đức
+  premises:
+    - { skeleton: "", victim: "", culprit: "", motive: "", twist: "", why_suspect_wrong_person: "" }
+  chosen: "" # premise được chọn, hoặc "ghép 1+3"
+
+# ---------------------------------------------------------------- BƯỚC 1: PREMISE
+meta:
+  slug: case_xxx
+  title: ""
+  synopsis: "" # 2-3 câu cho người chơi, không lộ hung thủ
+  difficulty: 3 # 1-5
+  duration_minutes: 30
+  setting:
+    city: ""
+    main_location: "" # hiện trường
+    date: "YYYY-MM-DD"
+    weekday: "" # PHẢI khớp lịch thật của ngày trên
+    season_notes: "" # thời tiết, cây cối, mùa vụ đúng với ngày trên
+  player_role: "" # người chơi là ai trong truyện (điều tra viên, hành khách, phóng viên...)
+  deadline: "" # hạn chót trong truyện, nếu có (vd: 05:00 công an đến, nghi phạm được rời đi)
+  available_tools: [] # người chơi có gì trong tay: chỉ dùng vật chứng khớp danh sách này
+  ui_labels: # chữ hiển thị trên giao diện cho vụ này (cần dev: needs_dev ui_labels)
+    interrogation: "Thẩm tra" # vd: Hỏi chuyện, Đối chất
+    motive: "Động cơ"
+    contradiction: "Mâu thuẫn"
+    statement: "Lời khai" # vd: Lời kể
+    indictment: "Kết luận" # vd: Chỉ mặt hung thủ
+  axes: # luật chống nhàm: khác vụ trước ở ≥3 trục (FORMULA.md)
+    case_type: "" # án mạng | mất tích | trộm | tống tiền | tự sát nghi vấn | ...
+    skeleton: ""
+    culprit_count: 1
+    twist: []
+    false_alibi: []
+    opening_gate: ""
+    tone: ""
+    main_clue_source: ""
+  breaks: [] # khung mặc định bị phá: { rule: "", reason: "" }
+  needs_dev: [] # cơ chế engine chưa có: { mechanic: "", why: "" }
+  status: draft
+
+truth:
+  victim: "" # mã nhân vật
+  culprit: "" # mã nhân vật; nhiều người thì dùng danh sách; "none" nếu không có tội phạm
+  motive: "" # 1 câu
+  motive_code: "" # mã ngắn dùng chấm điểm (vd: romantic-jealousy)
+  method: ""
+  weapon_evidence: "" # mã vật chứng
+  death_window: { from: "HH:MM", to: "HH:MM", best_estimate: "HH:MM" }
+  twist: "" # vì sao người chơi nghi sai người lúc đầu
+  backstory: "" # quá khứ tạo động cơ (nếu có)
+  status: draft
+
+# ---------------------------------------------------------------- BƯỚC 2: SỰ THẬT
+characters:
+  - key: ""
+    name: ""
+    aliases: [] # mọi cách gõ tên người chơi có thể dùng
+    role: suspect # victim | suspect | witness | related
+    age: 0
+    occupation: ""
+    relation_to_victim: ""
+    phones: [] # chỉ chữ số
+    address: ""
+    secret: "" # điều nhân vật giấu (lý do nói dối)
+    is_culprit: false
+
+locations:
+  - key: ""
+    name: ""
+    notes: "" # đặc điểm có ý nghĩa điều tra (gần đường tàu, có camera...)
+travel: # thời gian di chuyển giữa các địa điểm (phút)
+  - { from: "", to: "", distance_km: 0, minutes: 0, by: "" }
+
+timeline:
+  # Mỗi nghi phạm phải có vị trí cho TOÀN BỘ death_window.
+  - id: T-01
+    date: "YYYY-MM-DD"
+    time: "HH:MM"
+    end_time: "HH:MM" # tùy chọn
+    actors: []
+    location: ""
+    action: ""
+    is_secret: false # true = người chơi phải tự suy ra
+    witnessed_by: []
+timeline_status: draft
+
+# ---------------------------------------------------------------- BƯỚC 3: DẤU VẾT
+evidence:
+  - code: ""
+    title: ""
+    kind: document # document | photo | object | audio | phone | hotspot
+    dossier: "" # dossier_key chứa vật chứng
+    from_events: [] # T-xx sinh ra dấu vết này (bắt buộc, kể cả red herring)
+    content: "" # thông tin người chơi đọc/nhìn thấy được
+    is_red_herring: false
+    file: "" # đường dẫn tệp nếu đã có
+evidence_status: draft
+
+# ---------------------------------------------------------------- BƯỚC 4: SUY LUẬN
+deductions:
+  - id: D-01
+    type: identify # identify | motive | contradiction | clear | elimination | time | culprit | scene | target | (tự đặt thêm nếu cần)
+    subject: "" # mã nhân vật
+    conclusion: ""
+    required: [] # ≥2 mã vật chứng (trừ identify)
+    optional: [] # mã liên quan, chọn thêm không bị phạt
+    answer: "" # nếu checkpoint hỏi đáp án dạng giờ/mã/chữ
+    breaks_statement: "" # S-xx nếu là contradiction
+deductions_status: draft
+
+# ---------------------------------------------------------------- BƯỚC 5: BỀ MẶT
+statements:
+  - id: S-01
+    character: ""
+    document: "" # mã vật chứng của biên bản lời khai
+    claim: ""
+    truthful: true
+    why_lie: "" # bắt buộc khi truthful: false
+    exposed_by: "" # D-xx, bắt buộc khi truthful: false
+red_herrings:
+  - target: "" # mã nhân vật hoặc vật chứng
+    lure: "" # vì sao gây nghi
+    resolved_by: "" # D-xx
+surface_status: draft
+
+# ---------------------------------------------------------------- BƯỚC 6: TÀI LIỆU
+dossiers:
+  - key: "" # dossier_key
+    title: ""
+    slot: 0 # slot 0 và 1 mở từ đầu
+    unlocked_by: "" # checkpoint id; trống ở slot 0/1; "indictment" = mở sau kết luận
+documents_status: draft
+
+# ---------------------------------------------------------------- BƯỚC 7: CHECKPOINT
+checkpoints:
+  - id: cp-xxx-0
+    kind: phone_lookup # xem rules/02_gameplay_constraints.md
+    title: ""
+    question: ""
+    subject: "" # mã nhân vật (thẩm tra)
+    depends_on: []
+    tests: [] # D-xx; đáp án sinh từ suy luận, không gõ tay
+    unlocks_dossier: ""
+    hints: [] # 3 cấp: hướng nhìn → tài liệu cụ thể → gần lời giải
+    narrative: "" # lời dẫn khi mở khóa
+epilogues:
+  - id: ""
+    title: ""
+    text: ""
+checkpoints_status: draft

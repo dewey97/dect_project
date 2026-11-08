@@ -1,0 +1,1383 @@
+# =============================================================================
+# CASE BIBLE — VỤ #000 "TRỐN TÌM" (bản chuẩn hóa theo form mẫu)
+# =============================================================================
+# Nguồn: docs/cases/case_000/01_design/case_design.md, gameplay_design.md,
+#        db/schema/36_backfill_interrogation_criteria.sql, public/documents/case_000/.
+# Các điểm đã sửa so với tài liệu cũ: xem DECISIONS.md cùng thư mục.
+# Mã vật chứng: A = hồ sơ ban đầu, H = hiện trường, B, C, TT, E, F, K = các bộ mở dần.
+# Không dùng tiền tố D-, T-, S- cho vật chứng (trùng mã suy luận, sự kiện, lời khai).
+# Cột `legacy` ghi mã cũ trong tài liệu thiết kế để đối chiếu khi import.
+# =============================================================================
+
+# ---------------------------------------------------------------- BƯỚC 1: PREMISE
+meta:
+  slug: case_000
+  title: "Trốn Tìm"
+  synopsis: >
+    Sáng 25/07/2016, Nguyễn Văn Khang, chủ cho vay nặng lãi ở xóm Bờ Sông, được phát hiện
+    tử vong trong phòng khách. Đêm trước, bốn người quen cũ lần lượt ghé nhà anh ta.
+    Ai cũng có lý do, và ai cũng nói dối một điều gì đó.
+  difficulty: 3
+  duration_minutes: 30
+  setting:
+    city: "Hà Nội (hư cấu)"
+    main_location: home_khang
+    date: "2016-07-24"
+    weekday: "Chủ nhật" # đã kiểm: 24/07/2016 là Chủ nhật
+    season_notes: >
+      Giữa hè, nóng ẩm, trời tối khoảng 19:15. Tháng 7 là mùa hoa bằng lăng tím nở rộ;
+      hoa xoan đã tàn từ tháng 4 (vì vậy dấu vết thực vật là cánh hoa bằng lăng).
+  status: approved
+
+truth:
+  victim: khang
+  culprit: ha
+  motive: >
+    Hà yêu Khang mù quáng. Khi Khang bất tỉnh, Hà mở điện thoại của anh ta và đọc được
+    tin nhắn Khang hẹn bỏ trốn vào Đà Lạt với Thảo Vy chuyến bay 06:15 sáng hôm sau.
+  motive_code: romantic-jealousy
+  method: >
+    Dùng mảnh thủy tinh của bình trà vỡ (vỡ từ lúc Tùng xô xát) cứa đứt động mạch cảnh
+    của Khang đang bất tỉnh, rồi cắt một lọn tóc mai bên trái mang đi.
+  weapon_evidence: H-03
+  death_window: { from: "20:45", to: "21:15", best_estimate: "21:00" }
+  twist: >
+    Tùng có động cơ mạnh nhất, nói dối là không đến và để lại vân tay, nên người chơi
+    tưởng đã tìm ra hung thủ. Nhưng Tùng chỉ xô Khang ngất lúc 20:05 và rời đi 20:15;
+    vết thương chí mạng xảy ra ~21:00. Hung thủ là người "hiền lành nhất" và có
+    ngoại phạm trông chắc chắn nhất.
+  backstory: >
+    Chiều 24/07/1996, nhóm trẻ xóm Bờ Sông (Khang, Tùng, Hà, Mai, bé Nguyễn Gia Huy 7 tuổi,
+    em trai Tùng, câm bẩm sinh và bị bệnh tim) chơi trốn tìm. Khang cài then sắt bên ngoài
+    tủ gỗ lim nơi Huy trốn rồi bỏ đi. Huy chết ngạt. Vụ việc được khép là tai nạn.
+    Hai ngày trước án mạng (22/07/2016), trong bữa nhậu xóm cũ, Khang say rượu khoe lại
+    "chiến tích nhốt thằng câm trong tủ". Ngày án mạng là đúng ngày giỗ thứ 20 của Huy.
+  status: approved
+
+# ---------------------------------------------------------------- BƯỚC 2: SỰ THẬT
+characters:
+  - key: khang
+    name: "Nguyễn Văn Khang"
+    aliases: ["khang"]
+    role: victim
+    age: 27
+    occupation: "Cho vay nặng lãi (bốc họ)"
+    relation_to_victim: "-"
+    phones: ["0904118826"]
+    address: "Số 14 Đường Bờ Sông, phường Phân khu Cảng"
+    secret: >
+      Chuẩn bị bỏ trốn vào Đà Lạt với Thảo Vy, mang theo tiền thế chấp mảnh đất hương hỏa.
+    is_culprit: false
+
+  - key: mai
+    name: "Nguyễn Ngọc Mai"
+    aliases: ["mai", "ngoc mai", "nguyen ngoc mai"]
+    role: suspect
+    age: 27
+    occupation: "Giáo viên mầm non"
+    relation_to_victim: "Em họ. Đang đòi lại mảnh đất 200m² hương hỏa Khang lén đứng tên và thế chấp."
+    phones: ["0915662204"]
+    address: "Phố Đoàn Kết"
+    secret: "Không có. Mai nói thật; Mai chỉ bỏ qua chi tiết chồng ở lại."
+    is_culprit: false
+
+  - key: vu
+    name: "Lê Quang Vũ"
+    aliases: ["vu", "quang vu", "le quang vu", "lech pha"]
+    role: suspect
+    age: 30
+    occupation: "Kỹ sư điện"
+    relation_to_victim: 'Chồng Mai. Con nợ 300 triệu biệt danh "Lệch Pha" (kỹ sư điện, mắt lác).'
+    phones: ["0988200991"]
+    address: "Phố Đoàn Kết"
+    secret: "Giấu vợ khoản nợ 300 triệu. Ở lại nhà Khang 25 phút xin khất nợ."
+    is_culprit: false
+
+  - key: tung
+    name: "Nguyễn Thanh Tùng"
+    aliases: ["tung", "thanh tung", "nguyen thanh tung"]
+    role: suspect
+    age: 29
+    occupation: "Thợ nề tự do"
+    relation_to_victim: "Bạn thời thơ ấu. Anh trai bé Gia Huy."
+    phones: ["0912331888"]
+    address: "Cầu Bươu"
+    secret: "Đã sang đối chất và xô Khang ngất; tưởng Khang sắp chết nên bỏ chạy."
+    is_culprit: false
+
+  - key: ha
+    name: "Trần Thị Hà"
+    aliases: ["ha", "tran ha", "tran thi ha", "ha ke toan"]
+    role: suspect
+    age: 27
+    occupation: "Kế toán"
+    relation_to_victim: "Bạn gái Khang, bạn thời thơ ấu."
+    phones: ["0936504771"]
+    address: "Phòng trọ ngõ 61 phố Kim Liên, cách đường sắt gần nhất khoảng 2.5 km"
+    secret: "Rình nhà Khang từ 19:20, vào nhà 20:45, giết Khang ~21:00."
+    is_culprit: true
+
+  - key: dat
+    name: "Trần Văn Đạt"
+    aliases: ["dat", "dat ga", "tran van dat", "dat ga cho cang"]
+    role: suspect
+    age: 35
+    occupation: "Bán gà ở Chợ Cảng"
+    relation_to_victim: "Con nợ 50 triệu."
+    phones: ["0984180357"]
+    address: "Chợ Cảng"
+    secret: "Không có. Gọi Khang 20:09 để khất nợ, Khang không nghe."
+    is_culprit: false
+
+  - key: lua
+    name: "Bà Phạm Thị Lụa"
+    aliases: ["lua", "ba lua"]
+    role: witness
+    age: 68
+    occupation: "Hưu trí, hàng xóm sát vách"
+    relation_to_victim: "Hàng xóm. Người phát hiện thi thể."
+    phones: []
+    address: "Số 16 Đường Bờ Sông"
+    secret: "-"
+    is_culprit: false
+
+  - key: vy
+    name: "Lý Thảo Vy"
+    aliases: ["vy", "thao vy"]
+    role: related
+    age: 23
+    occupation: "Nhân viên spa"
+    relation_to_victim: "Người tình mới, hẹn cùng Khang bay vào Đà Lạt."
+    phones: ["0977345102"]
+    address: "-"
+    secret: "-"
+    is_culprit: false
+
+  - key: huy
+    name: "Nguyễn Gia Huy"
+    aliases: ["huy", "gia huy"]
+    role: related
+    age: 7
+    occupation: "-"
+    relation_to_victim: "Em trai Tùng, mất năm 1996 (1989–1996)."
+    phones: []
+    address: "-"
+    secret: "-"
+    is_culprit: false
+
+locations:
+  - key: home_khang
+    name: "Nhà Khang, số 14 Đường Bờ Sông"
+    notes: "Cửa sổ phòng khách nhìn ra gác chắn đường sắt (khoảng 80 m). Cây bằng lăng trước cổng."
+  - key: home_mai_vu
+    name: "Nhà Mai và Vũ, Phố Đoàn Kết"
+    notes: "Mạng truyền hình cáp khu Đoàn Kết mất tín hiệu 20:10–22:00 đêm 24/07."
+  - key: quan_bia_88
+    name: "Quán Bia 88"
+    notes: "Cách nhà Khang 3.8 km. Chủ quán ghi sổ thu chi theo bàn."
+  - key: cho_cang
+    name: "Chợ Cảng"
+    notes: "Chợ đêm, Đạt bán hàng 18:00–22:00."
+  - key: home_tung
+    name: "Nhà Tùng, Cầu Bươu"
+    notes: "Tuyến xe buýt 21 nối Đường Bờ Sông – Cầu Bươu."
+  - key: room_ha
+    name: "Phòng trọ Hà, ngõ 61 Kim Liên"
+    notes: "Không nghe được còi tàu (cách đường sắt ~2.5 km, nhiều nhà cao chắn)."
+  - key: rail_gate
+    name: "Gác chắn đường sắt Bờ Sông"
+    notes: "Tàu SE19 qua lúc 20:30–20:33, kéo còi và chuông gác chắn."
+
+travel:
+  - {
+      from: home_khang,
+      to: home_mai_vu,
+      distance_km: 9,
+      minutes: 40,
+      by: "xe máy, giờ cao điểm",
+    }
+  - {
+      from: home_khang,
+      to: quan_bia_88,
+      distance_km: 3.8,
+      minutes: 15,
+      by: "xe ôm công nghệ",
+    }
+  - {
+      from: home_khang,
+      to: home_tung,
+      distance_km: 6,
+      minutes: 30,
+      by: "xe buýt 21",
+    }
+  - { from: home_khang, to: room_ha, distance_km: 4, minutes: 15, by: "xe máy" }
+
+timeline:
+  # --- Trước án mạng
+  - {
+      id: T-01,
+      date: "1996-07-24",
+      time: "16:00",
+      actors: [khang, huy, tung, ha, mai],
+      location: home_khang,
+      action: "Trò trốn tìm. Khang cài then tủ gỗ nhốt Huy. Huy chết ngạt.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-02,
+      date: "2016-07-22",
+      time: "20:00",
+      actors: [khang, tung, ha, mai, vu],
+      location: "quán nhậu xóm cũ",
+      action: "Khang say, khoe chuyện nhốt Huy trong tủ. Tùng chết lặng.",
+      is_secret: false,
+      witnessed_by: [ha, mai, vu],
+    }
+  - {
+      id: T-03,
+      date: "2016-07-24",
+      time: "17:30",
+      actors: [khang],
+      location: home_khang,
+      action: "Chị Lan quán nước gọi Khang (nhiễu).",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-04,
+      date: "2016-07-24",
+      time: "18:00",
+      actors: [khang],
+      location: home_khang,
+      action: "Bình Còi gọi Khang (nhiễu).",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-05,
+      date: "2016-07-24",
+      time: "18:15",
+      actors: [vu, khang],
+      location: "đường",
+      action: "Vũ gọi Khang báo đang cùng vợ sang.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-06,
+      date: "2016-07-24",
+      time: "18:30",
+      end_time: "19:00",
+      actors: [mai, vu, khang],
+      location: home_khang,
+      action: "Mai đòi đất, cãi nhau, ném xấp đơn khởi kiện xuống sàn.",
+      is_secret: false,
+      witnessed_by: [lua],
+    }
+  # --- Mai về
+  - {
+      id: T-07,
+      date: "2016-07-24",
+      time: "19:00",
+      actors: [mai],
+      location: home_khang,
+      action: "Mai nổ máy xe về một mình, đúng lúc nhạc hiệu Thời sự VTV1 nhà bà Lụa cất lên.",
+      is_secret: false,
+      witnessed_by: [lua],
+    }
+  - {
+      id: T-08,
+      date: "2016-07-24",
+      time: "19:40",
+      end_time: "22:00",
+      actors: [mai],
+      location: home_mai_vu,
+      action: "Mai về đến nhà, xem TV; 20:10 mất tín hiệu cáp.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  # --- Tùng gọi, Vũ ở lại
+  - {
+      id: T-09,
+      date: "2016-07-24",
+      time: "19:00",
+      actors: [tung, khang],
+      location: home_khang,
+      action: "Tùng gọi Khang hẹn gặp tối nay.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-10,
+      date: "2016-07-24",
+      time: "19:00",
+      end_time: "19:25",
+      actors: [vu, khang],
+      location: home_khang,
+      action: "Vũ ở lại xin khất nợ. Khang đập sổ nợ, dọa báo vợ Vũ.",
+      is_secret: true,
+      witnessed_by: [],
+    }
+  - {
+      id: T-11,
+      date: "2016-07-24",
+      time: "19:20",
+      actors: [ha],
+      location: home_khang,
+      action: "Hà mặc áo gió xám trùm đầu đứng nép dưới cây bằng lăng trước cổng nhà Khang.",
+      is_secret: true,
+      witnessed_by: [],
+    }
+  - {
+      id: T-12,
+      date: "2016-07-24",
+      time: "19:25",
+      actors: [vu],
+      location: home_khang,
+      action: "Vũ ra cổng, thấy bóng người áo gió trùm đầu dưới gốc cây bằng lăng.",
+      is_secret: true,
+      witnessed_by: [],
+    }
+  - {
+      id: T-13,
+      date: "2016-07-24",
+      time: "19:30",
+      actors: [vu],
+      location: "đầu ngõ Bờ Sông",
+      action: "Vũ đặt xe ôm công nghệ từ SĐT 0988200991 đi Quán Bia 88.",
+      is_secret: true,
+      witnessed_by: [],
+    }
+  - {
+      id: T-14,
+      date: "2016-07-24",
+      time: "19:45",
+      end_time: "21:15",
+      actors: [vu],
+      location: quan_bia_88,
+      action: "Vũ ngồi một mình bàn B7: 1 nem chua 95k + 5 lon bia 100k. Trả tiền mặt 195k lúc 21:15.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  # --- Tùng đối chất
+  - {
+      id: T-15,
+      date: "2016-07-24",
+      time: "20:00",
+      actors: [tung, khang],
+      location: home_khang,
+      action: 'Tùng đến, đưa bài báo 1996 bắt Khang tạ tội. Khang cợt nhả "chuyện xưa rồi".',
+      is_secret: true,
+      witnessed_by: [ha],
+    }
+  - {
+      id: T-16,
+      date: "2016-07-24",
+      time: "20:05",
+      actors: [tung, khang],
+      location: home_khang,
+      action: "Giằng co: bài báo bị xé, khung ảnh kỷ niệm 1996 rơi vỡ (Tùng cầm khung), bình trà thủy tinh vỡ. Tùng xô Khang ngã đập gáy vào cạnh bàn, Khang bất tỉnh.",
+      is_secret: true,
+      witnessed_by: [],
+    }
+  - {
+      id: T-17,
+      date: "2016-07-24",
+      time: "20:09",
+      actors: [dat],
+      location: cho_cang,
+      action: "Đạt gọi Khang khất nợ, không ai nghe (cuộc gọi nhỡ).",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-18,
+      date: "2016-07-24",
+      time: "20:15",
+      actors: [tung],
+      location: "trạm xe buýt Bờ Sông",
+      action: "Tùng thấy Khang còn thở nhưng hoảng sợ bỏ chạy, lên xe buýt 21 về Cầu Bươu (vé 20:15).",
+      is_secret: true,
+      witnessed_by: [ha],
+    }
+  # --- Hà
+  - {
+      id: T-19,
+      date: "2016-07-24",
+      time: "20:30",
+      end_time: "20:33",
+      actors: [],
+      location: rail_gate,
+      action: "Tàu SE19 qua gác chắn, kéo còi và chuông.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-20,
+      date: "2016-07-24",
+      time: "20:31",
+      actors: [ha, khang],
+      location: home_khang,
+      action: "Hà gọi Khang, không ai nghe (cuộc gọi nhỡ).",
+      is_secret: true,
+      witnessed_by: [],
+    }
+  - {
+      id: T-21,
+      date: "2016-07-24",
+      time: "20:32",
+      actors: [ha],
+      location: home_khang,
+      action: 'Hà gửi tin nhắn thoại "Anh ơi nghe máy đi, em đang ở nhà xem phim...", lọt tiếng còi tàu và chuông gác chắn.',
+      is_secret: true,
+      witnessed_by: [],
+    }
+  - {
+      id: T-22,
+      date: "2016-07-24",
+      time: "20:45",
+      actors: [ha],
+      location: home_khang,
+      action: "Hà vào nhà, thấy Khang bất tỉnh.",
+      is_secret: true,
+      witnessed_by: [],
+    }
+  - {
+      id: T-23,
+      date: "2016-07-24",
+      time: "20:52",
+      actors: [ha],
+      location: home_khang,
+      action: 'Hà ấn ngón tay Khang mở Touch ID, đọc tin nhắn Thảo Vy gửi 20:40 (chuyến bay 06:15 đi Đà Lạt). Tin nhắn chuyển trạng thái "Đã xem 20:52".',
+      is_secret: true,
+      witnessed_by: [],
+    }
+  - {
+      id: T-24,
+      date: "2016-07-24",
+      time: "21:00",
+      actors: [ha, khang],
+      location: home_khang,
+      action: "Hà dùng mảnh thủy tinh bình trà cứa cổ Khang, cắt một lọn tóc mai bên trái. Cánh hoa bằng lăng bám áo gió rơi xuống sàn.",
+      is_secret: true,
+      witnessed_by: [],
+    }
+  - {
+      id: T-25,
+      date: "2016-07-24",
+      time: "21:08",
+      actors: [ha],
+      location: home_khang,
+      action: "Hà rời nhà Khang, về phòng trọ. Cất lọn tóc vào hộp thiếc khóa số.",
+      is_secret: true,
+      witnessed_by: [],
+    }
+  # --- Sau án mạng
+  - {
+      id: T-26,
+      date: "2016-07-25",
+      time: "06:30",
+      actors: [lua],
+      location: home_khang,
+      action: "Bà Lụa sang gọi, phát hiện thi thể, báo công an.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+  - {
+      id: T-27,
+      date: "2016-07-25",
+      time: "07:30",
+      actors: [],
+      location: "-",
+      action: "Quyết định khởi tố vụ án.",
+      is_secret: false,
+      witnessed_by: [],
+    }
+timeline_status: approved
+
+# ---------------------------------------------------------------- BƯỚC 3: DẤU VẾT
+# Bộ hồ sơ: bo_a (mở sẵn), bo_hien_truong (mở sẵn), bo_b, bo_c, bo_d, bo_e, bo_f, bo_ket_luan.
+evidence:
+  # ===== bo_a: Hồ sơ ban đầu (public/documents/case_000/00_khoi_dau)
+  - {
+      code: A-01,
+      title: "Phiếu tiếp nhận tin báo",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-26],
+      content: "Bà Lụa báo 06:30 sáng 25/07.",
+      is_red_herring: false,
+      file: "00_khoi_dau/01_tiep_nhan_tin_bao.pdf",
+    }
+  - {
+      code: A-02,
+      title: "Quyết định khởi tố",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-27],
+      content: "",
+      is_red_herring: false,
+      file: "00_khoi_dau/02_quyet_dinh_khoi_to.pdf",
+    }
+  - {
+      code: A-03a,
+      title: "Biên bản khám nghiệm hiện trường",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-16, T-24],
+      content: "Bình trà thủy tinh vỡ, khung ảnh vỡ, bài báo xé vụn, cánh hoa tím khô trên sàn cạnh thi thể. Vân tay trên khung ảnh vỡ trùng mẫu Nguyễn Thanh Tùng.",
+      is_red_herring: false,
+      file: "00_khoi_dau/03a_bien_ban_kham_nghiem_hien_truong.pdf",
+    }
+  - {
+      code: A-03b,
+      title: "Báo cáo khám nghiệm tử thi sơ bộ",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-16, T-24],
+      content: "Tụ máu vùng gáy (va đập, trước tử vong ≥45 phút). Nguyên nhân chết: đứt động mạch cảnh do vật sắc (thủy tinh). Giờ chết 20:45–21:15. Tóc mai trái bị cắt sát da.",
+      is_red_herring: false,
+      file: "00_khoi_dau/03b_bao_cao_kham_nghiem_tu_thi_so_bo.pdf",
+    }
+  - {
+      code: A-04,
+      title: "Nhân thân nạn nhân",
+      kind: document,
+      dossier: bo_a,
+      from_events: [],
+      content: "Khang mồ côi, cho vay nặng lãi, nhiều ân oán.",
+      is_red_herring: false,
+      file: "00_khoi_dau/04_nhan_than_nan_nhan.pdf",
+    }
+  - {
+      code: A-05a,
+      title: "Lý lịch Nguyễn Ngọc Mai",
+      kind: document,
+      dossier: bo_a,
+      from_events: [],
+      content: "Địa chỉ Phố Đoàn Kết.",
+      is_red_herring: false,
+      file: "00_khoi_dau/05a_ly_lich_nguyen_ngoc_mai.pdf",
+    }
+  - {
+      code: A-05b,
+      title: "Lý lịch Lê Quang Vũ",
+      kind: document,
+      dossier: bo_a,
+      from_events: [],
+      content: "Kỹ sư điện. Đặc điểm nhận dạng: mắt trái lác. SĐT 0988200991.",
+      is_red_herring: false,
+      file: "00_khoi_dau/05b_ly_lich_le_quang_vu.pdf",
+    }
+  - {
+      code: A-05c,
+      title: "Lý lịch Trần Thị Hà",
+      kind: document,
+      dossier: bo_a,
+      from_events: [],
+      content: "Kế toán. Nơi ở: phòng trọ ngõ 61 Kim Liên.",
+      is_red_herring: false,
+      file: "00_khoi_dau/05c_ly_lich_tran_thi_ha.pdf",
+    }
+  - {
+      code: A-06,
+      title: "Lời khai bà Lụa",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-06, T-07],
+      content: "Nghe cãi nhau từ 18:30. Thấy Mai dắt xe nổ máy đi MỘT MÌNH đúng lúc Thời sự VTV1 bắt đầu (19:00). Không để ý sau đó. Nhắc nhà bà Tùng xóm bên có hai anh em, đứa nhỏ mất sớm.",
+      is_red_herring: false,
+      file: "00_khoi_dau/06_loi_khai_nhan_chung.pdf",
+    }
+  - {
+      code: A-07,
+      title: "Lời khai Mai",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-06, T-07, T-08],
+      content: "Xem S-01, S-02.",
+      is_red_herring: false,
+      file: "00_khoi_dau/07_loi_khai_mai.pdf",
+    }
+  - {
+      code: A-08,
+      title: "Lời khai Vũ lần 1",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-06],
+      content: "Xem S-03, S-04.",
+      is_red_herring: false,
+      file: "00_khoi_dau/08_loi_khai_vu.pdf",
+    }
+  - {
+      code: A-09,
+      title: "Lời khai Hà lần 1",
+      kind: document,
+      dossier: bo_a,
+      from_events: [],
+      content: "Xem S-08, S-09.",
+      is_red_herring: false,
+      file: "00_khoi_dau/09_loi_khai_ha.pdf",
+    }
+  - {
+      code: A-10,
+      title: "Sổ ghi nợ của Khang",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-10],
+      content: '"Lệch Pha – 300tr – 0988200991" kèm chữ ký Lê Quang Vũ. "Đạt Gà – 50tr – 0984180357". Trang của Lệch Pha có vết đập nhàu.',
+      is_red_herring: false,
+      file: "00_khoi_dau/10_so_ghi_no.pdf",
+      legacy: ["05", "10"],
+    }
+  - {
+      code: A-11,
+      title: "Bảng tin phường",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-08],
+      content: 'Rao vặt "Nhận xây sửa nhà – Tùng – 0912331888". Thông báo nhà mạng: sự cố cáp truyền hình khu Phố Đoàn Kết từ 20:10 ngày 24/07.',
+      is_red_herring: false,
+      file: "00_khoi_dau/11_bang_tin_rao_vat.pdf",
+      legacy: ["11", "18"],
+    }
+  - {
+      code: A-12,
+      title: "Kết quả xác minh nhà mạng và ứng dụng xe",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-13],
+      content: "Chủ thuê bao các số trong nhật ký cuộc gọi chưa xác định. Ứng dụng xe ôm: chuyến đặt từ 0988200991 lúc 19:30, điểm đón đầu ngõ Bờ Sông, điểm trả Quán Bia 88.",
+      is_red_herring: false,
+      file: "00_khoi_dau/12_tong_hop_loi_khai_cuoc_goi.pdf",
+      legacy: ["p10"],
+    }
+  - {
+      code: A-13,
+      title: "Đơn khởi kiện tranh chấp đất",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-06],
+      content: "Mai kiện đòi 200m² đất hương hỏa.",
+      is_red_herring: true,
+      file: "00_khoi_dau/13_don_khoi_kien_tranh_chap.pdf",
+      legacy: ["p2"],
+    }
+  - {
+      code: A-14,
+      title: "Thông báo nợ ngân hàng",
+      kind: document,
+      dossier: bo_a,
+      from_events: [],
+      content: "Mảnh đất bị thế chấp, Khang rút toàn bộ tiền mặt ngày 23/07.",
+      is_red_herring: false,
+      file: "00_khoi_dau/14_thong_bao_no_ngan_hang.pdf",
+    }
+  - {
+      code: A-15,
+      title: "Trích đoạn bài báo 1996",
+      kind: document,
+      dossier: bo_a,
+      from_events: [T-01, T-16],
+      content: "Bé N.G.H, 7 tuổi, tử vong do ngạt trong tủ gỗ chiều 24/07/1996 tại xóm Bờ Sông. Bản ghép từ các mảnh xé vụn thu ở hiện trường.",
+      is_red_herring: false,
+      file: "00_khoi_dau/15_trich_doan_bai_bao_1996.pdf",
+      legacy: ["p5"],
+    }
+  - {
+      code: A-DEV,
+      title: "Nhật ký cuộc gọi máy nạn nhân",
+      kind: phone,
+      dossier: bo_a,
+      from_events: [T-03, T-04, T-05, T-09, T-17, T-20],
+      content: "17:30 Chị Lan Quán Nước; 18:00 Bình Còi; 18:15 0988200991; 19:00 0912331888; 20:09 0984180357 (nhỡ); 20:31 Hà Kế Toán (nhỡ).",
+      is_red_herring: false,
+      file: "00_khoi_dau/dev00.pdf",
+      legacy: ["dev-00"],
+    }
+
+  # ===== Điện thoại nạn nhân (mở sẵn)
+  - {
+      code: MSG-01,
+      title: 'Chuỗi tin nhắn "Lệch Pha"',
+      kind: phone,
+      dossier: bo_a,
+      from_events: [T-10],
+      content: 'Khang đòi 300 triệu, dọa "tao nói hết với vợ mày".',
+      is_red_herring: false,
+    }
+  - {
+      code: MSG-02,
+      title: "Tin nhắn thoại của Hà 20:32",
+      kind: audio,
+      dossier: bo_a,
+      from_events: [T-21, T-19],
+      content: '"Anh ơi nghe máy đi, em đang ở nhà xem phim..." Nền có tiếng còi tàu dài và chuông gác chắn.',
+      is_red_herring: false,
+      legacy: ["01 (tuyến C)"],
+    }
+  - {
+      code: MSG-03,
+      title: "Tin nhắn Thảo Vy 20:40",
+      kind: phone,
+      dossier: bo_a,
+      from_events: [T-23],
+      content: '"Vé 6h15 sáng mai nhé anh, em ra sân bay trước." Trạng thái: Đã xem 20:52.',
+      is_red_herring: false,
+      file: "/images/cases/case_000/photo_cheating_sms.jpg",
+    }
+  - {
+      code: PH-01,
+      title: 'Ảnh trong máy: "Ngày đầu tiên 12.07.13"',
+      kind: photo,
+      dossier: bo_a,
+      from_events: [],
+      content: 'Ảnh Khang và Hà, chú thích "Ngày đầu tiên 12.07.13".',
+      is_red_herring: false,
+    }
+
+  # ===== bo_hien_truong: ảnh, vật thể, hotspot (mở sẵn)
+  - {
+      code: H-01,
+      title: "Ảnh kỷ niệm 1996 trong khung vỡ",
+      kind: photo,
+      dossier: bo_hien_truong,
+      from_events: [T-01, T-16],
+      content: 'Năm đứa trẻ trước tủ gỗ. Cậu bé lớn (sẹo mày hình chữ V) bế em nhỏ. Mặt sau: "Tùng – Huy – Khang – Hà – Mai, hè 96".',
+      is_red_herring: false,
+      legacy: ["p4"],
+    }
+  - {
+      code: H-02,
+      title: "Xấp đơn đòi đất trên sàn",
+      kind: photo,
+      dossier: bo_hien_truong,
+      from_events: [T-06],
+      content: "",
+      is_red_herring: true,
+      legacy: ["p2"],
+    }
+  - {
+      code: H-03,
+      title: "Mảnh thủy tinh bình trà dính máu",
+      kind: object,
+      dossier: bo_hien_truong,
+      from_events: [T-16, T-24],
+      content: "Hung khí. Không lấy được vân tay (bị lau).",
+      is_red_herring: false,
+      legacy: ["p3"],
+    }
+  - {
+      code: H-04,
+      title: "Tờ báo ngày 24/07/2016 trên bàn, trang lịch truyền hình",
+      kind: document,
+      dossier: bo_hien_truong,
+      from_events: [],
+      content: 'VTV3 Chủ nhật 24/07: 20:00 "Gameshow Chung sức", 21:00 "Ca nhạc cuối tuần". Không có phim bộ.',
+      is_red_herring: false,
+      legacy: ["02 (tuyến C)"],
+    }
+  - {
+      code: H-05,
+      title: "Cánh hoa bằng lăng khô cạnh thi thể",
+      kind: object,
+      dossier: bo_hien_truong,
+      from_events: [T-24],
+      content: "Trong nhà không có hoa. Cây bằng lăng chỉ có ở cổng.",
+      is_red_herring: false,
+    }
+  - {
+      code: H-HS1,
+      title: "Hotspot: cửa sổ nhìn ra gác chắn",
+      kind: hotspot,
+      dossier: bo_hien_truong,
+      from_events: [T-19],
+      content: "Âm thanh tàu SE19 kéo còi + chuông gác chắn. Biển giờ tàu tại gác: SE19 qua 20:30.",
+      is_red_herring: false,
+    }
+
+  # ===== bo_b: Tuyến Tùng & Đạt Gà (mở sau cp-000-0) — 02_nhanh_tung
+  - {
+      code: B-01,
+      title: "Lời khai Tùng lần 1",
+      kind: document,
+      dossier: bo_b,
+      from_events: [T-09],
+      content: "Xem S-05, S-06.",
+      is_red_herring: false,
+      file: "02_nhanh_tung/02_loi_khai_tung.pdf",
+      legacy: ["14"],
+    }
+  - {
+      code: B-02,
+      title: "Lý lịch Nguyễn Thanh Tùng",
+      kind: document,
+      dossier: bo_b,
+      from_events: [],
+      content: "Đặc điểm: sẹo mày phải hình chữ V. Gia đình: em trai Nguyễn Gia Huy (1989–1996). Tay phải sưng khớp, gò má bầm khi làm việc.",
+      is_red_herring: false,
+      file: "02_nhanh_tung/03_ly_lich_nguyen_thanh_tung.pdf",
+      legacy: ["14_ly_lich"],
+    }
+  - {
+      code: B-03,
+      title: "Lời khai Đạt Gà",
+      kind: document,
+      dossier: bo_b,
+      from_events: [T-17],
+      content: "Bán hàng Chợ Cảng 18:00–22:00, 3 tiểu thương xác nhận. Gọi Khang 20:09 xin khất nợ, không ai nghe.",
+      is_red_herring: true,
+      file: "02_nhanh_tung/04_loi_khai_dat_ga.pdf",
+      legacy: ["14a"],
+    }
+  - {
+      code: B-04,
+      title: "Lý lịch Đạt Gà",
+      kind: document,
+      dossier: bo_b,
+      from_events: [],
+      content: "",
+      is_red_herring: true,
+      file: "02_nhanh_tung/05_ly_lich_dat_ga.pdf",
+      legacy: ["14a_ly_lich"],
+    }
+
+  # ===== bo_c: Tuyến Vũ – Quán Bia 88 (mở sau cp-000-1a) — 01_nhanh_mai_vu
+  - {
+      code: C-01,
+      title: "Sổ thu chi Quán Bia 88",
+      kind: document,
+      dossier: bo_c,
+      from_events: [T-14],
+      content: "Bàn B7 (1 khách): 195k, tiền mặt, 21:15.",
+      is_red_herring: false,
+      file: "01_nhanh_mai_vu/01_so_thu_chi_quan_bia.pdf",
+      legacy: ["06"],
+    }
+  - {
+      code: C-02,
+      title: "Lời khai Vũ lần 2",
+      kind: document,
+      dossier: bo_c,
+      from_events: [T-10, T-12, T-13, T-14],
+      content: "Xem S-07. Gọi 1 đĩa nem chua và 5 lon bia. Lúc ra cổng 19:25 thấy bóng người mặc áo gió trùm đầu đứng dưới gốc cây bằng lăng.",
+      is_red_herring: false,
+      file: "01_nhanh_mai_vu/02_loi_khai_lan_2_vu.pdf",
+      legacy: ["07"],
+    }
+  - {
+      code: C-03,
+      title: "Biên bản làm việc chủ quán bia",
+      kind: document,
+      dossier: bo_c,
+      from_events: [T-14],
+      content: "Khách đàn ông mắt lác ngồi bàn B7 từ khoảng 19:45 đến 21:15. Bảng giá: nem chua 95k, bia 20k/lon.",
+      is_red_herring: false,
+      file: "01_nhanh_mai_vu/03_bien_ban_lam_viec_chu_quan_bia.pdf",
+    }
+
+  # ===== bo_d: Tùng tự thú (mở sau cp-000-1b)
+  - {
+      code: TT-01,
+      title: "Bản tự thú của Tùng",
+      kind: document,
+      dossier: bo_d,
+      from_events: [T-15, T-16, T-18],
+      content: "Đến 20:00, xô Khang ngã 20:05, Khang còn thở, bỏ chạy 20:15.",
+      is_red_herring: false,
+      file: "02_nhanh_tung/01_tu_thu_xo_xat_tung.pdf",
+      legacy: ["01"],
+    }
+  - {
+      code: TT-02,
+      title: "Cuống vé xe buýt 21 lúc 20:15",
+      kind: photo,
+      dossier: bo_d,
+      from_events: [T-18],
+      content: "Thu trong ví Tùng. Tuyến Bờ Sông – Cầu Bươu, 20:15.",
+      is_red_herring: false,
+      file: "/images/cases/case_000/cuong_ve_xe_tung.png",
+    }
+
+  # ===== bo_e: Tuyến Hà (mở sau cp-000-1c) — 03_nhanh_ha
+  - {
+      code: E-01,
+      title: "Lời khai Hà lần 2",
+      kind: document,
+      dossier: bo_e,
+      from_events: [],
+      content: 'Hà vẫn khẳng định ở phòng trọ, nói "chắc là tiếng TV".',
+      is_red_herring: false,
+      file: "03_nhanh_ha/01_loi_khai_lan_2_tran_thi_ha.pdf",
+    }
+  - {
+      code: E-02,
+      title: "Biên bản khám xét phòng Hà",
+      kind: document,
+      dossier: bo_e,
+      from_events: [T-11, T-24, T-25],
+      content: "Thu giữ: áo gió xám đen có mũ trùm (E-03); hộp thiếc khóa số 6 chữ số (chưa mở).",
+      is_red_herring: false,
+      file: "03_nhanh_ha/03_kham_xet_phong_ha.pdf",
+    }
+  - {
+      code: E-03,
+      title: "Áo gió xám đen dính cánh hoa bằng lăng",
+      kind: object,
+      dossier: bo_e,
+      from_events: [T-11, T-24],
+      content: "Cánh hoa và phấn bằng lăng mắc ở mũ và vai áo.",
+      is_red_herring: false,
+      legacy: ["03 (tuyến C)"],
+    }
+
+  # ===== bo_f: Hộp thiếc (mở sau cp-000-1c-followup)
+  - {
+      code: F-01,
+      title: "Lọn tóc mai dính máu trong hộp thiếc",
+      kind: object,
+      dossier: bo_f,
+      from_events: [T-24, T-25],
+      content: "",
+      is_red_herring: false,
+      legacy: ["04", "EV-HAIR-DNA"],
+    }
+  - {
+      code: F-02,
+      title: "Kết quả giám định ADN",
+      kind: document,
+      dossier: bo_f,
+      from_events: [T-24],
+      content: "Tóc và máu trên lọn tóc trùng 100% ADN Nguyễn Văn Khang. Khớp vùng tóc mai trái bị cắt (A-03b).",
+      is_red_herring: false,
+    }
+
+  # ===== bo_ket_luan (mở sau kết luận) — 04_ket_luan
+  - {
+      code: K-01,
+      title: "Đề nghị truy tố",
+      kind: document,
+      dossier: bo_ket_luan,
+      from_events: [],
+      content: "",
+      is_red_herring: false,
+      file: "04_ket_luan/de_nghi_truy_to.pdf",
+    }
+  - {
+      code: K-02,
+      title: "Ký sự hậu án",
+      kind: document,
+      dossier: bo_ket_luan,
+      from_events: [],
+      content: "",
+      is_red_herring: false,
+      file: "04_ket_luan/05_ky_su_hau_an.pdf",
+    }
+evidence_status: approved
+
+# ---------------------------------------------------------------- BƯỚC 4: SUY LUẬN
+deductions:
+  # --- Giai đoạn 0
+  - {
+      id: D-01,
+      type: identify,
+      subject: vu,
+      conclusion: "0988200991 là Lê Quang Vũ.",
+      required: [A-DEV, A-10],
+      optional: [A-05b, MSG-01],
+      answer: "Lê Quang Vũ",
+    }
+  - {
+      id: D-02,
+      type: identify,
+      subject: tung,
+      conclusion: "0912331888 là Nguyễn Thanh Tùng.",
+      required: [A-DEV, A-11],
+      optional: [],
+      answer: "Nguyễn Thanh Tùng",
+    }
+  - {
+      id: D-03,
+      type: identify,
+      subject: dat,
+      conclusion: "0984180357 là Đạt Gà.",
+      required: [A-DEV, A-10],
+      optional: [],
+      answer: "Đạt Gà",
+    }
+  # --- Vũ
+  - {
+      id: D-04,
+      type: motive,
+      subject: vu,
+      conclusion: 'Vũ là con nợ 300 triệu "Lệch Pha", bị Khang dọa báo vợ.',
+      required: [A-10, MSG-01],
+      optional: [A-05b, A-DEV],
+    }
+  - {
+      id: D-05,
+      type: contradiction,
+      subject: vu,
+      conclusion: "Vũ nói về cùng Mai lúc 19:00, nhưng Mai đi một mình và Vũ đặt xe từ đầu ngõ lúc 19:30.",
+      required: [A-08, A-06, A-12],
+      optional: [A-07],
+      breaks_statement: S-03,
+    }
+  - {
+      id: D-06,
+      type: clear,
+      subject: vu,
+      conclusion: "Bàn B7 195k (95k + 5×20k) là của Vũ; Vũ ở quán 19:45–21:15, không thể có mặt lúc ~21:00.",
+      required: [C-01, C-02],
+      optional: [C-03, A-03b],
+      answer: "21:15",
+    }
+  # --- Mai
+  - {
+      id: D-07,
+      type: clear,
+      subject: mai,
+      conclusion: "Mai về nhà trước 20:10 và ở đó (biết sự cố cáp 20:10 khu Đoàn Kết).",
+      required: [A-07, A-11],
+      optional: [A-06],
+    }
+  # --- Tùng
+  - {
+      id: D-08,
+      type: motive,
+      subject: tung,
+      conclusion: "Tùng là anh trai bé Huy, người Khang nhốt chết trong tủ năm 1996; ngày án mạng là ngày giỗ thứ 20.",
+      required: [A-15, H-01, B-02],
+      optional: [A-06],
+    }
+  - {
+      id: D-09,
+      type: contradiction,
+      subject: tung,
+      conclusion: "Tùng nói chỉ gọi điện, không đến; nhưng vân tay Tùng trên khung ảnh vỡ ở hiện trường.",
+      required: [B-01, A-03a],
+      optional: [H-01, B-02],
+      breaks_statement: S-06,
+    }
+  - {
+      id: D-10,
+      type: clear,
+      subject: tung,
+      conclusion: "Tùng xô Khang ngất 20:05 và rời đi 20:15; vết thương chí mạng xảy ra 20:45–21:15. Tùng không phải người giết.",
+      required: [TT-01, TT-02, A-03b],
+      optional: [],
+      answer: "Trước khi nạn nhân tử vong",
+    }
+  # --- Hội tụ
+  - {
+      id: D-11,
+      type: elimination,
+      subject: "",
+      conclusion: "Mai (D-07), Vũ (D-06), Tùng (D-10) đều không có mặt trong khung giờ tử vong. Hung thủ là người khác.",
+      required: [A-07, A-11, C-01, C-02, TT-01, A-03b],
+      optional: [TT-02, A-06, C-03],
+    }
+  # --- Hà
+  - {
+      id: D-12,
+      type: motive,
+      subject: ha,
+      conclusion: "Hà là bạn gái Khang; tin nhắn Vy bị đọc lúc 20:52 khi Khang đã bất tỉnh từ 20:05, tức người đọc là người khác có mặt trong phòng.",
+      required: [MSG-03, A-09],
+      optional: [A-14, A-03b, TT-01],
+    }
+  - {
+      id: D-13,
+      type: contradiction,
+      subject: ha,
+      conclusion: "Hà nói ở phòng trọ xem phim bộ VTV3. Tin nhắn thoại 20:32 lọt còi tàu SE19 (chỉ nghe được gần gác chắn Bờ Sông), và VTV3 tối đó không chiếu phim bộ.",
+      required: [A-09, MSG-02, H-04],
+      optional: [H-HS1, A-05c, A-DEV],
+      breaks_statement: S-08,
+    }
+  - {
+      id: D-14,
+      type: time,
+      subject: ha,
+      conclusion: "Mã hộp thiếc là ngày yêu nhau 12.07.13.",
+      required: [PH-01, E-02],
+      optional: [],
+      answer: "120713",
+    }
+  # --- Kết luận
+  - {
+      id: D-15,
+      type: culprit,
+      subject: ha,
+      conclusion: "Hà rình dưới cây bằng lăng (áo gió dính cánh hoa, khớp lời Vũ), vào nhà, giết Khang và giữ lọn tóc mai dính máu.",
+      required: [F-01, F-02, E-03],
+      optional: [H-05, C-02, MSG-02, H-04, MSG-03, E-02],
+      answer: "Trần Thị Hà",
+    }
+deductions_status: approved
+
+# ---------------------------------------------------------------- BƯỚC 5: BỀ MẶT
+statements:
+  - {
+      id: S-01,
+      character: mai,
+      document: A-07,
+      claim: "Cãi nhau đòi đất rồi nổ máy về lúc 19:00.",
+      truthful: true,
+    }
+  - {
+      id: S-02,
+      character: mai,
+      document: A-07,
+      claim: "Ở nhà xem TV đến 20:10 thì mất sóng cáp, đi ngủ.",
+      truthful: true,
+    }
+  - {
+      id: S-03,
+      character: vu,
+      document: A-08,
+      claim: "Ra về cùng vợ lúc 19:00, sau đó đi uống bia với bạn.",
+      truthful: false,
+      why_lie: "Giấu vợ khoản nợ 300 triệu và việc ở lại xin khất.",
+      exposed_by: D-05,
+    }
+  - {
+      id: S-04,
+      character: vu,
+      document: A-08,
+      claim: "Không quen biết gì chuyện tiền nong của Khang.",
+      truthful: false,
+      why_lie: "Giấu nợ.",
+      exposed_by: D-04,
+    }
+  - {
+      id: S-05,
+      character: tung,
+      document: B-01,
+      claim: "Gọi Khang lúc 19:00 hẹn gặp.",
+      truthful: true,
+    }
+  - {
+      id: S-06,
+      character: tung,
+      document: B-01,
+      claim: "Sau đó đổi ý, không sang, ở nhà Cầu Bươu cả tối.",
+      truthful: false,
+      why_lie: "Sợ bị quy tội giết người vì đã xô Khang ngất.",
+      exposed_by: D-09,
+    }
+  - {
+      id: S-07,
+      character: vu,
+      document: C-02,
+      claim: "Ở lại xin khất nợ đến 19:25, đặt xe 19:30, ngồi quán bia đến 21:15.",
+      truthful: true,
+    }
+  - {
+      id: S-08,
+      character: ha,
+      document: A-09,
+      claim: "Ở phòng trọ xem phim bộ VTV3 từ 20:00 đến 21:30.",
+      truthful: false,
+      why_lie: "Che giấu việc có mặt và giết Khang.",
+      exposed_by: D-13,
+    }
+  - {
+      id: S-09,
+      character: ha,
+      document: A-09,
+      claim: "Gọi Khang 20:31 không được nên nhắn thoại rồi đi ngủ.",
+      truthful: false,
+      why_lie: "Nửa thật: có gọi và nhắn, nhưng gọi từ trước cổng nhà Khang.",
+      exposed_by: D-13,
+    }
+red_herrings:
+  - {
+      target: mai,
+      lure: "Tranh chấp đất, ném đơn xuống sàn trước mặt Khang.",
+      resolved_by: D-07,
+    }
+  - {
+      target: dat,
+      lure: "Con nợ 50 triệu, gọi Khang 20:09 sát giờ án.",
+      resolved_by: D-03,
+    }
+  - {
+      target: tung,
+      lure: "Động cơ mạnh nhất, nói dối, có vân tay và vết bầm.",
+      resolved_by: D-10,
+    }
+surface_status: approved
+
+# ---------------------------------------------------------------- BƯỚC 6: TÀI LIỆU
+dossiers:
+  - { key: bo_a, title: "Hồ sơ ban đầu", slot: 0, unlocked_by: "" }
+  - { key: bo_hien_truong, title: "Hiện trường", slot: 1, unlocked_by: "" }
+  - { key: bo_b, title: "Tuyến Tùng và Đạt Gà", slot: 2, unlocked_by: cp-000-0 }
+  - {
+      key: bo_c,
+      title: "Tuyến Vũ – Quán Bia 88",
+      slot: 3,
+      unlocked_by: cp-000-1a,
+    }
+  - { key: bo_d, title: "Tự thú của Tùng", slot: 4, unlocked_by: cp-000-1b }
+  - { key: bo_e, title: "Tuyến Hà", slot: 5, unlocked_by: cp-000-1c }
+  - { key: bo_f, title: "Hộp thiếc", slot: 6, unlocked_by: cp-000-1c-followup }
+  - {
+      key: bo_ket_luan,
+      title: "Kết luận và hậu án",
+      slot: 7,
+      unlocked_by: indictment,
+    }
+documents_status: draft # nội dung Hỏi/Đáp chi tiết vẫn nằm trong PDF cũ, chưa đưa vào bible
+
+# ---------------------------------------------------------------- BƯỚC 7: CHECKPOINT
+checkpoints:
+  - id: cp-000-0
+    kind: phone_lookup
+    title: "Ba số điện thoại lạ"
+    question: "Ba số chưa lưu tên trong nhật ký cuộc gọi của Khang là của ai?"
+    depends_on: []
+    tests: [D-01, D-02, D-03]
+    unlocks_dossier: bo_b
+    hints:
+      - "Khang là người cho vay. Người cho vay ghi lại gì về con nợ?"
+      - "Đối chiếu số trong nhật ký với Sổ ghi nợ (A-10) và Bảng tin phường (A-11)."
+      - "Số 18:15 và 20:09 nằm trong sổ nợ. Số 19:00 nằm trên một tờ rao vặt."
+    narrative: "Ba cái tên hiện ra. Hồ sơ của những người này được chuyển sang bàn anh."
+
+  - id: cp-000-1a
+    kind: suspect_interrogation
+    title: "Thẩm tra Lê Quang Vũ"
+    subject: vu
+    depends_on: [cp-000-0]
+    tests: [D-04, D-05]
+    unlocks_dossier: bo_c
+    hints:
+      - "[động cơ] Biệt danh trong sổ nợ có liên quan gì đến nghề và ngoại hình của Vũ?"
+      - "[động cơ] Sổ ghi nợ (A-10) và chuỗi tin nhắn Lệch Pha (MSG-01)."
+      - "[mâu thuẫn] Vũ nói về cùng vợ. Bà Lụa thấy gì lúc 19:00?"
+      - "[mâu thuẫn] Lời khai Vũ (A-08), lời khai bà Lụa (A-06), xác minh ứng dụng xe (A-12)."
+    narrative: "Vũ cúi đầu. Anh ta xin khai lại."
+
+  - id: cp-000-1a-followup
+    kind: time
+    title: "Vũ rời Quán Bia 88 lúc nào?"
+    question: "Theo sổ thu chi, Vũ thanh toán và rời quán lúc mấy giờ?"
+    subject: vu
+    depends_on: [cp-000-1a]
+    tests: [D-06]
+    unlocks_dossier: ""
+    hints:
+      - "Vũ nhớ mình đã gọi món gì?"
+      - "1 nem chua + 5 lon bia. Bảng giá ở biên bản chủ quán (C-03)."
+      - "Tìm bàn 1 khách có tổng 195k trong sổ thu chi (C-01)."
+
+  - id: cp-000-1b
+    kind: suspect_interrogation
+    title: "Thẩm tra Nguyễn Thanh Tùng"
+    subject: tung
+    depends_on: [cp-000-0]
+    tests: [D-08, D-09]
+    unlocks_dossier: bo_d
+    hints:
+      - "[động cơ] Cậu bé trong ảnh kỷ niệm có vết sẹo gì?"
+      - "[động cơ] Ghép bài báo 1996 (A-15), ảnh kỷ niệm (H-01), lý lịch Tùng (B-02)."
+      - "[mâu thuẫn] Tùng nói không đến. Ai đã cầm khung ảnh bị vỡ?"
+      - "[mâu thuẫn] Lời khai Tùng (B-01) và biên bản khám nghiệm hiện trường (A-03a)."
+    narrative: "Tùng im lặng rất lâu, rồi xin giấy bút."
+
+  - id: cp-000-1b-followup
+    kind: choice
+    title: "Tùng rời đi khi nào?"
+    question: "Thời điểm Tùng rời hiện trường so với giờ tử vong của Khang?"
+    subject: tung
+    depends_on: [cp-000-1b]
+    tests: [D-10]
+    options:
+      [
+        "Trước khi nạn nhân tử vong",
+        "Trong khung giờ tử vong",
+        "Sau khi nạn nhân tử vong",
+      ]
+    unlocks_dossier: ""
+    hints:
+      - "Khang có hai vết thương. Vết nào giết anh ta?"
+      - "So bản tự thú (TT-01), vé xe (TT-02) với báo cáo tử thi (A-03b)."
+      - "Tùng đi 20:15. Khang chết 20:45–21:15."
+
+  - id: cp-000-convergence
+    kind: text
+    title: "Loại trừ"
+    question: "Vì sao Mai, Vũ và Tùng đều không thể là người gây ra vết thương chí mạng?"
+    depends_on: [cp-000-1a-followup, cp-000-1b-followup]
+    tests: [D-11]
+    unlocks_dossier: ""
+    hints:
+      - "Mỗi người đang ở đâu lúc 20:45–21:15?"
+      - "Mai: sự cố cáp. Vũ: bàn B7. Tùng: vé xe buýt."
+    narrative: "Ba người đã được loại trừ. Còn một người có tên trong nhật ký cuộc gọi mà anh chưa hỏi kỹ."
+
+  - id: cp-000-1c
+    kind: suspect_interrogation
+    title: "Thẩm tra Trần Thị Hà"
+    subject: ha
+    depends_on: [cp-000-convergence]
+    tests: [D-12, D-13]
+    unlocks_dossier: bo_e
+    hints:
+      - "[động cơ] Khang bất tỉnh từ 20:05. Vậy ai đọc tin nhắn của Thảo Vy?"
+      - '[động cơ] Trạng thái "Đã xem" ở MSG-03 và lời khai Hà (A-09).'
+      - "[mâu thuẫn] Nghe kỹ nền tin nhắn thoại 20:32. Rồi đứng ở cửa sổ hiện trường."
+      - "[mâu thuẫn] MSG-02, tờ báo lịch truyền hình (H-04), lời khai Hà (A-09)."
+    narrative: "Lệnh khám xét phòng trọ của Trần Thị Hà được ký."
+
+  - id: cp-000-1c-followup
+    kind: code
+    title: "Hộp thiếc"
+    question: "Mã 6 số của hộp thiếc trong phòng Hà là gì?"
+    subject: ha
+    depends_on: [cp-000-1c]
+    tests: [D-14]
+    unlocks_dossier: bo_f
+    hints:
+      - "Người ta hay đặt mật mã bằng ngày gì?"
+      - "Ảnh trong điện thoại Khang (PH-01)."
+      - "Ngày, tháng, năm: 6 chữ số."
+
+  - id: cp-000-2b
+    kind: indictment
+    title: "Kết luận"
+    question: "Ai giết Nguyễn Văn Khang, vì sao, và bằng chứng nào?"
+    depends_on: [cp-000-1c-followup]
+    tests: [D-15]
+    valid_motives:
+      ["ghen tuông", "cuồng ghen", "bị phản bội", "romantic-jealousy"]
+    unlocks_dossier: bo_ket_luan
+    hints:
+      - "Hung thủ đã mang theo một thứ từ thi thể."
+      - "Hộp thiếc (F-01, F-02) và chiếc áo gió (E-03)."
+
+epilogues:
+  - {
+      id: cp-epilogue-mai-vu,
+      title: "Mảnh đất",
+      text: "Mảnh đất được trả lại đứng tên Mai. Vũ thú nhận khoản nợ với vợ; hai người bán bớt một phần đất để trả dứt.",
+    }
+  - {
+      id: cp-epilogue-tung,
+      title: "Hoa cúc trắng",
+      text: "Tùng được đình chỉ điều tra tội giết người, chịu xử lý hành vi cố ý gây thương tích. Ngày ra về, anh mang hoa cúc trắng ra mộ em.",
+    }
+  - {
+      id: cp-epilogue-ha,
+      title: "Bài hát trốn tìm",
+      text: "Hà bị truy tố tội Giết người, được trưng cầu giám định tâm thần. Trong phòng giam, cô lẩm nhẩm bài hát trốn tìm năm nào.",
+    }
+  - {
+      id: cp-epilogue-closure,
+      title: "Chiếc tủ gỗ",
+      text: "Chiếc tủ gỗ lim vẫn nằm trong góc phòng khách số 14, then cài sắt đã gỉ.",
+    }
+checkpoints_status: draft # chờ chủ dự án duyệt thứ tự mở bộ (DECISIONS.md)
