@@ -35,6 +35,7 @@ import { CheckpointStudioInspector } from "./studio-inspector";
 import { CheckpointStudioHeader } from "./studio-header";
 import { useResizableSidebar } from "./use-resizable-sidebar";
 import { useFlowDependencies } from "./use-flow-dependencies";
+import { boardPath } from "@/lib/play/routes";
 
 interface CheckpointStudioClientProps {
   initialCaseId: string;
@@ -312,7 +313,7 @@ export function CheckpointStudioClient({
       });
       toast.success("Đang mở màn chơi thử nghiệm");
     } else {
-      window.open(`/evidence/web?case_id=${caseId}`, "_blank");
+      window.open(boardPath(caseId), "_blank");
     }
   };
 

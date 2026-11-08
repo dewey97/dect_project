@@ -16,6 +16,7 @@ import { useRoomSync } from "@/components/investigation/room/room-sync-context";
 import { normalizeRoomCode } from "@/lib/rooms/code";
 import { NICKNAME_MAX_LENGTH, cleanNickname } from "@/lib/rooms/nickname";
 import { PlayButton, PlayCard, PlayError } from "@/components/play/play-ui";
+import { boardPath } from "@/lib/play/routes";
 
 const NICKNAME_KEY = "dect_player_nickname";
 const DEFAULT_MAX_PLAYERS = 4;
@@ -252,7 +253,7 @@ export function PlayEntry({
             <div className="flex flex-col items-center gap-3 pt-2">
               {(!access || ownsCase) && (
                 <Link
-                  href={`/evidence/web?case_id=${caseId}`}
+                  href={boardPath(caseId)}
                   className="text-xs text-zinc-400 hover:text-amber-400 transition underline underline-offset-4"
                 >
                   Chơi một mình (không qua phòng)

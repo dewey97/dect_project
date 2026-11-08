@@ -172,6 +172,8 @@ interface PlayLobbyProps {
   caseTitle: string;
   caseSynopsis?: string | null;
   caseId?: string;
+  /** Trong modal Chơi nhóm của bàn điều tra: bỏ banner chào và lời nhắc. */
+  embedded?: boolean;
 }
 
 /**
@@ -185,6 +187,7 @@ export function PlayLobby({
   caseTitle,
   caseSynopsis,
   caseId = "case_000",
+  embedded = false,
 }: PlayLobbyProps) {
   const {
     room,
@@ -240,6 +243,7 @@ export function PlayLobby({
   return (
     <div className="w-full flex flex-col items-center">
       {/* 1. WELCOME BANNER (FLOATING PILL TRÊN CÙNG - Chuẩn Figma) */}
+      {!embedded && (
       <div className="mb-6 animate-in fade-in slide-in-from-top-3 duration-300">
         <div className="inline-flex items-center gap-2.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#27272a]/95 border border-zinc-700/80 shadow-xl backdrop-blur-md text-xs sm:text-sm text-zinc-200">
           <div className="size-6 sm:size-7 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0">
@@ -257,6 +261,7 @@ export function PlayLobby({
           </span>
         </div>
       </div>
+      )}
 
       {/* 2. CARD CHÍNH CỦA WAITING ROOM (Node Figma 412:710 / 413:1062) */}
       <div className="w-full max-w-2xl animate-in fade-in zoom-in-95 duration-200">
@@ -336,9 +341,11 @@ export function PlayLobby({
           )}
 
           {/* Lời nhắc nhở dưới khối thông tin */}
+          {!embedded && (
           <p className="text-xs text-zinc-400 font-serif italic text-center">
             Hãy đảm bảo tất cả thành viên đều đã sẵn sàng để bắt đầu vụ án!
           </p>
+          )}
 
           <PlayError>{error}</PlayError>
 
@@ -364,7 +371,7 @@ export function PlayLobby({
               </div>
             )}
 
-            {started && (
+            {started && !me.enteredAt && (
               <PlayButton
                 disabled={busy}
                 className="w-full py-4 text-base tracking-wider uppercase font-bold"

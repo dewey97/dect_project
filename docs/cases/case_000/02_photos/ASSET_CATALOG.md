@@ -75,7 +75,7 @@ public/
 
 | Tên File                                | Mục Đích Sử Dụng                                   | Vị Trí Hiển Thị Trong Code / UI                                |
 | :-------------------------------------- | :------------------------------------------------- | :------------------------------------------------------------- |
-| `corkboard_vertical_empty.jpg`          | Mặt bảng gỗ bần dọc trống để cắm ghim              | Bảng ghim án Boardgame (`/evidence/boardgame`)                 |
+| `corkboard_vertical_empty.jpg`          | Mặt bảng gỗ bần dọc trống để cắm ghim              | Bảng ghim án Boardgame (`/play/case_000/box`)                 |
 | `crime_scene_outline_bg.jpg`            | Hình nền hiện trường kẻ vệt phấn                   | Background màn hình phân tích hiện trường                      |
 | `mobile_evidence_board_bg.jpg`          | Hình nền tối ưu cho giao diện di động              | Bảng điều tra Mobile View                                      |
 | `ios7_wallpaper.jpg`                    | Hình nền màn hình khóa điện thoại tang vật         | Trình giả lập iPhone (`components/investigation/iphone`)       |

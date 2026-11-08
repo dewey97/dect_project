@@ -101,7 +101,7 @@ export async function saveBoardNode(
     if (error) throw error;
 
     revalidatePath(STUDIO_PATH);
-    revalidatePath(`/evidence/web`);
+    revalidatePath("/play/[caseId]/board", "page");
     return { success: true, data: data as DbCaseBoardNode };
   } catch (error: unknown) {
     console.error("Error saving board node:", error);
@@ -129,7 +129,7 @@ export async function deleteBoardNode(
     if (error) throw error;
 
     revalidatePath(STUDIO_PATH);
-    revalidatePath(`/evidence/web`);
+    revalidatePath("/play/[caseId]/board", "page");
     return { success: true, data: { id } };
   } catch (error: unknown) {
     console.error("Error deleting board node:", error);
@@ -162,7 +162,7 @@ export async function saveBoardNodesBatch(
     if (error) throw error;
 
     revalidatePath(STUDIO_PATH);
-    revalidatePath(`/evidence/web`);
+    revalidatePath("/play/[caseId]/board", "page");
     return { success: true, data: rows.length };
   } catch (error: unknown) {
     console.error("Error saving board nodes batch:", error);
@@ -194,7 +194,7 @@ export async function updateCheckpointBoardConfig(
     if (error) throw error;
 
     revalidatePath(STUDIO_PATH);
-    revalidatePath(`/evidence/web`);
+    revalidatePath("/play/[caseId]/board", "page");
     return { success: true, data: { id: checkpointId } };
   } catch (error: unknown) {
     console.error("Error updating checkpoint board config:", error);
@@ -294,7 +294,7 @@ export async function saveBoardgamePinPositions(
       if (delAllError) throw delAllError;
     }
 
-    revalidatePath("/evidence/boardgame");
+    revalidatePath("/play/[caseId]/box", "page");
     return { success: true };
   } catch (error: unknown) {
     console.error("Error saving boardgame pin positions:", error);
@@ -410,7 +410,7 @@ export async function saveReinvestigationHotspots(
       );
 
     if (dbError) throw dbError;
-    revalidatePath(`/evidence/web`);
+    revalidatePath("/play/[caseId]/board", "page");
     return { success: true };
   } catch (error: unknown) {
     console.error("Error saving reinvestigation hotspots:", error);

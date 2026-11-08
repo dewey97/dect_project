@@ -49,7 +49,7 @@ test.describe("Evidence Studio & Case Evidence Engine", () => {
       }),
     );
 
-    await page.goto("/evidence/web?case_id=case_000");
+    await page.goto("/play/case_000/board");
 
     // Board canvas should attach
     await expect(page.locator('[data-pin-id="c0-pin-phone"], [data-node-kind="phone_lookup"]').first()).toBeAttached();

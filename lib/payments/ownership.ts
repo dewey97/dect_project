@@ -31,7 +31,7 @@ export function isPlayGatingEnabled(): boolean {
 }
 
 /**
- * Server half of the play gate for /play and /evidence/web.
+ * Server half of the play gate for the /play/<case_id>/board, /box and /phone routes.
  * true: render the page. false: the client guard (CaseAccessGuard) still lets
  * the visitor in when this device holds a room session of the case (an invited
  * player), otherwise sends them to /cases/<case_id>.

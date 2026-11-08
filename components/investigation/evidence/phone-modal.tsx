@@ -1,4 +1,5 @@
 import { normalizeCaseId } from "@/lib/cases/case-id";
+import { phonePath } from "@/lib/play/routes";
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, ExternalLink } from 'lucide-react'
@@ -47,7 +48,7 @@ export function PhoneModal({ isOpen, onClose, caseId }: PhoneModalProps) {
 
             <div className="flex items-center gap-2">
               <Link
-                href={`/evidence/victim-phone?case_id=${normalizeCaseId(caseId)}`}
+                href={phonePath(normalizeCaseId(caseId))}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#1C1C1E] text-zinc-300 hover:text-white hover:bg-white/15 border border-white/20 active:scale-95 transition-all cursor-pointer shadow-md text-[12px] font-sans font-medium"
                 title="Mở toàn màn hình / Tab riêng"
                 aria-label="Mở toàn màn hình / Tab riêng"

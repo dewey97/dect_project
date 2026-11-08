@@ -1,6 +1,7 @@
 "use client";
 
 import { normalizeCaseId } from "@/lib/cases/case-id";
+import { phonePath } from "@/lib/play/routes";
 import { useState } from "react";
 import Link from "next/link";
 import { X, ExternalLink, FolderOpen } from "lucide-react";
@@ -102,7 +103,7 @@ export function SingleInvestigationWorkspace({
               </div>
               <div className="flex items-center gap-1.5">
                 <Link
-                  href={`/evidence/victim-phone?case_id=${normalizeCaseId(caseId)}`}
+                  href={phonePath(normalizeCaseId(caseId))}
                   className="flex items-center gap-1 px-2 py-1 rounded bg-[#1C1C1E] text-zinc-400 hover:text-white border border-white/10 text-[11px] font-sans transition-all"
                 >
                   <ExternalLink className="size-3" />

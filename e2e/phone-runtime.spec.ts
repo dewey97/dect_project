@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const CASE_URL = "/evidence/web?case_id=case_000";
+const CASE_URL = "/play/case_000/board";
 
 const EXPECTED_APPS = [
   "Ảnh",

@@ -2,6 +2,15 @@
 
 All notable changes to the Detective Case System (dect_project) will be documented in this file.
 
+## [2026-11-08]
+
+### Route chơi game thống nhất dưới `/play/<case_id>`
+
+- Bàn điều tra `/evidence/web?case_id=X` → `/play/X/board`; bàn hộp `/evidence/boardgame` → `/play/X/box`; điện thoại `/evidence/victim-phone` → `/play/X/phone`. Case nằm trên path, không còn rơi về case_000 khi link quên `?case_id=`.
+- Phòng chờ có route riêng `/play/X/lobby?room=CODE`; `/play/X` chỉ còn màn vào game.
+- Bỏ màn loading "phòng chờ giả" trước bàn điều tra; modal Chơi nhóm dùng lại `PlayLobby`.
+- Route cũ `/evidence/*` chuyển hướng 308 sang route mới; xóa `/cabinet-demo`.
+
 ## [2026-10-28]
 
 ### Quy hoạch lại tài liệu

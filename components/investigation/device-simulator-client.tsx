@@ -8,6 +8,7 @@ import { PhoneSimulator } from '@/components/phone-engine/phone-simulator'
 import { EvidenceHeader } from '@/components/investigation/viewers/evidence-header'
 import { MetadataPanel } from '@/components/investigation/viewers/metadata-panel'
 import { RecoveryStatusPanel } from '@/components/investigation/viewers/recovery-status-panel'
+import { boardPath } from '@/lib/play/routes'
 import type { Device, Conversation, Photo, Email, Document, BrowserHistory, RecoveredFile } from '@/lib/types'
 
 interface DeviceSimulatorClientProps {
@@ -36,7 +37,7 @@ export function DeviceSimulatorClient({
 
   // Check if device is locked by Checkpoints
   const isLocked = isDeviceLockedByCheckpoint(caseId, device.id)
-  const boardHref = `/evidence/web?case_id=${caseId}`
+  const boardHref = boardPath(caseId)
 
   if (isLocked) {
     return (

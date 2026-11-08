@@ -37,6 +37,60 @@ const nextConfig = {
         destination: '/studio/dossier',
         permanent: true,
       },
+      // Route chơi cũ (/evidence/*?case_id=X) → /play/X/... Query còn lại (?room=) được giữ.
+      {
+        source: '/evidence/web',
+        has: [{ type: 'query', key: 'case_id', value: '(?<cid>[A-Za-z0-9_-]+)' }],
+        destination: '/play/:cid/board',
+        permanent: true,
+      },
+      {
+        source: '/evidence/web',
+        has: [{ type: 'query', key: 'caseId', value: '(?<cid>[A-Za-z0-9_-]+)' }],
+        destination: '/play/:cid/board',
+        permanent: true,
+      },
+      {
+        source: '/evidence/web',
+        destination: '/play/case_000/board',
+        permanent: true,
+      },
+      {
+        source: '/evidence/boardgame',
+        has: [{ type: 'query', key: 'case_id', value: '(?<cid>[A-Za-z0-9_-]+)' }],
+        destination: '/play/:cid/box',
+        permanent: true,
+      },
+      {
+        source: '/evidence/boardgame',
+        has: [{ type: 'query', key: 'caseId', value: '(?<cid>[A-Za-z0-9_-]+)' }],
+        destination: '/play/:cid/box',
+        permanent: true,
+      },
+      {
+        source: '/evidence/boardgame',
+        destination: '/play/case_000/box',
+        permanent: true,
+      },
+      {
+        source: '/evidence/victim-phone',
+        has: [{ type: 'query', key: 'case_id', value: '(?<cid>[A-Za-z0-9_-]+)' }],
+        destination: '/play/:cid/phone',
+        permanent: true,
+      },
+      {
+        source: '/evidence/victim-phone',
+        has: [{ type: 'query', key: 'caseId', value: '(?<cid>[A-Za-z0-9_-]+)' }],
+        destination: '/play/:cid/phone',
+        permanent: true,
+      },
+      {
+        source: '/evidence/victim-phone',
+        destination: '/play/case_000/phone',
+        permanent: true,
+      },
+      { source: '/evidence', destination: '/play/case_000/board', permanent: true },
+      { source: '/cabinet-demo', destination: '/', permanent: true },
     ]
   },
   async headers() {

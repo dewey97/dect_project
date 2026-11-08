@@ -10,6 +10,8 @@ import { PlayShell } from "@/components/play/play-ui";
 import { normalizeCaseId } from "@/lib/cases/case-id";
 import { normalizeRoomCode } from "@/lib/rooms/code";
 import { findSessionByCode } from "@/lib/rooms/client";
+import { boardPath, lobbyPath, playPath } from "@/lib/play/routes";
+import type { PublicParticipant, PublicRoom } from "@/lib/types/room";
 
 export interface PlayCaseInfo {
   caseId: string;
@@ -20,74 +22,104 @@ export interface PlayCaseInfo {
   access?: { online: boolean; box: boolean; groupCredits: number } | null;
 }
 
-/**
- * Điều hướng theo trạng thái phòng (spec 2.1):
- * chưa ở phòng → màn vào game; lobby / người vào muộn → phòng chờ;
- * intro_scene / intro_handover → màn dẫn truyện; investigating / epilogue → bàn điều tra.
- */
-export function PlayRoomClient({ info }: { info: PlayCaseInfo }) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { room, me, isConnecting } = useRoomSync();
-  // F5 / mở lại link phòng mà thiết bị đã có phiên: provider tự nối lại, hiện trạng thái chờ
-  // thay vì màn vào game. Các thao tác khác (tạo, vào phòng) giữ nguyên form để không mất lỗi.
-  const [autoResuming, setAutoResuming] = useState(false);
-  useEffect(() => {
-    const code = normalizeRoomCode(
-      new URLSearchParams(window.location.search).get("room"),
-    );
-    setAutoResuming(!!code && !!findSessionByCode(code));
-  }, []);
-
-  const inGame =
+function isInGame(room: PublicRoom | null, me: PublicParticipant | null) {
+  return (
     !!room &&
     !!me &&
     !!me.enteredAt &&
-    (room.phase === "investigating" || room.phase === "epilogue");
+    (room.phase === "investigating" || room.phase === "epilogue")
+  );
+}
 
-  // Giữ `?room=<CODE>` trên URL để F5 tự nối lại phòng (router của Next có thể ghi đè
-  // URL đã sửa bằng history.replaceState).
+/** Mã phòng trên URL hiện tại (`?room=`), đã chuẩn hóa. */
+function urlRoomCode(): string | null {
+  return normalizeRoomCode(
+    new URLSearchParams(window.location.search).get("room"),
+  );
+}
+
+function Status({ children }: { children: string }) {
+  return (
+    <p role="status" className="py-20 text-center text-sm text-zinc-400">
+      {children}
+    </p>
+  );
+}
+
+/**
+ * `/play/<case_id>`: màn vào game (chơi một mình, tạo phòng, nhập mã).
+ * Vào được phòng thì chuyển sang `/play/<case_id>/lobby?room=CODE`.
+ */
+export function PlayRoomClient({ info }: { info: PlayCaseInfo }) {
+  const router = useRouter();
+  const { room, me, isConnecting } = useRoomSync();
+  // F5 / mở lại link phòng mà thiết bị đã có phiên: provider tự nối lại.
+  const [autoResuming, setAutoResuming] = useState(false);
+  useEffect(() => {
+    const code = urlRoomCode();
+    setAutoResuming(!!code && !!findSessionByCode(code));
+  }, []);
+
+  useEffect(() => {
+    if (!room || !me) return;
+    const caseId = normalizeCaseId(room.caseId);
+    if (isInGame(room, me)) router.replace(boardPath(caseId, room.code));
+    else if (room.code) router.replace(lobbyPath(caseId, room.code));
+  }, [room, me, router]);
+
+  const body =
+    room && me ? (
+      <Status>Đang vào phòng chờ…</Status>
+    ) : autoResuming && isConnecting ? (
+      <Status>Đang kết nối phòng…</Status>
+    ) : (
+      <PlayEntry
+        caseId={info.caseId}
+        caseTitle={info.title}
+        access={info.access ?? null}
+      />
+    );
+
+  return <PlayShell>{body}</PlayShell>;
+}
+
+/**
+ * `/play/<case_id>/lobby?room=CODE`: phòng chờ và intro đồng bộ của phòng.
+ * Thiết bị chưa có phiên của mã phòng thì về màn vào game để nhập tên.
+ * Phòng đã vào `investigating` và người chơi đã vào cuộc thì sang bàn điều tra.
+ */
+export function PlayLobbyClient({ info }: { info: PlayCaseInfo }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { room, me, leftRoom } = useLobbyState();
+
+  // Không có phiên cho mã này (link chuyển tiếp, máy khác) hoặc vừa rời phòng.
+  useEffect(() => {
+    const code = urlRoomCode();
+    if (!code || !findSessionByCode(code) || leftRoom) {
+      router.replace(playPath(info.caseId, leftRoom ? null : code));
+    }
+  }, [info.caseId, router, leftRoom]);
+
+  // Giữ `?room=<CODE>` khớp phòng hiện tại để F5 tự nối lại; phòng thuộc vụ khác thì đổi vụ.
   const urlRoom = searchParams.get("room");
   useEffect(() => {
-    if (
-      room?.code &&
-      urlRoom !== room.code &&
-      normalizeCaseId(room.caseId) === info.caseId
-    ) {
-      router.replace(`/play/${info.caseId}?room=${room.code}`, {
-        scroll: false,
-      });
+    if (!room?.code) return;
+    const caseId = normalizeCaseId(room.caseId);
+    if (urlRoom !== room.code || caseId !== info.caseId) {
+      router.replace(lobbyPath(caseId, room.code), { scroll: false });
     }
   }, [room?.code, room?.caseId, urlRoom, info.caseId, router]);
 
-  // Phòng thuộc vụ án khác (mở link cũ): chuyển về đúng vụ của phòng.
   useEffect(() => {
-    if (room?.code && normalizeCaseId(room.caseId) !== info.caseId) {
-      router.replace(`/play/${room.caseId}?room=${room.code}`);
+    if (isInGame(room, me) && room) {
+      router.replace(boardPath(normalizeCaseId(room.caseId), room.code));
     }
-  }, [room?.caseId, room?.code, info.caseId, router]);
-
-  useEffect(() => {
-    if (!inGame || !room) return;
-    const qs = new URLSearchParams({ case_id: room.caseId });
-    if (room.code) qs.set("room", room.code);
-    router.replace(`/evidence/web?${qs.toString()}`);
-  }, [inGame, room, router]);
+  }, [room, me, router]);
 
   let body: React.ReactNode;
   if (!room || !me) {
-    body =
-      autoResuming && isConnecting ? (
-        <p role="status" className="py-20 text-center text-sm text-zinc-400">
-          Đang kết nối phòng…
-        </p>
-      ) : (
-        <PlayEntry
-          caseId={info.caseId}
-          caseTitle={info.title}
-          access={info.access ?? null}
-        />
-      );
+    body = <Status>Đang kết nối phòng…</Status>;
   } else if (room.phase === "lobby" || !me.enteredAt) {
     body = (
       <PlayLobby
@@ -99,13 +131,18 @@ export function PlayRoomClient({ info }: { info: PlayCaseInfo }) {
   } else if (room.phase === "intro_scene" || room.phase === "intro_handover") {
     body = <PlayIntro info={info} />;
   } else {
-    body = (
-      <p role="status" className="py-20 text-center text-sm text-zinc-400">
-        Đang mở bàn điều tra…
-      </p>
-    );
+    body = <Status>Đang mở bàn điều tra…</Status>;
   }
 
-  const isLobby = Boolean(room && (room.phase === "lobby" || !me?.enteredAt));
-  return <PlayShell wide={isLobby}>{body}</PlayShell>;
+  return <PlayShell wide>{body}</PlayShell>;
+}
+
+/** room/me của provider, kèm cờ vừa rời phòng (có phòng rồi mất phòng). */
+function useLobbyState() {
+  const { room, me } = useRoomSync();
+  const [hadRoom, setHadRoom] = useState(false);
+  useEffect(() => {
+    if (room) setHadRoom(true);
+  }, [room]);
+  return { room, me, leftRoom: hadRoom && !room };
 }

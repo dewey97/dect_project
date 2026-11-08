@@ -7,11 +7,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { useSearchParams } from "next/navigation";
-import { normalizeCaseId } from "@/lib/cases/case-id";
 import { setActiveCaseCharacters } from "@/lib/cases/case-characters";
 import { DEFAULT_AVATAR_PLACEHOLDER } from "@/lib/cases/characters";
 import type { DbCaseCharacter } from "@/lib/types/database";
+import { usePlayCaseId } from "@/lib/hooks/use-play-case-id";
 
 interface CaseCharactersValue {
   caseId: string;
@@ -40,15 +39,12 @@ async function fetchCharacters(caseId: string): Promise<DbCaseCharacter[]> {
 }
 
 /**
- * Nạp danh sách nhân vật (bảng `case_characters`) của vụ án trên URL `?case_id=`
+ * Nạp danh sách nhân vật (bảng `case_characters`) của vụ án trên route `/play/<case_id>`
  * trước khi render bàn điều tra, vì các hàm so khớp tên nghi phạm / SĐT đọc
  * registry đồng bộ trong lúc render.
  */
 export function CaseCharactersProvider({ children }: { children: ReactNode }) {
-  const searchParams = useSearchParams();
-  const caseId = normalizeCaseId(
-    searchParams.get("case_id") || searchParams.get("caseId"),
-  );
+  const caseId = usePlayCaseId();
   const [value, setValue] = useState<CaseCharactersValue | null>(() => {
     const cached = loadedCases.get(caseId);
     if (!cached) return null;

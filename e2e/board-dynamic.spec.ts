@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Dynamic Board and Read-only Gameplay', () => {
   test('gameplay board should not display admin move/setup controls', async ({ page }) => {
     // Navigate to gameplay evidence page
-    await page.goto('/evidence/web?case_id=case_000');
+    await page.goto('/play/case_000/board');
 
     // Wait for the board container or canvas to load
     await page.waitForLoadState('networkidle');
@@ -28,7 +28,7 @@ test.describe('Dynamic Board and Read-only Gameplay', () => {
       }
     });
 
-    await page.goto('/evidence/web?case_id=case_000');
+    await page.goto('/play/case_000/board');
     await page.waitForLoadState('networkidle');
 
     expect(legacyRequests).toHaveLength(0);

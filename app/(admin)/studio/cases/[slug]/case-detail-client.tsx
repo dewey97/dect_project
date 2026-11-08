@@ -13,6 +13,7 @@ import type { DbCase, CaseStatus } from "@/lib/types/database";
 import { updateCase } from "@/lib/actions/case-actions";
 import { uploadEvidenceAsset } from "@/lib/actions/evidence-actions";
 import { toast } from "@/components/ui/toast";
+import { boardPath } from "@/lib/play/routes";
 
 export function CaseDetailClient({ initialCase }: { initialCase: DbCase }) {
   const router = useRouter();
@@ -101,7 +102,7 @@ export function CaseDetailClient({ initialCase }: { initialCase: DbCase }) {
 
         <div className="flex items-center gap-2">
           <Link
-            href={`/evidence/web?case_id=${caseData.slug}`}
+            href={boardPath(caseData.slug)}
             className="inline-flex items-center gap-1.5 px-3 py-2 bg-zinc-800 text-zinc-200 border border-white/10 rounded-md text-xs font-medium hover:bg-zinc-700 transition-colors"
           >
             <ExternalLink className="size-3.5" />

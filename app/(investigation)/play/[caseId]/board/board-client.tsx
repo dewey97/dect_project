@@ -36,7 +36,9 @@ import { PhoneModal } from "@/components/investigation/evidence/phone-modal";
 import nextDynamic from "next/dynamic";
 import { HintModal } from "@/components/investigation/modals/hint-modal";
 import { DetectiveNotebookModal } from "@/components/investigation/modals/detective-notebook-modal";
-import { GameplayLoadingScreen } from "@/components/investigation/gameplay-loading-screen";
+import { BoardLoadingStatus } from "@/components/investigation/board-loading-status";
+import { usePlayCaseId } from "@/lib/hooks/use-play-case-id";
+import { boxPath, lobbyPath, playPath } from "@/lib/play/routes";
 import { useDossierDocuments } from "@/lib/hooks/use-dossier-documents";
 import { getDossierSlot, useCaseDossiers } from "@/lib/hooks/use-case-dossiers";
 import {
@@ -49,7 +51,7 @@ import {
   getStorageItem,
   setStorageItem,
 } from "@/lib/investigation/storage";
-import { caseStorageKey, normalizeCaseId, clearCaseProgress } from "@/lib/cases/case-id";
+import { caseStorageKey, clearCaseProgress } from "@/lib/cases/case-id";
 import { useInvestigationEvent } from "@/lib/investigation/investigation-events";
 import { EVIDENCE_PHOTO_PLACEHOLDER } from "@/lib/cases/placeholders";
 // Modal khám xét hiện trường kéo theo three.js (Scene360Viewer) — chỉ tải khi cần.
@@ -74,9 +76,7 @@ type ActiveModal =
 function WebEvidencePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const rawCaseId =
-    searchParams.get("case_id") || searchParams.get("caseId") || "case_000";
-  const caseId = normalizeCaseId(rawCaseId);
+  const caseId = usePlayCaseId();
 
   // Single modal registry
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
@@ -238,17 +238,19 @@ function WebEvidencePageContent() {
 
   // Link phòng mà thiết bị chưa có phiên: sang màn nhập nickname.
   useEffect(() => {
-    if (pendingRoomCode) router.replace(`/play/${caseId}?room=${pendingRoomCode}`);
+    if (pendingRoomCode) router.replace(playPath(caseId, pendingRoomCode));
   }, [pendingRoomCode, caseId, router]);
 
   // Chơi nhóm v3: bàn điều tra chỉ mở khi phòng đã vào `investigating` và người chơi
-  // đã vào cuộc. Phòng còn ở phòng chờ / intro (F5, mở link cũ): về /play.
+  // đã vào cuộc. Phòng còn ở phòng chờ / intro (F5, mở link cũ): về /lobby.
   useEffect(() => {
     if (!room || !me) return;
     const inGame =
       !!me.enteredAt && (room.phase === "investigating" || room.phase === "epilogue");
     if (!inGame) {
-      router.replace(`/play/${room.caseId}${room.code ? `?room=${room.code}` : ""}`);
+      router.replace(
+        room.code ? lobbyPath(room.caseId, room.code) : playPath(room.caseId),
+      );
     }
   }, [room, me, router]);
 
@@ -851,9 +853,8 @@ function WebEvidencePageContent() {
       </div>
       )}
 
-      {/* MÀN HÌNH CHỜ NẠP DỮ LIỆU & ẢNH BÀN ĐIỀU TRA TRƯỚC KHI VÀO GAMEPLAY */}
-      <GameplayLoadingScreen
-        caseId={caseId}
+      {/* Dòng trạng thái khi bàn còn đang nạp dữ liệu */}
+      <BoardLoadingStatus
         isReady={isGameplayReady}
         statusText={loadingStatus}
         progress={loadingProgress}
@@ -906,7 +907,7 @@ function WebEvidencePageContent() {
           <QuickActionFab
             onOpenBoardGame={() => {
               detectiveAudio.playPaperRustle();
-              router.push(`/evidence/boardgame?case_id=${caseId}`);
+              router.push(boxPath(caseId, roomCode));
             }}
             onResetCase={resetAllProgress}
             onGoHome={() => router.push("/")}

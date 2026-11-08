@@ -7,6 +7,7 @@ import { CreateCaseButton } from "./create-case-button";
 import { DeleteCaseButton } from "./delete-case-button";
 import { DuplicateCaseButton } from "./duplicate-case-button";
 import type { DbCase } from "@/lib/types/database";
+import { boardPath } from "@/lib/play/routes";
 
 export function CasesListClient({ initialCases }: { initialCases: DbCase[] }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -134,7 +135,7 @@ export function CasesListClient({ initialCases }: { initialCases: DbCase[] }) {
                       Edit
                     </Link>
                     <Link
-                      href={`/evidence/web?case_id=${c.slug}`}
+                      href={boardPath(c.slug)}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/20 text-primary border border-primary/30 rounded text-xs font-medium hover:bg-primary/30 transition-colors"
                     >
                       Playtest

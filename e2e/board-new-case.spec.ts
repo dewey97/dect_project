@@ -60,7 +60,7 @@ test.describe("B12-6: Dynamic New Case Board (Isolated Workspace)", () => {
       localStorage.setItem(`${slug}:intro_seen`, "true");
     }, TEST_CASE_SLUG);
 
-    await page.goto(`/evidence/web?case_id=${TEST_CASE_SLUG}`);
+    await page.goto(`/play/${TEST_CASE_SLUG}/board`);
 
     // Bàn điều tra render canvas
     const canvas = page.locator("canvas").first();

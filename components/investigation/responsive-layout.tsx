@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { usePathname } from 'next/navigation'
+
 import { PageTransition } from '@/components/investigation/page-transition'
 import type { Case, EvidenceDevice, Evidence, TraceCard } from '@/lib/types'
 
@@ -14,8 +14,6 @@ interface ResponsiveLayoutProps {
 }
 
 export function ResponsiveLayout({ children }: ResponsiveLayoutProps) {
-  const pathname = usePathname()
-  const isEvidenceSimulator = pathname.startsWith('/evidence/')
 
   return (
     <div suppressHydrationWarning className="flex h-dvh w-full justify-center items-center overflow-hidden bg-[#0d0c0a] fixed inset-0 min-h-0 min-w-0">

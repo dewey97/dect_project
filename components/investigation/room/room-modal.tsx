@@ -4,73 +4,36 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, X, Copy, Check, LogOut, ArrowRight, Crown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Users, X, ArrowRight } from "lucide-react";
 import { useRoomSync } from "@/components/investigation/room/room-sync-context";
-import { DetectiveAvatar } from "@/components/investigation/detective-avatar";
-import { normalizeCaseId } from "@/lib/cases/case-id";
-import { roomInviteUrl } from "@/lib/rooms/client";
-import { UNRANKED_GAP_MS } from "@/lib/rooms/ranking";
-
-const UNRANKED_GAP_MINUTES = UNRANKED_GAP_MS / 60_000;
+import { PlayLobby } from "@/components/play/play-lobby";
+import { usePlayCaseId } from "@/lib/hooks/use-play-case-id";
+import { playPath } from "@/lib/play/routes";
 
 interface RoomModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-/** Vụ án đang mở, đọc từ URL (`?case_id=`), để dẫn tới màn vào game của đúng vụ. */
-function currentCaseId(): string {
-  if (typeof window === "undefined") return normalizeCaseId(null);
-  const params = new URLSearchParams(window.location.search);
-  return normalizeCaseId(params.get("case_id") || params.get("caseId"));
-}
-
 /**
- * Modal phòng trong màn điều tra (plan D5).
- * Chưa ở phòng: dẫn tới màn vào game `/play/<case_id>` (tạo/vào phòng ở đó).
- * Đang ở phòng: mã phòng, link mời, thành viên, Rời phòng.
+ * Modal Chơi nhóm trong màn điều tra.
+ * Đang ở phòng: dùng chung phòng chờ `PlayLobby` của /play (thành viên, mã, QR, rời phòng).
+ * Chưa ở phòng: dẫn tới màn vào game `/play/<case_id>`.
  */
 export function RoomModal({ isOpen, onClose }: RoomModalProps) {
-  const { room, roomCode, me, participants, onlineIds, leaveRoom } =
-    useRoomSync();
-
-  // Cảnh báo phụ Q12: người online cuối cùng rời khi phòng đang tính giờ.
-  const isLastOnlineInRankedGame =
-    !!room &&
-    !!room.startedAt &&
-    !room.endedAt &&
-    !room.unrankedAt &&
-    participants.every((p) => p.id === me?.id || !onlineIds.has(p.id));
-
+  const { room, me } = useRoomSync();
+  const caseId = usePlayCaseId();
   const [isMounted, setIsMounted] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [confirmLeave, setConfirmLeave] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (isOpen) setConfirmLeave(false);
-  }, [isOpen]);
-
-  const handleCopyLink = async () => {
-    if (!room?.code) return;
-    try {
-      await navigator.clipboard.writeText(
-        roomInviteUrl(room.caseId, room.code),
-      );
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Clipboard bị chặn: người chơi vẫn đọc mã phòng trên màn hình.
-    }
-  };
-
   if (!isMounted) return null;
 
-  const modalContent = (
+  const inRoom = !!room && !!me;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <div
@@ -87,10 +50,10 @@ export function RoomModal({ isOpen, onClose }: RoomModalProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
-            className="w-full max-w-md bg-zinc-950 border border-zinc-800 text-zinc-100 rounded-2xl shadow-2xl overflow-hidden font-sans"
+            className={`w-full ${inRoom ? "max-w-2xl" : "max-w-md"} max-h-[90dvh] flex flex-col bg-zinc-950 border border-zinc-800 text-zinc-100 rounded-2xl shadow-2xl overflow-hidden font-sans`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800/80 bg-zinc-900/50">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800/80 bg-zinc-900/50 shrink-0">
               <div className="flex items-center gap-2.5">
                 <Users className="size-4 text-zinc-400" />
                 <h3
@@ -110,149 +73,9 @@ export function RoomModal({ isOpen, onClose }: RoomModalProps) {
               </button>
             </div>
 
-            <div className="p-5 space-y-4">
-              {room && roomCode ? (
-                <div className="space-y-4">
-                  <div className="p-4 rounded-xl bg-zinc-900/70 border border-zinc-800 flex flex-col items-center text-center space-y-2">
-                    <div className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
-                      {room.code ? "Mã phòng" : "Phòng đã kết thúc"}
-                    </div>
-                    {room.unrankedAt && (
-                      <p className="text-xs text-amber-300">
-                        Phòng này không còn tính xếp hạng.
-                      </p>
-                    )}
-                    {room.code && (
-                      <div className="text-3xl font-extrabold text-white tracking-widest font-mono select-all">
-                        {room.code}
-                      </div>
-                    )}
-                    <p className="text-xs text-zinc-400 max-w-xs leading-relaxed">
-                      Tiến trình điều tra, manh mối và kết luận đồng bộ cho cả
-                      phòng.
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-400 uppercase tracking-wider px-0.5">
-                      <Users className="size-3.5" />
-                      <span>
-                        Thành viên ({participants.length}/{room.maxPlayers})
-                      </span>
-                    </div>
-
-                    <ul className="space-y-2 max-h-56 overflow-y-auto pr-0.5 custom-scrollbar">
-                      {participants.map((p) => {
-                        const isMe = p.id === me?.id;
-                        const online = isMe || onlineIds.has(p.id);
-                        return (
-                          <li
-                            key={p.id}
-                            className={cn(
-                              "flex items-center gap-3 p-2.5 rounded-xl border",
-                              isMe
-                                ? "bg-zinc-900 border-zinc-700/80"
-                                : "bg-zinc-900/40 border-zinc-800/80",
-                            )}
-                          >
-                            <DetectiveAvatar
-                              name={p.nickname}
-                              size="md"
-                              showOnlineDot
-                              isOnline={online}
-                            />
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className="font-semibold text-sm text-zinc-100 truncate">
-                                  {p.nickname}
-                                </span>
-                                {isMe && (
-                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800 border border-zinc-700 text-zinc-300">
-                                    Bạn
-                                  </span>
-                                )}
-                                {p.isHost && (
-                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-950/40 border border-amber-800/50 text-amber-300">
-                                    <Crown className="size-3" aria-hidden />
-                                    Host
-                                  </span>
-                                )}
-                              </div>
-                              <div className="text-[11px] text-zinc-400">
-                                {online ? "Đang trực tuyến" : "Mất kết nối"}
-                              </div>
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-
-                  {confirmLeave ? (
-                    <div className="p-3 rounded-xl border border-red-900/50 bg-red-950/20 space-y-2">
-                      <p className="text-xs text-zinc-200">
-                        Rời phòng sẽ giải phóng chỗ của bạn. Quay lại thì vào
-                        như người mới nếu phòng còn chỗ.
-                      </p>
-                      {isLastOnlineInRankedGame && (
-                        <p className="text-xs text-amber-300">
-                          Bạn là người cuối cùng đang online. Nếu cả phòng vắng
-                          quá {UNRANKED_GAP_MINUTES} phút, phòng vẫn chơi tiếp
-                          nhưng không còn tính xếp hạng.
-                        </p>
-                      )}
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={async () => {
-                            await leaveRoom();
-                            onClose();
-                          }}
-                          className="flex-1 min-h-11 px-3 bg-red-900/60 hover:bg-red-800/70 rounded-lg text-xs font-semibold text-red-100 cursor-pointer"
-                        >
-                          Rời phòng
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setConfirmLeave(false)}
-                          className="flex-1 min-h-11 px-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-semibold cursor-pointer"
-                        >
-                          Ở lại
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 pt-1">
-                      {room.code && (
-                        <button
-                          type="button"
-                          onClick={handleCopyLink}
-                          className="flex-1 min-h-11 px-3 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl text-zinc-100 text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer"
-                        >
-                          {copied ? (
-                            <>
-                              <Check className="size-4 text-emerald-400" />
-                              <span>Đã sao chép link mời</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="size-4 text-zinc-300" />
-                              <span>Sao chép link mời</span>
-                            </>
-                          )}
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => setConfirmLeave(true)}
-                        className="min-h-11 px-3 bg-zinc-900 hover:bg-red-950/40 border border-zinc-800 hover:border-red-800/60 rounded-xl text-zinc-300 hover:text-red-300 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
-                      >
-                        <LogOut className="size-4" />
-                        <span>Rời phòng</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
+            <div className="p-4 sm:p-5 overflow-y-auto">
+              {inRoom ? (
+                <PlayLobby caseTitle="" caseId={room.caseId} embedded />
               ) : (
                 <div className="space-y-4">
                   <p className="text-sm text-zinc-300 leading-relaxed">
@@ -261,7 +84,7 @@ export function RoomModal({ isOpen, onClose }: RoomModalProps) {
                     không dùng tiến trình chơi Solo.
                   </p>
                   <Link
-                    href={`/play/${currentCaseId()}`}
+                    href={playPath(caseId)}
                     onClick={onClose}
                     className="w-full min-h-11 px-4 bg-zinc-100 hover:bg-white text-zinc-950 font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2"
                   >
@@ -274,10 +97,7 @@ export function RoomModal({ isOpen, onClose }: RoomModalProps) {
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
-
-  return typeof document !== "undefined"
-    ? createPortal(modalContent, document.body)
-    : null;
 }

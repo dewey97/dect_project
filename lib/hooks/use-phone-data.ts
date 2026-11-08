@@ -3,6 +3,7 @@
 import { getActiveCaseId } from "@/lib/cases/case-characters";
 import { useState, useEffect } from "react";
 import { normalizeCaseId } from "@/lib/cases/case-id";
+import { caseIdFromPath } from "@/lib/play/routes";
 
 export interface PhoneDataState<T> {
   data: T[];
@@ -22,13 +23,12 @@ const CACHE_TTL_MS = 30_000; // 30 seconds fresh cache
 
 export function usePhoneData<T = any>(
   tab: string,
-  /** Bỏ trống: lấy theo `?case_id=` trên URL, rồi vụ án đang chơi. */
+  /** Bỏ trống: lấy theo route `/play/<case_id>`, rồi vụ án đang chơi. */
   caseId?: string,
 ): PhoneDataState<T> {
   const urlCaseId =
     typeof window !== "undefined"
-      ? new URLSearchParams(window.location.search).get("case_id") ||
-        new URLSearchParams(window.location.search).get("caseId")
+      ? caseIdFromPath(window.location.pathname)
       : null;
   const effectiveCaseId = normalizeCaseId(
     caseId || urlCaseId || getActiveCaseId(),

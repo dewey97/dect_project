@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { caseStorageKey, normalizeCaseId } from "@/lib/cases/case-id";
+import { useRouter } from "next/navigation";
+import { caseStorageKey } from "@/lib/cases/case-id";
+import { usePlayCaseId } from "@/lib/hooks/use-play-case-id";
 import { useCheckpoints } from "@/components/investigation/contexts/checkpoints-context";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { BoardGameCompanionView } from "@/components/investigation/evidence/board-game-companion-view";
-import { GameplayLoadingScreen } from "@/components/investigation/gameplay-loading-screen";
+import { BoardLoadingStatus } from "@/components/investigation/board-loading-status";
 import {
   PhaseUnlockedModal,
   type UnlockedModalData,
@@ -36,10 +37,7 @@ type ActiveModal = "phone" | "reinvestigate" | "epilogue" | "hint" | null;
 
 function BoardGameCompanionContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const rawCaseId =
-    searchParams.get("case_id") || searchParams.get("caseId") || "case_000";
-  const caseId = normalizeCaseId(rawCaseId);
+  const caseId = usePlayCaseId();
 
   useCheckpoints();
 
@@ -122,9 +120,8 @@ function BoardGameCompanionContent() {
         onBoardReady={() => setIsBoardReady(true)}
       />
 
-      {/* MÀN HÌNH CHỜ NẠP DỮ LIỆU & ẢNH BÀN ĐIỀU TRA TRƯỚC KHI VÀO GAMEPLAY */}
-      <GameplayLoadingScreen
-        caseId={caseId}
+      {/* Dòng trạng thái khi bàn còn đang nạp dữ liệu */}
+      <BoardLoadingStatus
         isReady={isGameplayReady}
         statusText={
           !isBoardReady

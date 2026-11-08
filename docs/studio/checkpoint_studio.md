@@ -233,7 +233,7 @@ Từ phiên bản 2026-10-25 (Migration 39, WT-1 1G), Checkpoint Studio tích h�
   - Thêm, sửa, xóa các node phụ / ghi chú vật chứng vụ án (`case_board_nodes`).
   - Nối dây dẫn liên kết giữa các pin ghim (`boardgame_connections`).
   - Lưu cấu hình trực tiếp vào cơ sở dữ liệu Supabase mà không làm gián đoạn người chơi.
-- **Chơi thử**: Tích hợp nút "Chơi thử" khởi chạy trực tiếp phiên điều tra `/evidence/web?case_id=<slug>` với tiến trình tương ứng.
+- **Chơi thử**: Tích hợp nút "Chơi thử" khởi chạy trực tiếp phiên điều tra `/play/<slug>/board` với tiến trình tương ứng.
 
 
 ---

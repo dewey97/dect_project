@@ -17,7 +17,7 @@ test.describe("WT-5 Evidence Archival Dossier Grouping & Inspection", () => {
       localStorage.setItem("intro_seen", "true");
     });
 
-    await page.goto("/evidence/web?case_id=case_000");
+    await page.goto("/play/case_000/board");
 
     // Khay hồ sơ hiển thị
     await expect(page.getByText("Hồ sơ & Vật chứng")).toBeVisible();
@@ -54,7 +54,7 @@ test.describe("WT-5 Evidence Archival Dossier Grouping & Inspection", () => {
       localStorage.removeItem("case_000_indictment_solved");
     });
 
-    await page.goto("/evidence/web?case_id=case_000");
+    await page.goto("/play/case_000/board");
 
     const chipBoC = page.getByRole("button", { name: "Bộ C", exact: true });
     if (await chipBoC.count()) {
@@ -83,7 +83,7 @@ test.describe("WT-5 Evidence Archival Dossier Grouping & Inspection", () => {
       localStorage.setItem("intro_seen", "true");
     });
 
-    await page.goto("/evidence/web?case_id=case_000");
+    await page.goto("/play/case_000/board");
 
     // Click vào một tài liệu bất kỳ trong khay
     const docItem = page.locator('[id^="doc-card-dossier-"]').first();
@@ -100,14 +100,14 @@ test.describe("WT-5 Evidence Archival Dossier Grouping & Inspection", () => {
     }
   });
 
-  test("4. No legacy custody metadata appears on /evidence/web", async ({
+  test("4. No legacy custody metadata appears on the board", async ({
     page,
   }) => {
     await page.addInitScript(() => {
       localStorage.setItem("intro_seen", "true");
     });
 
-    await page.goto("/evidence/web?case_id=case_000");
+    await page.goto("/play/case_000/board");
 
     const pageContent = await page.content();
     expect(pageContent).not.toContain("Người thu thập");
@@ -115,10 +115,10 @@ test.describe("WT-5 Evidence Archival Dossier Grouping & Inspection", () => {
     expect(pageContent).not.toContain("VERIFIED");
   });
 
-  test("5. /evidence/victim-phone opens device simulator without integrity indicator", async ({
+  test("5. /play/<case>/phone opens device simulator without integrity indicator", async ({
     page,
   }) => {
-    await page.goto("/evidence/victim-phone");
+    await page.goto("/play/case_000/phone");
     // Verify phone simulator home screen renders
     await expect(page.getByRole("button", { name: /Ảnh/i })).toBeVisible();
     const pageContent = await page.content();

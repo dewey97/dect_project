@@ -90,6 +90,11 @@ Nhóm người chơi cùng điều tra một vụ án trên nhiều thiết bị
 
 - Hiển thị trên phòng chờ của Host (và của mọi thành viên, để mời thêm người), kèm mã to và nút chia sẻ link.
 - Link dạng `https://<domain>/play/<case_id>?room=<CODE>`. Quét vào là đi thẳng tới bước nhập nickname, bỏ qua màn 2 lựa chọn.
+- Route của luồng chơi (xem `lib/play/routes.ts`):
+  - `/play/<case_id>`: vào game (chơi một mình, tạo phòng, nhập mã). Link mời trỏ vào đây.
+  - `/play/<case_id>/lobby?room=<CODE>`: phòng chờ và intro đồng bộ. Thiết bị chưa có phiên của mã thì về `/play/<case_id>?room=<CODE>` để nhập tên.
+  - `/play/<case_id>/board?room=<CODE>`: bàn điều tra. Phòng chưa vào `investigating` hoặc người chơi chưa vào cuộc thì về `/lobby`.
+  - Không còn màn loading riêng trước bàn điều tra: cổng vào là nút ở `/play` hoặc phòng chờ; bàn hiện ngay, phần đang tải hiện dòng trạng thái nhỏ.
 
 **Nickname:**
 

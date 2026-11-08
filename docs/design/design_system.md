@@ -65,7 +65,7 @@ Sử dụng 2 họ font chính:
 ## 🗄️ 5. Không Gian Phòng Vật Chứng & Dynamic Pin Cards
 
 ### 1. Không Gian Phòng Vật Chứng 3 Vùng (Evidence Workspace — 3-Region Layout):
-Áp dụng tại `app/(investigation)/evidence/web/web-evidence-client.tsx` nhằm tối ưu hóa khả năng đối chiếu hồ sơ song song:
+Áp dụng tại `app/(investigation)/play/[caseId]/board/board-client.tsx` nhằm tối ưu hóa khả năng đối chiếu hồ sơ song song:
 - **Vùng 1 (Dossier Selector - ~180px Desktop)**: Thanh điều hướng chọn danh mục hồ sơ theo từng chặng vụ án (`Tất cả`, `Ban Đầu`, `Bộ A`, `Bộ B`, `Bộ C`) kèm chỉ báo số lượng tài liệu đã mở khóa. Hỗ trợ nút thu gọn trên màn hình hẹp.
 - **Vùng 2 (Evidence & Document Grid - ~260px Desktop)**: Danh sách cuộn độc lập hiển thị thẻ vật chứng:
   - *Vật chứng ảnh*: Hiển thị thumbnail ảnh chụp hiện trường thực tế, overlay mã vật chứng (`📸 A-06`...).
@@ -86,7 +86,7 @@ Sử dụng 2 họ font chính:
 ## 📑 6. Các Thành Phần Giao Diện Nâng Cao (Advanced UI Components)
 
 ### 1. Hiệu Ứng Tập Tài Liệu Xếp Chồng Gối Đầu (Overlapping Dossier Paper Stack):
-Áp dụng tại danh sách hồ sơ PDF trong `app/(investigation)/evidence/web/web-evidence-client.tsx`:
+Áp dụng tại danh sách hồ sơ PDF trong `app/(investigation)/play/[caseId]/board/board-client.tsx`:
 - **Gối đầu tự nhiên (`-mt-2`)**: Các tài liệu không được chọn xếp chồng gối đầu lên nhau như một tệp hồ sơ lưu trữ thật trong ngăn kéo điều tra viên.
 - **Thanh Header kẹp ghim (`Paperclip`)**: Luôn hiển thị mã số hồ sơ (`DOC A-01`...), tên tài liệu vắn tắt và giai đoạn vụ án (`BAN ĐẦU` / `BỘ A` / `BỘ B`).
 - **Mở rộng linh hoạt (Expanded State)**: Khi người chơi click chọn một tài liệu, tấm thẻ bung rộng với viền amber nổi bật (`#d9a066`), đổ bóng đa tầng (`shadow-[0_8px_24px_rgba(0,0,0,0.7)]`), hiện trích yếu và nút gọi hành động mở đọc toàn văn hồ sơ.

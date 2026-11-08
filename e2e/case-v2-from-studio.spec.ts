@@ -531,9 +531,9 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
       });
 
       // ----------------------------------------------------------------------
-      // BƯỚC 8: Chơi thử trực tiếp từ /evidence/web?case_id=<slug> đến KÝ SỰ HẬU ÁN
+      // BƯỚC 8: Chơi thử trực tiếp từ /play/<slug>/board đến KÝ SỰ HẬU ÁN
       // ----------------------------------------------------------------------
-      await test.step("8. Chơi thử trực tiếp tại /evidence/web?case_id=<slug>", async () => {
+      await test.step("8. Chơi thử trực tiếp tại /play/<slug>/board", async () => {
         await page.route("**/api/scan-answer", (route) =>
           route.fulfill({
             json: { isCorrect: true, confidenceScore: 95, feedback: "E2E mock" },
@@ -546,7 +546,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
           localStorage.setItem(`${slug}::intro_seen`, "true");
         }, createdSlug);
 
-        await page.goto(`/evidence/web?case_id=${createdSlug}`);
+        await page.goto(`/play/${createdSlug}/board`);
 
         await expect(
           page.locator('[data-board-ready="true"]').first(),

@@ -18,7 +18,7 @@ interface GameDesktopHeaderProps {
 }
 
 /**
- * Desktop Header dành riêng cho màn hình chơi game trực tuyến (/evidence/web).
+ * Desktop Header dành riêng cho màn hình chơi game trực tuyến (/play/<case_id>/board).
  * Bố cục 3 cột đối xứng đảm bảo cụm Nav ở giữa luôn căn chính giữa tuyệt đối.
  * Hiển thị các lối tắt gameplay thiết yếu: Bảng điều tra, Sổ tay hướng dẫn, Chơi nhóm, Báo lỗi.
  * Định dạng chữ proper case, không dùng uppercase, không kèm icon rườm rà.

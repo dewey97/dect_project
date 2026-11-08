@@ -10,7 +10,7 @@
 ```
 app/
   (admin)/studio/        Studio: cases, checkpoints, dossier, phone, map, feedbacks, players, settings
-  (investigation)/       Gameplay: evidence/web (chính), evidence/boardgame, evidence/[id] (điện thoại), cabinet-demo (đóng băng)
+  (investigation)/       Gameplay dưới play/[caseId]: page (vào game), lobby (phòng chờ + intro), board (bàn điều tra), box (bàn hộp), phone (điện thoại). Đường dẫn: lib/play/routes.ts
   api/                   Route Handler (bảng mục 2)
   activate/ brand/ how-to-play/ login/ auth/   Trang công khai
   cases/ buy/ me/        Cửa hàng: danh sách vụ, trang vụ án, kết quả thanh toán, vụ án của tôi
@@ -135,7 +135,7 @@ Nguồn: [`lib/progress/case-progress.ts`](../../lib/progress/case-progress.ts).
 - Renderer: `HeroInteractive` (`components/investigation/board/renderer/`), Canvas 2D.
 - Vị trí ghim: `boardgame_pins` (desktop + `mobile_x/mobile_y`).
 - Danh sách nút ẩn `[data-pin-id]` phục vụ bàn phím, trình đọc màn hình và E2E. Không xóa.
-- Modal giải đố: `board/canvas/canvas-modals.tsx`. Chế độ `/evidence/web`: `single` (mặc định) hoặc `canvas` (bàn hồ sơ tự do, `dossier-canvas-board.tsx`).
+- Modal giải đố: `board/canvas/canvas-modals.tsx`. Chế độ `/play/<case_id>/board`: `single` (mặc định) hoặc `canvas` (bàn hồ sơ tự do, `dossier-canvas-board.tsx`).
 
 ---
 

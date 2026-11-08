@@ -30,7 +30,7 @@ Lưu trữ thông tin metadata bao quát của các Vụ án trong hệ thống.
 - INSERT không truyền `slug` thì trigger `assign_case_slug` cấp số kế tiếp (`case_001`, `case_002`...). App không tự đếm.
 - Xóa vụ án còn nội dung sẽ bị DB chặn (lỗi `23503`); xóa nội dung trước.
 - `boardgame_pins` / `boardgame_connections` đã được chuẩn hóa `case-000` -> `case_000` và gắn FK qua migration 29 (`29_boardgame_pins_case_slug_fk.sql`). `board-actions.ts` dùng trực tiếp `normalizeCaseId()`.
-- Code chuẩn hóa mọi mã đầu vào qua `normalizeCaseId()` (`lib/cases/case-id.ts`). URL gameplay: `/evidence/web?case_id=<slug>`; Studio: `?case=<slug>`.
+- Code chuẩn hóa mọi mã đầu vào qua `normalizeCaseId()` (`lib/cases/case-id.ts`). URL gameplay: `/play/<slug>/board` (case trên path, xem `lib/play/routes.ts`); Studio: `?case=<slug>`.
 
 ### Table: `case_characters`
 

@@ -61,7 +61,7 @@ test.describe("Group play v3", () => {
     await host.getByRole("button", { name: "Tạo phòng" }).click();
 
     await expect(host.getByText("Phòng chờ")).toBeVisible();
-    await expect(host).toHaveURL(/room=[0-9A-Z]{4}/);
+    await expect(host).toHaveURL(/\/lobby\?room=[0-9A-Z]{4}/);
     const code = new URL(host.url()).searchParams.get("room")!;
     const roomId = await host.evaluate(() => {
       const raw = localStorage.getItem("dect_room_sessions");
@@ -104,10 +104,10 @@ test.describe("Group play v3", () => {
       timeout: 20_000,
     });
     await host.getByRole("button", { name: "Tiếp nhận vụ án" }).click();
-    await expect(host).toHaveURL(/\/evidence\/web\?.*room=/, {
+    await expect(host).toHaveURL(/\/play\/[a-z0-9_]+\/board\?.*room=/, {
       timeout: 30_000,
     });
-    await expect(member).toHaveURL(/\/evidence\/web\?.*room=/, {
+    await expect(member).toHaveURL(/\/play\/[a-z0-9_]+\/board\?.*room=/, {
       timeout: 30_000,
     });
 
@@ -118,13 +118,13 @@ test.describe("Group play v3", () => {
     await expect(late.getByText(/Đang điều tra/)).toBeVisible();
     await expect(late.getByText("Vy", { exact: true })).toBeVisible();
     await late.getByRole("button", { name: "Vào cuộc" }).click();
-    await expect(late).toHaveURL(/\/evidence\/web\?.*room=/, {
+    await expect(late).toHaveURL(/\/play\/[a-z0-9_]+\/board\?.*room=/, {
       timeout: 30_000,
     });
 
     // 7. F5 giữ nguyên phòng (nhận lại bằng token, không hỏi nickname).
     await member.reload();
-    await expect(member).toHaveURL(/\/evidence\/web\?.*room=/);
+    await expect(member).toHaveURL(/\/play\/[a-z0-9_]+\/board\?.*room=/);
     await expect(member.getByLabel("Nickname của bạn")).toHaveCount(0);
   });
 });

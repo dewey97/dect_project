@@ -90,7 +90,7 @@
 | Bỏ `'use server'` khỏi module client còn import                                    | Build hỏng                                                                | `grep -rn "<module>" app components` trước khi đổi ranh giới        |
 | "Chấm server" nhưng API vẫn gửi `answer_config`, client chấm đè khi server nói sai | Đáp án lộ, đáp án sai vẫn qua                                             | Lọc allowlist ở API; client không giữ đáp án, không chấm            |
 | Route AI nhận tiêu chí chấm từ client                                              | Proxy LLM mở cho mọi prompt                                               | Server tự đọc tiêu chí theo `checkpointId`                          |
-| Default prop `caseId = "case_000"`                                                 | Trang quên truyền `caseId` âm thầm đọc case_000 (`/evidence/boardgame`)   | `caseId` bắt buộc; chỉ route entry fallback                         |
+| Default prop `caseId = "case_000"`                                                 | Trang quên truyền `caseId` âm thầm đọc case_000 (`/play/<case_id>/box`)   | `caseId` bắt buộc; chỉ route entry fallback                         |
 | Mã bypass chấp nhận ở mọi môi trường                                               | Người chơi gõ `000` là qua                                                | Chỉ dev hoặc session admin                                          |
 | Sửa file bằng script đọc/ghi mặc định                                              | File `\r\r\n` bị giãn dòng; chuỗi `\b` trong Python thành ký tự backspace | Đọc/ghi bytes khi file có line ending lạ; dùng raw string cho regex |
 | Upsert `onConflict` khi RLS anon chỉ cho INSERT                                    | Lỗi RLS 42501                                                             | `ignoreDuplicates: true` hoặc INSERT thuần                          |
@@ -105,7 +105,7 @@
 2. `git push origin main` → GitHub Actions (`preflight`, `build-and-push`) → VPS pull image, restart container ([`../ops/cicd_deployment.md`](../ops/cicd_deployment.md)).
 3. Chạy migration đang chờ (xem [`../ROADMAP.md`](../ROADMAP.md)).
 4. Smoke test production:
-   - `/evidence/web?case_id=case_000`: intro → bàn điều tra → tra SĐT → mở điện thoại nạn nhân.
+   - `/play/case_000/board`: intro → bàn điều tra → tra SĐT → mở điện thoại nạn nhân.
    - Thẩm tra 2 lớp một nghi phạm → câu hỏi phụ → bộ hồ sơ tương ứng mở trong khay.
    - Cáo trạng sai bị từ chối, đúng thì kết án; hậu án có nội dung.
    - Gõ `000` vào ô trả lời khi chưa đăng nhập admin → bị từ chối.

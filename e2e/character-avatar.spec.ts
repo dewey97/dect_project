@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test.use({ storageState: "e2e/.auth/admin.json" });
 
-const CASE_URL = "/evidence/web?case_id=case_000";
+const CASE_URL = "/play/case_000/board";
 
 test.describe("WT-4 Character Avatar Engine & Gameplay Integration", () => {
   test("1. /api/characters returns avatar_url for case_000 characters", async ({

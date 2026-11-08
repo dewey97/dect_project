@@ -11,7 +11,7 @@ test.describe("Phone Devices & Presets (WT-2)", () => {
       localStorage.setItem("intro_seen", "true");
     });
 
-    await page.goto("/evidence/web?case_id=case_000");
+    await page.goto("/play/case_000/board");
 
     // Click phone pin
     const phonePin = page
@@ -41,7 +41,7 @@ test.describe("Phone Devices & Presets (WT-2)", () => {
       localStorage.setItem("intro_seen", "true");
     });
 
-    await page.goto("/evidence/web?case_id=case_000");
+    await page.goto("/play/case_000/board");
 
     const phonePin = page
       .locator(

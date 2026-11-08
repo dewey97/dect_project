@@ -85,7 +85,7 @@ test.describe("B15-2: Khớp chính xác bị can theo nhân vật và không m�
       localStorage.setItem(`${slug}:intro_seen`, "true");
     }, TEST_SLUG);
 
-    await page.goto(`/evidence/web?case_id=${TEST_SLUG}`);
+    await page.goto(`/play/${TEST_SLUG}/board`);
 
     const indictmentPin = page.locator('[data-node-kind="indictment"]').first();
     await expect(indictmentPin).toBeAttached({ timeout: 15_000 });

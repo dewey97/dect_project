@@ -3,6 +3,7 @@
 import type { DbCaseCheckpoint } from "@/lib/types/database";
 import { caseStorageKey } from "@/lib/cases/case-id";
 import { setStorageItem } from "@/lib/investigation/storage";
+import { boardPath } from "@/lib/play/routes";
 
 /**
  * Tìm toàn bộ các checkpoint tiên quyết (tổ tiên) cần hoàn thành trước targetCpId
@@ -35,7 +36,7 @@ export function getPrerequisiteCheckpoints(
 /**
  * Thiết lập tiến trình chơi thử (Playtest) từ một node X bất kỳ (C4).
  * Tự động ghi localStorage các mốc trung gian của toàn bộ node tiên quyết,
- * sau đó mở `/evidence/web?case_id=...` trên tab mới.
+ * sau đó mở `/play/<case_id>/board` trên tab mới.
  */
 export function launchPlaytestFromCheckpoint(params: {
   caseId: string;
@@ -130,6 +131,6 @@ export function launchPlaytestFromCheckpoint(params: {
 
   // Mở tab chơi thử
   if (typeof window !== "undefined") {
-    window.open(`/evidence/web?case_id=${encodeURIComponent(caseId)}`, "_blank");
+    window.open(boardPath(caseId), "_blank");
   }
 }

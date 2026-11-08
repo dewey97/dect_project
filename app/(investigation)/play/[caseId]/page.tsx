@@ -15,8 +15,9 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Màn vào game của một vụ án (spec 2.3).
- * QR động của phòng: `/play/<case_id>?room=<CODE>`.
+ * Màn vào game của một vụ án (spec 2.3): chơi một mình, tạo phòng, nhập mã.
+ * Link mời / QR của phòng: `/play/<case_id>?room=<CODE>` (form vào phòng điền sẵn mã).
+ * Vào được phòng thì sang phòng chờ `/play/<case_id>/lobby?room=<CODE>`.
  *
  * Khi bật PLAY_GATING_ENABLED: chưa sở hữu (mua online hoặc kích hoạt hộp) thì
  * về trang vụ án. Không chặn link có `?room=` và thiết bị đang có phiên phòng

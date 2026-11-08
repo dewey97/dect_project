@@ -10,7 +10,7 @@ import { expect, test, type Page } from "@playwright/test";
  * - Nhiều nút dùng CSS `uppercase`, nên so chữ không phân biệt hoa thường.
  */
 
-const CASE_URL = "/evidence/web?case_id=case_000";
+const CASE_URL = "/play/case_000/board";
 
 function escapeRegExp(text: string) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
