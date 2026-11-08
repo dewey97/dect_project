@@ -906,7 +906,7 @@ function WebEvidencePageContent() {
           <QuickActionFab
             onOpenBoardGame={() => {
               detectiveAudio.playPaperRustle();
-              router.push("/evidence/boardgame");
+              router.push(`/evidence/boardgame?case_id=${caseId}`);
             }}
             onResetCase={resetAllProgress}
             onGoHome={() => router.push("/")}

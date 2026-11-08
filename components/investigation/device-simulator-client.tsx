@@ -8,10 +8,10 @@ import { PhoneSimulator } from '@/components/phone-engine/phone-simulator'
 import { EvidenceHeader } from '@/components/investigation/viewers/evidence-header'
 import { MetadataPanel } from '@/components/investigation/viewers/metadata-panel'
 import { RecoveryStatusPanel } from '@/components/investigation/viewers/recovery-status-panel'
-import type { Case, Device, Conversation, Photo, Email, Document, BrowserHistory, RecoveredFile } from '@/lib/types'
+import type { Device, Conversation, Photo, Email, Document, BrowserHistory, RecoveredFile } from '@/lib/types'
 
 interface DeviceSimulatorClientProps {
-  activeCase?: Case
+  caseId: string
   device: Device
   threads: Conversation[]
   photos: Photo[]
@@ -22,7 +22,7 @@ interface DeviceSimulatorClientProps {
 }
 
 export function DeviceSimulatorClient({
-  activeCase,
+  caseId,
   device,
   threads,
   photos,
@@ -35,14 +35,15 @@ export function DeviceSimulatorClient({
   const { isDeviceLockedByCheckpoint } = useCheckpoints()
 
   // Check if device is locked by Checkpoints
-  const isLocked = activeCase ? isDeviceLockedByCheckpoint(activeCase.id, device.id) : false
+  const isLocked = isDeviceLockedByCheckpoint(caseId, device.id)
+  const boardHref = `/evidence/web?case_id=${caseId}`
 
   if (isLocked) {
     return (
       <div suppressHydrationWarning className="pb-6 px-4 flex flex-col gap-6">
         <div className="pt-4">
           <Link
-            href="/evidence"
+            href={boardHref}
             className="flex items-center gap-1.5 font-sans text-[0.65rem] text-primary uppercase tracking-wider hover:-translate-x-0.5 active:scale-95 transition-all w-fit"
           >
             <ArrowLeft className="size-3.5" />
@@ -64,7 +65,7 @@ export function DeviceSimulatorClient({
           </p>
 
           <button
-            onClick={() => router.push('/checkpoints')}
+            onClick={() => router.push(boardHref)}
             className="mt-6 font-mono text-xs uppercase tracking-wider border border-destructive/30 bg-destructive/5 text-destructive hover:bg-destructive/10 px-5 py-2.5 rounded font-bold transition-all z-10 active:scale-95"
           >
             Đi đến Checkpoints
@@ -81,7 +82,7 @@ export function DeviceSimulatorClient({
         {/* Phone Simulator Frame */}
         <div className="flex-1 min-h-0 w-full overflow-hidden">
           <PhoneSimulator
-            device={device}
+            device={{ id: device.id, caseId }}
             threads={threads}
             photos={photos}
             emails={emails}
@@ -98,7 +99,7 @@ export function DeviceSimulatorClient({
     <div suppressHydrationWarning className="pb-10 px-4 flex flex-col gap-5">
       <div className="pt-2">
         <Link
-          href="/evidence"
+          href={boardHref}
           className="flex items-center gap-1.5 font-sans text-[0.65rem] text-primary uppercase tracking-wider hover:-translate-x-0.5 active:scale-95 transition-all w-fit"
         >
           <ArrowLeft className="size-3.5" />

@@ -15,11 +15,7 @@ import {
 import { useRoomSync } from "@/components/investigation/room/room-sync-context";
 import { normalizeRoomCode } from "@/lib/rooms/code";
 import { NICKNAME_MAX_LENGTH, cleanNickname } from "@/lib/rooms/nickname";
-import {
-  PlayButton,
-  PlayCard,
-  PlayError,
-} from "@/components/play/play-ui";
+import { PlayButton, PlayCard, PlayError } from "@/components/play/play-ui";
 
 const NICKNAME_KEY = "dect_player_nickname";
 const DEFAULT_MAX_PLAYERS = 4;
@@ -82,7 +78,12 @@ export function PlayEntry({
   } = useRoomSync();
 
   const [step, setStep] = useState<Step>(pendingRoomCode ? "join" : "choose");
-  const [nickname, setNickname] = useState(savedNickname);
+  // Đọc localStorage sau khi mount: lần render đầu phải khớp HTML từ server.
+  const [nickname, setNickname] = useState("");
+  useEffect(() => {
+    const saved = savedNickname();
+    if (saved) setNickname((current) => current || saved);
+  }, []);
   const [maxPlayers, setMaxPlayers] = useState(DEFAULT_MAX_PLAYERS);
   const [code, setCode] = useState(pendingRoomCode ?? "");
   const [error, setError] = useState<string | null>(null);
@@ -207,10 +208,7 @@ export function PlayEntry({
                 </div>
 
                 <div className="w-full">
-                  <PlayButton
-                    className="w-full"
-                    onClick={() => go("join")}
-                  >
+                  <PlayButton className="w-full" onClick={() => go("join")}>
                     Tham gia ngay
                   </PlayButton>
                 </div>
@@ -425,7 +423,9 @@ export function PlayEntry({
 
                 {pendingRoomCode ? (
                   <div className="p-4 rounded-xl border border-amber-500/50 bg-[#212124] flex items-center justify-between">
-                    <span className="text-xs text-zinc-400">Mã phòng đã nhận:</span>
+                    <span className="text-xs text-zinc-400">
+                      Mã phòng đã nhận:
+                    </span>
                     <span className="font-mono text-2xl font-extrabold tracking-widest text-amber-400">
                       #{pendingRoomCode}
                     </span>

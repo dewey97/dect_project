@@ -1,5 +1,6 @@
 "use client";
 
+import { normalizeCaseId } from "@/lib/cases/case-id";
 import React from "react";
 import Link from "next/link";
 import {
@@ -87,7 +88,7 @@ export function CanvasPhoneWindow({
             </div>
             <div className="flex items-center gap-1 pointer-events-auto">
               <Link
-                href="/evidence/victim-phone"
+                href={`/evidence/victim-phone?case_id=${normalizeCaseId(caseId)}`}
                 target="_blank"
                 className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-zinc-100 border border-white/10 text-[10px] font-sans transition-all"
                 title="Mở trong tab mới"

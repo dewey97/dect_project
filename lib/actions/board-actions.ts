@@ -294,7 +294,7 @@ export async function saveBoardgamePinPositions(
       if (delAllError) throw delAllError;
     }
 
-    revalidatePath(`/cases/${caseId}/evidence/boardgame`);
+    revalidatePath("/evidence/boardgame");
     return { success: true };
   } catch (error: unknown) {
     console.error("Error saving boardgame pin positions:", error);

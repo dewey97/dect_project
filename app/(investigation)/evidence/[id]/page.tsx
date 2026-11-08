@@ -1,40 +1,12 @@
 import { DeviceSimulatorClient } from "@/components/investigation/device-simulator-client";
-import type { Case, Device } from "@/lib/types";
+import type { Device } from "@/lib/types";
 import { normalizeCaseId } from "@/lib/cases/case-id";
 
-const ACTIVE_CASE_000: Case = {
-  id: "case_000",
-  code: "TEST-99",
-  title: "Trốn Tìm",
-  logline:
-    "Một vụ án mạng xảy ra tại căn nhà chuẩn bị giải tỏa, mở ra những mâu thuẫn tranh chấp thừa kế và bí mật quá khứ đen tối.",
-  briefing:
-    "Liệu bí mật nào đang ẩn sau cái chết của Khang. Trò chơi trốn tìm có liên quan gì? Hãy bóc tách từng manh mối nhỏ nhất để tìm ra lời giải cho vụ án hóc búa này.",
-  objective:
-    "Phân tích di chúc bị tráo, hồ sơ đo đạc sai lệch và tìm ra thủ phạm sát hại Khang.",
-  estimatedTime: "60-90 phút",
-  status: "active",
-  difficulty: 2,
-  progress: 0,
-  location: "Khu giải tỏa Bờ Sông",
-  coverImage: "/poster_c0.webp",
-};
-
-const DEFAULT_VICTIM_DEVICE: Device = {
-  id: "dev-000-1",
-  caseId: "case_000",
-  code: "EV-PHONE-KHANG",
-  evidenceId: "EV-PHONE-KHANG",
-  label: "Điện thoại nạn nhân",
-  kind: "phone",
-  owner: "Nguyễn Văn Khang",
-  locked: false,
-  status: "unlocked",
-  recoveryLevel: 100,
-  lastUpdated: "24/07/2016 // 17:55",
-  description: "Điện thoại cá nhân của nạn nhân Khang",
-};
-
+/**
+ * Trang thiết bị vật chứng: `/evidence/<id>?case_id=<slug>`.
+ * Chỉ truyền id và case; chủ máy, nhãn, hình nền... PhoneSimulator lấy từ nạn nhân
+ * của vụ án (`case_characters`, nạp theo `?case_id=` ở CaseCharactersProvider).
+ */
 export default async function DeviceSimulatorPage({
   params,
   searchParams,
@@ -44,23 +16,26 @@ export default async function DeviceSimulatorPage({
 }) {
   const { id } = await params;
   const sParams = searchParams ? await searchParams : {};
-  const rawCaseId = sParams.case_id || sParams.caseId || "case_000";
-  const caseId = normalizeCaseId(rawCaseId);
-
-  const activeCase = {
-    ...ACTIVE_CASE_000,
-    id: caseId,
-  };
+  const caseId = normalizeCaseId(sParams.case_id || sParams.caseId);
 
   const device: Device = {
-    ...DEFAULT_VICTIM_DEVICE,
     id,
     caseId,
+    code: id.toUpperCase(),
+    evidenceId: id.toUpperCase(),
+    label: "Điện thoại nạn nhân",
+    kind: "phone",
+    owner: "",
+    locked: false,
+    status: "unlocked",
+    recoveryLevel: 100,
+    lastUpdated: "",
+    description: "",
   };
 
   return (
     <DeviceSimulatorClient
-      activeCase={activeCase}
+      caseId={caseId}
       device={device}
       threads={[]}
       photos={[]}
