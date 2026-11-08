@@ -85,19 +85,19 @@ export function LandingFooter() {
             <span className="text-xs font-bold uppercase tracking-wider text-zinc-300 font-mono text-left lg:text-right">
               Nhận thông tin và ưu đãi sớm nhất
             </span>
-            <form onSubmit={handleSubmit} className="flex items-center gap-2">
+            <form onSubmit={handleSubmit} className="flex items-center gap-1.5">
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Nhập email của bạn..."
-                className="w-full sm:w-56 md:w-60 rounded border border-zinc-800 bg-zinc-900/90 px-3 py-1.5 text-xs text-zinc-200 placeholder:text-zinc-500 focus:border-amber-500/60 focus:outline-none transition-colors"
+                placeholder="Email của bạn..."
+                className="w-40 sm:w-44 rounded border border-zinc-800 bg-zinc-900/90 px-2.5 py-1.5 text-xs text-zinc-200 placeholder:text-zinc-500 focus:border-amber-500/60 focus:outline-none transition-colors"
               />
               <button
                 type="submit"
                 disabled={submitted}
-                className="shrink-0 inline-flex items-center justify-center rounded bg-amber-500 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-zinc-950 transition-colors hover:bg-amber-400 disabled:opacity-80 active:scale-95 cursor-pointer"
+                className="shrink-0 inline-flex items-center justify-center rounded bg-amber-500 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-zinc-950 transition-colors hover:bg-amber-400 disabled:opacity-80 active:scale-95 cursor-pointer"
               >
                 {submitted ? (
                   <>
@@ -120,9 +120,9 @@ export function LandingFooter() {
         {/* Bottom Sub-bar: Essential Legal & Copyright */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-[0.7rem] text-muted-foreground/60 font-mono">
           <div className="flex items-center gap-4">
-            <a href="#" className="hover:text-foreground transition-colors">Điều khoản dịch vụ</a>
+            <Link href="/terms" className="hover:text-foreground transition-colors">Điều khoản dịch vụ</Link>
             <span>·</span>
-            <a href="#" className="hover:text-foreground transition-colors">Chính sách bảo mật</a>
+            <Link href="/privacy" className="hover:text-foreground transition-colors">Chính sách bảo mật</Link>
             <span>·</span>
             <Link href="/brand" className="hover:text-primary transition-colors text-muted-foreground/80">Bộ nhận diện</Link>
           </div>
