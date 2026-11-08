@@ -339,6 +339,8 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         actionType: phoneCpId ? "sheet_checkpoint" : "info",
         rotation: typeof phoneBoardCfg?.rotation === "number" ? phoneBoardCfg.rotation : 0,
         scale: typeof phoneBoardCfg?.scale === "number" && phoneBoardCfg.scale > 0 ? phoneBoardCfg.scale : 1.0,
+        hasExplicitScale: typeof phoneBoardCfg?.scale === "number" && phoneBoardCfg.scale > 0,
+        hasExplicitRotation: typeof phoneBoardCfg?.rotation === "number" && phoneBoardCfg.rotation !== 0,
       });
     }
   }
@@ -390,6 +392,8 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         actionType: indictmentCpId ? "sheet_checkpoint" : "info",
         rotation: typeof indictmentBoardCfg?.rotation === "number" ? indictmentBoardCfg.rotation : 0,
         scale: typeof indictmentBoardCfg?.scale === "number" && indictmentBoardCfg.scale > 0 ? indictmentBoardCfg.scale : 1.0,
+        hasExplicitScale: typeof indictmentBoardCfg?.scale === "number" && indictmentBoardCfg.scale > 0,
+        hasExplicitRotation: typeof indictmentBoardCfg?.rotation === "number" && indictmentBoardCfg.rotation !== 0,
       });
     }
   }
@@ -538,6 +542,8 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         typeof cpBoardCfg?.scale === "number" && cpBoardCfg.scale > 0
           ? cpBoardCfg.scale
           : 1.0,
+      hasExplicitScale: typeof cpBoardCfg?.scale === "number" && cpBoardCfg.scale > 0,
+      hasExplicitRotation: typeof cpBoardCfg?.rotation === "number" && cpBoardCfg.rotation !== 0,
     });
   });
 
@@ -668,6 +674,8 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       actionType: "sheet_checkpoint",
       rotation: typeof boardCfg?.rotation === "number" ? boardCfg.rotation : 0,
       scale: typeof boardCfg?.scale === "number" && boardCfg.scale > 0 ? boardCfg.scale : 1.0,
+      hasExplicitScale: typeof boardCfg?.scale === "number" && boardCfg.scale > 0,
+      hasExplicitRotation: typeof boardCfg?.rotation === "number" && boardCfg.rotation !== 0,
     });
   });
 
@@ -730,6 +738,8 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       actionType: "sheet_checkpoint",
       rotation: typeof boardCfg?.rotation === "number" ? boardCfg.rotation : 0,
       scale: typeof boardCfg?.scale === "number" && boardCfg.scale > 0 ? boardCfg.scale : 1.0,
+      hasExplicitScale: typeof boardCfg?.scale === "number" && boardCfg.scale > 0,
+      hasExplicitRotation: typeof boardCfg?.rotation === "number" && boardCfg.rotation !== 0,
     });
   });
 
@@ -1006,20 +1016,28 @@ export function applyLayoutOverrides(
     const override = findMatchingOverride(pin, customPinPositions);
     const tf = findMatchingOverride(pin, pinTransforms);
 
-    // Ưu tiên transform được kéo chỉnh trên bảng (tf từ boardgame_pins) làm override,
-    // sau đó mới fallback sang rotation và scale gốc từ pin/board_config
+    // Nếu pin có scale hoặc rotation do người dùng chỉ định rõ ràng trong board_config,
+    // ưu tiên giá trị đó để thanh trượt Inspector phản ánh trực tiếp lên Canvas.
+    // Nếu không, dùng tf từ boardgame_pins hoặc fallback về mặc định.
+    const hasExplicitScale = Boolean(pin.hasExplicitScale);
+    const hasExplicitRot = Boolean(pin.hasExplicitRotation);
+
     const finalRot =
-      typeof tf?.rotation === "number"
-        ? tf.rotation
-        : typeof pin.rotation === "number"
-          ? pin.rotation
-          : 0;
+      hasExplicitRot
+        ? (pin.rotation ?? 0)
+        : typeof tf?.rotation === "number"
+          ? tf.rotation
+          : typeof pin.rotation === "number"
+            ? pin.rotation
+            : 0;
     const finalScale =
-      typeof tf?.scale === "number" && tf.scale > 0
-        ? tf.scale
-        : typeof pin.scale === "number" && pin.scale > 0
-          ? pin.scale
-          : 1.0;
+      hasExplicitScale
+        ? (pin.scale ?? 1.0)
+        : typeof tf?.scale === "number" && tf.scale > 0
+          ? tf.scale
+          : typeof pin.scale === "number" && pin.scale > 0
+            ? pin.scale
+            : 1.0;
 
     return {
       ...pin,

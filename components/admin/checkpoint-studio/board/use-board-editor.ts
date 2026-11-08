@@ -331,16 +331,15 @@ export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; c
 
       let merged: PinPoint;
       if (isCheckpoint && modelPin) {
-        // Với checkpoint: modelPin phản ánh tức thì từ draft trong Inspector qua liveRows,
-        // nhưng các tinh chỉnh trên canvas bằng toolbar (rotation, scale, zIndex, x, y) trong p PHẢI ĐƯỢC BẢO LƯU!
+        // Với checkpoint: modelPin phản ánh tức thì từ draft trong Inspector qua liveRows
         merged = {
           ...p,
           ...modelPin,
           x: p.x,
           y: p.y,
-          rotation: typeof p.rotation === "number" ? p.rotation : modelPin.rotation,
-          scale: typeof p.scale === "number" && p.scale > 0 ? p.scale : modelPin.scale,
-          zIndex: typeof p.zIndex === "number" ? p.zIndex : modelPin.zIndex,
+          rotation: typeof modelPin.rotation === "number" ? modelPin.rotation : p.rotation,
+          scale: typeof modelPin.scale === "number" && modelPin.scale > 0 ? modelPin.scale : p.scale,
+          zIndex: typeof modelPin.zIndex === "number" ? modelPin.zIndex : p.zIndex,
         };
       } else if (modelPin) {
         // Với board node (như suspects_hub, reinvestigate, custom node):
@@ -495,6 +494,13 @@ export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; c
           const isMatch =
             p.id === nodeId ||
             p.checkpointId === nodeId ||
+            (nodeId && (p.id.includes(nodeId) || nodeId.includes(p.id))) ||
+            (p.subjectKey && nodeId && (
+              nodeId.toLowerCase().endsWith(`-${p.subjectKey.toLowerCase()}`) ||
+              nodeId.toLowerCase().endsWith(`:${p.subjectKey.toLowerCase()}`) ||
+              nodeId.toLowerCase().includes(`:${p.subjectKey.toLowerCase()}:`) ||
+              nodeId.toLowerCase().includes(`-${p.subjectKey.toLowerCase()}-`)
+            )) ||
             (p.nodeKind === "suspects_hub" && nodeId === "suspects_hub") ||
             (p.nodeKind === "reinvestigate" && nodeId === "reinvestigate");
           if (!isMatch) return p;

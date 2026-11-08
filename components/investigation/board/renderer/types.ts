@@ -89,6 +89,8 @@ export interface PinPoint {
   // Visual transform overrides
   rotation?: number; // degrees (-45 to 45)
   scale?: number; // multiplier (0.5 to 2.0)
+  hasExplicitScale?: boolean;
+  hasExplicitRotation?: boolean;
 
   // Custom / user node markers
   isCustomNode?: boolean;

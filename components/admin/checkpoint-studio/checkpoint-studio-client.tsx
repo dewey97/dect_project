@@ -510,6 +510,23 @@ export function CheckpointStudioClient({
         });
       }
 
+      // Đồng bộ live sang Bảng điều tra nếu có thay đổi cấu hình hiển thị bảng
+      if (patch.boardConfig) {
+        const cfg = patch.boardConfig;
+        if (current.id) {
+          handleUpdateNodeLocal(current.id, {
+            title: patch.title !== undefined ? patch.title : current.title,
+            config: cfg,
+          });
+        }
+        if (current.checkpointId && current.checkpointId !== current.id) {
+          handleUpdateNodeLocal(current.checkpointId, {
+            title: patch.title !== undefined ? patch.title : current.title,
+            config: cfg,
+          });
+        }
+      }
+
       // Cập nhật live vào rows ngay lập tức để Canvas phản ánh theo thời gian thực (0s độ trễ)
       setRows((prevRows) => {
         const selectedDossier =
