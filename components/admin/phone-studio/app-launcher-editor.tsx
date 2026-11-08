@@ -22,7 +22,10 @@ import {
   reorderPhoneApps,
   uploadPhoneAsset,
 } from "@/lib/actions/phone-actions";
-import { DEFAULT_APP_ICONS } from "@/components/phone-engine/system/home-screen";
+import {
+  DEFAULT_APP_ICONS,
+  resolveAppIcon,
+} from "@/components/phone-engine/system/home-screen";
 
 interface AppLauncherEditorProps {
   caseId: string;
@@ -366,10 +369,7 @@ export function AppLauncherEditor({
   };
 
   const renderAppRow = (app: DbCasePhoneApp, idx: number, isDock: boolean) => {
-    const iconSrc =
-      app.icon_url ||
-      DEFAULT_APP_ICONS[app.app_type] ||
-      DEFAULT_APP_ICONS.settings;
+    const iconSrc = resolveAppIcon(app.icon_url, app.app_type);
 
     return (
       <div

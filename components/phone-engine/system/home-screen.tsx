@@ -23,6 +23,30 @@ export type IPhoneApp =
   | "tetris"
   | null;
 
+/**
+ * Icon for an app tile. Icons moved from /images/cases/<case>/phone/icons/ to
+ * the shared /images/phone/icons/, and phone_apps rows may still hold the old
+ * path, so it is rewritten. No icon: the default for the app type.
+ */
+export function resolveAppIcon(
+  iconUrl: string | null | undefined,
+  appType: string,
+): string {
+  const moved = iconUrl?.match(/^\/images\/cases\/[^/]+\/phone\/icons\/(.+)$/);
+  if (moved) return `/images/phone/icons/${moved[1]}`;
+  return iconUrl || DEFAULT_APP_ICONS[appType] || DEFAULT_APP_ICONS.settings;
+}
+
+/** Last resort when an icon file fails to load. */
+function showDefaultIconOnError(
+  e: React.SyntheticEvent<HTMLImageElement>,
+  appType: string,
+) {
+  const fallback = DEFAULT_APP_ICONS[appType] || DEFAULT_APP_ICONS.settings;
+  const img = e.currentTarget;
+  if (!img.src.endsWith(fallback)) img.src = fallback;
+}
+
 export const DEFAULT_APP_ICONS: Record<string, string> = {
   photos: "/images/phone/icons/photos.png",
   camera: "/images/phone/icons/camera.png",
@@ -79,10 +103,7 @@ export function IPhoneHomeScreen({
           return {
             id: a.id || a.app_type,
             name: a.display_name,
-            icon:
-              a.icon_url ||
-              DEFAULT_APP_ICONS[a.app_type] ||
-              DEFAULT_APP_ICONS.settings,
+            icon: resolveAppIcon(a.icon_url, a.app_type),
             appTarget: a.app_type as IPhoneApp,
             isLocked,
           };
@@ -176,10 +197,7 @@ export function IPhoneHomeScreen({
           return {
             id: a.id || a.app_type,
             name: a.display_name,
-            icon:
-              a.icon_url ||
-              DEFAULT_APP_ICONS[a.app_type] ||
-              DEFAULT_APP_ICONS.phone,
+            icon: resolveAppIcon(a.icon_url, a.app_type),
             appTarget: a.app_type as IPhoneApp,
             isLocked,
           };
@@ -241,6 +259,7 @@ export function IPhoneHomeScreen({
                 <img
                   src={app.icon}
                   alt={app.name}
+                  onError={(e) => showDefaultIconOnError(e, app.appTarget ?? "")}
                   className={cn(
                     "w-full h-full object-cover pointer-events-none select-none",
                     app.isLocked && "grayscale brightness-75",
@@ -295,6 +314,7 @@ export function IPhoneHomeScreen({
                   <img
                     src={app.icon}
                     alt={app.name}
+                    onError={(e) => showDefaultIconOnError(e, app.appTarget ?? "")}
                     className={cn(
                       "w-full h-full object-cover pointer-events-none select-none",
                       app.isLocked && "grayscale brightness-75",
