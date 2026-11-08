@@ -13,6 +13,7 @@ import {
 } from "@/components/play/play-ui";
 import { formatVnd } from "@/lib/payments/format";
 import { OwnershipBadge } from "@/components/store/ownership-badge";
+import { SafeImg } from "@/components/ui/safe-img";
 
 export interface CaseOffer {
   sku: string;
@@ -153,8 +154,7 @@ export function CaseStore({
         {/* Header */}
         <header className="flex flex-col gap-4 sm:flex-row sm:items-end">
           {coverImageUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <SafeImg
               src={coverImageUrl}
               alt=""
               className="aspect-[1/1.414] w-28 shrink-0 rounded-md border border-zinc-800 object-cover"
@@ -222,8 +222,7 @@ export function CaseStore({
                 {box?.title ?? "Bộ hộp vật lý"}
               </h2>
               {(box?.imageUrl || coverImageUrl) && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <SafeImg
                   src={box?.imageUrl || coverImageUrl || ""}
                   alt={`Ảnh ${box?.title ?? "bộ hộp"}`}
                   className="aspect-[4/3] w-full rounded-lg border border-zinc-800 object-cover"

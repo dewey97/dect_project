@@ -6,6 +6,7 @@ import { getOwnedCases } from "@/lib/payments/ownership";
 import { formatVnd } from "@/lib/payments/format";
 import { OwnershipBadge } from "@/components/store/ownership-badge";
 import { PlayCard, PlayLabel } from "@/components/play/play-ui";
+import { SafeImg } from "@/components/ui/safe-img";
 
 export const dynamic = "force-dynamic";
 
@@ -102,8 +103,7 @@ export default async function MePage() {
                   <li key={caseId}>
                     <PlayCard className="flex flex-wrap items-center gap-4">
                       {c?.cover_image_url && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <SafeImg
                           src={c.cover_image_url}
                           alt=""
                           className="aspect-[1/1.414] w-14 shrink-0 rounded border border-zinc-800 object-cover"

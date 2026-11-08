@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getOwnedCases, NOT_OWNED } from "@/lib/payments/ownership";
 import { OwnershipBadge } from "@/components/store/ownership-badge";
 import { PlayLabel } from "@/components/play/play-ui";
+import { SafeImg } from "@/components/ui/safe-img";
 
 export const dynamic = "force-dynamic";
 
@@ -41,8 +42,7 @@ export default async function CasesIndexPage() {
                   className="flex h-full gap-4 rounded-xl border border-zinc-800 bg-zinc-950/80 p-4 transition-colors hover:border-zinc-600 focus-visible:outline-2 focus-visible:outline-amber-400"
                 >
                   {c.cover_image_url && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <SafeImg
                       src={c.cover_image_url}
                       alt=""
                       className="aspect-[1/1.414] w-20 shrink-0 rounded-md border border-zinc-800 object-cover"
