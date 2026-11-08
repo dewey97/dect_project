@@ -85,6 +85,10 @@ export function DossierStudioWorkspace({
   handleSelectEvidence,
   setLightboxUrl,
 }: DossierStudioWorkspaceProps) {
+  const missingFileCount = displayedEvidence.filter(
+    (e) => !e.file_url && !e.thumb_url,
+  ).length;
+
   return (
     <main
           ref={canvasContainerRef}
@@ -223,6 +227,11 @@ export function DossierStudioWorkspace({
                   <span className="text-[10px] text-neutral-400 font-mono border-l border-white/10 pl-2">
                     Ảnh / PDF
                   </span>
+                  {missingFileCount > 0 && (
+                    <span className="rounded border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-300">
+                      {missingFileCount} chưa có tệp
+                    </span>
+                  )}
                 </div>
                 <button
                   type="button"

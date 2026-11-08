@@ -7,6 +7,7 @@ import { useCaseDossiers } from "@/lib/hooks/use-case-dossiers";
 import { DiegeticDossierSheet } from "./diegetic-dossier-sheet";
 import { EvidencePhotoAnnotator } from "./evidence-photo-annotator";
 import { DiegeticDocumentReader } from "./diegetic-document-reader";
+import { EVIDENCE_PHOTO_PLACEHOLDER } from "@/lib/cases/placeholders";
 
 interface EvidenceDetailInspectorProps {
   selectedView: SelectedView | null;
@@ -85,7 +86,7 @@ export function EvidenceDetailInspector({
           )
         ) : (
           <EvidencePhotoAnnotator
-            photoUrl={photoUrl || "/photo_scene_overview.jpg"}
+            photoUrl={photoUrl || EVIDENCE_PHOTO_PLACEHOLDER}
             title={selectedView.data.title || "Vật chứng"}
             evidenceId={displayCode}
           />

@@ -51,6 +51,7 @@ import {
 } from "@/lib/investigation/storage";
 import { caseStorageKey, normalizeCaseId, clearCaseProgress } from "@/lib/cases/case-id";
 import { useInvestigationEvent } from "@/lib/investigation/investigation-events";
+import { EVIDENCE_PHOTO_PLACEHOLDER } from "@/lib/cases/placeholders";
 // Modal khám xét hiện trường kéo theo three.js (Scene360Viewer) — chỉ tải khi cần.
 const ReinvestigationModal = nextDynamic(
   () =>
@@ -414,7 +415,7 @@ function WebEvidencePageContent() {
               title.toLowerCase().includes(e.title.toLowerCase()),
           );
           const imgUrl =
-            driveUrl || localFallback?.thumbnail || "/photo_scene_overview.jpg";
+            driveUrl || localFallback?.thumbnail || EVIDENCE_PHOTO_PLACEHOLDER;
 
           return {
             type: "evidence",

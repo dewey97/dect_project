@@ -879,7 +879,7 @@ export function MainInvestigationCanvas({
       "/images/pins/pin-yellow.png",
       "/images/pins/pin-green.png",
       "/images/pins/pin-blue.png",
-      "/images/pins/pin-white.png",
+      "/images/pins/pin-silver.png",
       "/images/pins/pin-brass.png",
     ];
 

@@ -16,6 +16,7 @@ import type {
   SelectedView,
 } from "@/components/investigation/evidence/evidence-types";
 import type { DbCaseDossier } from "@/lib/types/database";
+import { EVIDENCE_PHOTO_PLACEHOLDER } from "@/lib/cases/placeholders";
 
 export type DossierFilterTab = "pdf" | "evidence";
 
@@ -497,7 +498,7 @@ export function DossierTray({
                     <img
                       src={
                         normalizeImageUrl(evItem?.thumbnail) ||
-                        "/photo_scene_overview.jpg"
+                        EVIDENCE_PHOTO_PLACEHOLDER
                       }
                       alt={item.data.title || "Vật chứng"}
                       className="w-full h-full object-cover select-none"

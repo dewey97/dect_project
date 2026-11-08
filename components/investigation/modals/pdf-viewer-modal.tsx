@@ -9,6 +9,7 @@ import { trackDossierView, trackPhotoInspected } from '@/lib/analytics/analytics
 import { DiegeticDossierSheet } from '@/components/investigation/evidence/diegetic-dossier-sheet'
 import { EvidencePhotoAnnotator } from '@/components/investigation/evidence/evidence-photo-annotator'
 import { DiegeticDocumentReader } from '@/components/investigation/evidence/diegetic-document-reader'
+import { EVIDENCE_PHOTO_PLACEHOLDER } from '@/lib/cases/placeholders'
 
 interface PDFViewerModalProps {
   pdfUrl?: string | null
@@ -93,7 +94,7 @@ export function PDFViewerModal({ pdfUrl, title, selectedView, isOpen, onClose, c
         <div className="flex-1 w-full h-full bg-[#120d09] relative overflow-hidden flex flex-col">
           {isEvidence && selectedView ? (
             <EvidencePhotoAnnotator
-              photoUrl={normalizeImageUrl(selectedView.data.thumbnail) || "/photo_scene_overview.jpg"}
+              photoUrl={normalizeImageUrl(selectedView.data.thumbnail) || EVIDENCE_PHOTO_PLACEHOLDER}
               title={selectedView.data.title || "Vật chứng"}
               evidenceId={selectedView.data.code}
             />

@@ -112,6 +112,7 @@ Hệ thống ghim cắm bảng phân loại theo màu sắc nghiệp vụ (mỗi
 ### 7.1. Ảnh Thẻ Nhân Vật, Avatar Placeholder & Dynamic Canvas Composite
 
 - **`/public/images/avatar_placeholder.svg`**: Hình bóng avatar điều tra trung tính chuẩn, hiển thị mặc định cho mọi nghi phạm và nhân chứng khi chưa có ảnh chân dung trong Studio.
+- **`/public/images/evidence-placeholder.svg`**: Ảnh tạm "Chưa có ảnh" (`EVIDENCE_PHOTO_PLACEHOLDER` trong `lib/cases/placeholders.ts`), hiện thay cho vật chứng loại ảnh chưa có tệp trong khay hồ sơ, khung xem chi tiết, trình xem PDF và bàn điều tra. Dossier Studio đánh dấu các vật chứng này ("N chưa có tệp").
 - **Loại bỏ ảnh tĩnh `pinned_photos_with_tape/`**: Toàn bộ các ảnh PNG ghép sẵn băng dính giấy tĩnh trước đây (`pinned_tape_khang.png`, `pinned_tape_vu.png`...) đã được gỡ bỏ khỏi `public/` để tối ưu dung lượng và chuyển sang kiến trúc **Dynamic Card Composite**.
 - **Cơ chế Dựng Thẻ Động (`card-composite.ts`)**: Trình duyệt nạp ảnh chân dung từ Supabase Storage / `public/`, tự động ghép khung Polaroid và vẽ băng dính giấy răng cưa trên Canvas bộ nhớ (Offscreen Canvas 60 FPS), đảm bảo nội dung luôn đồng bộ với dữ liệu bảng tính mà không cần re-build code.
 
@@ -128,7 +129,7 @@ Toàn bộ giấy note ghi chú nghiệp vụ trên bảng điều tra hiện đ
 - `reinvestigation_crime_scene_prop.png`: Vật thể vật lý khám xét hiện trường (ảnh chụp toàn cảnh phòng khách, dải băng niêm phong cảnh sát vàng đen, thước đo pháp y Forensic Scale và dấu mộc tái khám nghiệm) đặt trên mặt bàn điều tra thay thế tờ note giấy.
 - `photo_cheating_sms.jpg`: Ảnh chụp màn hình tin nhắn Khang hẹn hò Thảo Vy.
 - `cuong_ve_xe_tung.png`: Cuống vé xe buýt của Tùng lúc 20:15.
-- `wardrobe_eyes.jpg`: Tủ gỗ lim 1996 then cài sắt.
+- `wardrobe_eyes.jpg`: Tủ gỗ lim 1996 then cài sắt, dùng cho màn `JumpscareEndgame` (khôi phục 2026-11-08 từ lịch sử git, trước đó code trỏ sai `/images/jumpscare/`).
 - `choi.jpg`: Ảnh chụp buổi chơi nhóm phá án thực tế.
 - `9.webp`, `11.webp`, `14.webp`, `15.webp`, `16.webp`, `17.webp`, `18.webp`: Các ảnh cận cảnh điểm khám xét lại và các góc nhìn phục vụ tạo panorama. Đã tối ưu WebP chất lượng 80.
 

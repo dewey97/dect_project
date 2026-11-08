@@ -115,9 +115,14 @@ export function DossierEvidenceCard({
             loading="lazy"
           />
         ) : (
-          <div className="flex flex-col items-center gap-1 text-neutral-500">
-            <Package className="size-8 opacity-40" />
-            <span className="text-[11px] italic">Chưa có tệp đính kèm</span>
+          <div className="flex flex-col items-center gap-1 px-3 text-center text-amber-300/90">
+            <Package className="size-8 opacity-70" />
+            <span className="text-[11px] font-semibold">Chưa có tệp đính kèm</span>
+            {isImageKind && (
+              <span className="text-[10px] text-amber-200/70">
+                Người chơi đang thấy ảnh tạm &quot;Chưa có ảnh&quot;
+              </span>
+            )}
           </div>
         )}
 

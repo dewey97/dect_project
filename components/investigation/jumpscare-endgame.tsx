@@ -224,7 +224,7 @@ export function JumpscareEndgame({ isActive, onComplete }: JumpscareEndgameProps
 
             {/* The wardrobe eyes image with slow creepy zoom */}
             <motion.img
-              src="/images/jumpscare/wardrobe_eyes.jpg"
+              src="/images/cases/case_000/wardrobe_eyes.jpg"
               alt=""
               className="absolute inset-0 w-full h-full object-cover"
               initial={{ scale: 1, opacity: 0 }}
