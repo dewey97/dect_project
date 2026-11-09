@@ -2,10 +2,11 @@
 
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { Bell, Menu, ShoppingBag } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import { BrandMark } from "@/components/investigation/brand-mark";
 import { UserNav } from "@/components/auth/user-nav";
 import { LandingBanner } from "@/components/public/landing-banner";
+import { NotificationBell } from "@/components/public/notification-bell";
 import { cn } from "@/lib/utils";
 
 export function LandingNavbar({
@@ -21,7 +22,7 @@ export function LandingNavbar({
       <LandingBanner />
       <header className="sticky top-0 z-50 w-full border-b border-border/30 bg-[oklch(0.21_0.009_265/0.9)] backdrop-blur-md font-sans">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2.5 sm:px-6 lg:py-4">
-          {/* Left Side: Brand + Left-aligned Navigation */}
+          {/* Left Side: Brand + Left-aligned Navigation (Desktop) */}
           <div className="flex items-center gap-5 sm:gap-7">
             <BrandMark href="/" />
 
@@ -29,7 +30,7 @@ export function LandingNavbar({
               <Link
                 href="/cases"
                 className={cn(
-                  "whitespace-nowrap transition-colors hover:text-primary",
+                  "hidden md:inline whitespace-nowrap transition-colors hover:text-primary",
                   active === "cases" ? "text-primary font-semibold" : ""
                 )}
               >
@@ -62,61 +63,23 @@ export function LandingNavbar({
             </nav>
           </div>
 
-          {/* Mobile menu: native popover, chỉ hiện dưới md */}
-          <div
-            id="landing-mobile-menu"
-            popover="auto"
-            className="m-0 mt-14 ml-auto mr-4 w-56 rounded-lg border border-border/40 bg-card p-2 font-sans text-base text-foreground shadow-xl"
-          >
-            {[
-              { href: "/#tinh-nang", label: "Trải nghiệm phá án" },
-              { href: "/how-to-play", label: "Cách chơi" },
-              { href: "/#faq", label: "Hỏi & Đáp" },
-            ].map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => document.getElementById("landing-mobile-menu")?.hidePopover()}
-                className="flex min-h-11 items-center rounded-md px-3 hover:bg-secondary hover:text-primary"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
+          {/* Right Side: Notification Bell + Kho Vụ Án (icon chỉ hiện mobile) + Avatar Dropdown (tích hợp điều hướng mobile) */}
+          <div className="flex items-center gap-2 sm:gap-3 text-muted-foreground md:text-zinc-300">
+            {/* Notification Bell + dropdown */}
+            <NotificationBell />
 
-          {/* Right Side: Notification Bell + Shopping Bag + User Avatar (No Search icon, no 'Vào chơi' or 'Chưa sở hữu') */}
-          <div className="flex items-center gap-2 sm:gap-3 text-muted-foreground">
-            {/* Notification Bell */}
-            <Link
-              href="/#faq"
-              className="relative flex size-10 items-center justify-center rounded-full transition-colors hover:bg-card hover:text-primary"
-              title="Thông báo vụ án"
-              aria-label="Thông báo vụ án"
-            >
-              <Bell className="size-5" />
-            </Link>
-
-            {/* Shopping Bag / Orders */}
+            {/* Kho vụ án icon: Chỉ hiện trên mobile (dưới md) vì desktop đã có text link ở nav bên trái */}
             <Link
               href="/cases"
-              className="flex size-10 items-center justify-center rounded-full transition-colors hover:bg-card hover:text-primary"
-              title="Bộ hồ sơ vụ án"
-              aria-label="Bộ hồ sơ vụ án"
+              className="flex md:hidden size-9 items-center justify-center rounded-full transition-colors hover:bg-card hover:text-primary"
+              title="Kho vụ án"
+              aria-label="Kho vụ án"
             >
-              <ShoppingBag className="size-5" />
+              <ShoppingBag className="size-[18px]" />
             </Link>
 
-            {/* Optional extra slot (if needed in specific standalone pages) */}
+            {/* Optional extra slot */}
             {rightSlot}
-
-            <button
-              type="button"
-              popoverTarget="landing-mobile-menu"
-              className="flex size-10 items-center justify-center rounded-full transition-colors hover:bg-card hover:text-primary md:hidden"
-              aria-label="Mở menu"
-            >
-              <Menu className="size-5" />
-            </button>
 
             {/* User Avatar Dropdown */}
             <UserNav />

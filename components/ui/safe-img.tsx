@@ -22,6 +22,10 @@ export function SafeImg({
   const [current, setCurrent] = useState(primary || fallbackSrc || "");
   const ref = useRef<HTMLImageElement>(null);
 
+  useEffect(() => {
+    setCurrent(primary || fallbackSrc || "");
+  }, [primary, fallbackSrc]);
+
   const fail = () => {
     setCurrent((cur) =>
       fallbackSrc && cur !== fallbackSrc ? fallbackSrc : "",
@@ -32,7 +36,7 @@ export function SafeImg({
     const img = ref.current;
     if (img?.complete && img.naturalWidth === 0) fail();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [current]);
 
   if (!current) return null;
   return <img ref={ref} src={current} onError={fail} {...rest} />;

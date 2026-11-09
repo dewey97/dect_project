@@ -3,7 +3,19 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import { User, LogOut, Settings, UserCircle, Terminal, Palette, LogIn } from "lucide-react";
+import {
+  User,
+  LogOut,
+  Settings,
+  UserCircle,
+  Terminal,
+  Palette,
+  LogIn,
+  FolderArchive,
+  Compass,
+  BookOpen,
+  HelpCircle,
+} from "lucide-react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { emitInvestigationEvent } from "@/lib/investigation/investigation-events";
@@ -140,7 +152,7 @@ export function UserNav({ size = "md", placement = "default" }: UserNavProps) {
             : "bg-zinc-800 text-zinc-300 border border-zinc-700/80 hover:bg-zinc-700",
           isSmall ? "size-7.5 text-xs" : "size-9 text-sm"
         )}
-        title={user ? `Tài khoản: ${user.email}` : "Hồ sơ thám tử & Tùy chọn"}
+        title={user ? `Tài khoản: ${user.email}` : "Hồ sơ thám tử & Menu"}
         data-user-nav="true"
       >
         {user ? (
@@ -150,7 +162,7 @@ export function UserNav({ size = "md", placement = "default" }: UserNavProps) {
         )}
       </button>
 
-      {/* PORTAL DROPDOWN: Render trực tiếp vào document.body để không bao giờ bị overflow-hidden hay backdrop-filter của sidebar chặn/cắt */}
+      {/* PORTAL DROPDOWN: Render trực tiếp vào document.body để không bao giờ bị overflow-hidden hay backdrop-filter chặn/cắt */}
       {isOpen && isMounted && typeof document !== "undefined" &&
         createPortal(
           <div
@@ -164,7 +176,7 @@ export function UserNav({ size = "md", placement = "default" }: UserNavProps) {
               bottom: dropdownPos?.bottom,
               zIndex: 9999,
             }}
-            className="w-56 bg-[#16181e]/98 text-zinc-100 rounded-xl shadow-2xl border border-zinc-700/80 p-1 backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-150 select-none"
+            className="w-60 bg-[#16181e]/98 text-zinc-100 rounded-xl shadow-2xl border border-zinc-700/80 p-1 backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-150 select-none font-sans"
           >
             {/* Header: Thông tin tài khoản hoặc trạng thái khách */}
             <div className="px-3 py-2 border-b border-zinc-800/80 mb-1 flex items-center justify-between">
@@ -181,6 +193,50 @@ export function UserNav({ size = "md", placement = "default" }: UserNavProps) {
                   ADMIN
                 </span>
               )}
+            </div>
+
+            {/* Menu điều hướng trên Mobile (thay thế nút 3 gạch ngoài Navbar) */}
+            <div className="md:hidden border-b border-zinc-800/80 pb-1 mb-1 flex flex-col gap-0.5">
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  router.push("/cases");
+                }}
+                className="w-full flex items-center gap-2 px-2.5 py-1.5 text-xs rounded-md hover:bg-zinc-800 text-zinc-300 hover:text-zinc-100 transition-colors text-left cursor-pointer font-medium"
+              >
+                <FolderArchive className="w-4 h-4 text-zinc-400" />
+                Kho vụ án
+              </button>
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  router.push("/#tinh-nang");
+                }}
+                className="w-full flex items-center gap-2 px-2.5 py-1.5 text-xs rounded-md hover:bg-zinc-800 text-zinc-300 hover:text-zinc-100 transition-colors text-left cursor-pointer font-medium"
+              >
+                <Compass className="w-4 h-4 text-zinc-400" />
+                Trải nghiệm phá án
+              </button>
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  router.push("/how-to-play");
+                }}
+                className="w-full flex items-center gap-2 px-2.5 py-1.5 text-xs rounded-md hover:bg-zinc-800 text-zinc-300 hover:text-zinc-100 transition-colors text-left cursor-pointer font-medium"
+              >
+                <BookOpen className="w-4 h-4 text-zinc-400" />
+                Cách chơi
+              </button>
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  router.push("/#faq");
+                }}
+                className="w-full flex items-center gap-2 px-2.5 py-1.5 text-xs rounded-md hover:bg-zinc-800 text-zinc-300 hover:text-zinc-100 transition-colors text-left cursor-pointer font-medium"
+              >
+                <HelpCircle className="w-4 h-4 text-zinc-400" />
+                Hỏi & Đáp
+              </button>
             </div>
 
             <div className="p-1 flex flex-col gap-1">
