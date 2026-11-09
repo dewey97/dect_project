@@ -70,6 +70,43 @@ export function saveRoomSession(
 
 export function removeRoomSession(roomId: string): void {
   writeRoomSessions(readRoomSessions().filter((s) => s.roomId !== roomId));
+  if (readSavedRoomId() === roomId) clearSavedRoom();
+}
+
+/**
+ * Phòng đã lưu: chỉ một phòng, chỉ khi người chơi chọn "Lưu phòng & thoát".
+ * Màn vào game chỉ hiện [Tiếp tục phòng cũ] cho phòng này.
+ */
+const SAVED_ROOM_KEY = "dect_saved_room";
+
+export function readSavedRoomId(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return localStorage.getItem(SAVED_ROOM_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/** Lưu phòng này; phòng đã lưu trước đó (nếu khác) bị bỏ khỏi thiết bị. */
+export function setSavedRoom(roomId: string): void {
+  const previous = readSavedRoomId();
+  try {
+    localStorage.setItem(SAVED_ROOM_KEY, roomId);
+  } catch {
+    // ignore
+  }
+  if (previous && previous !== roomId) {
+    writeRoomSessions(readRoomSessions().filter((s) => s.roomId !== previous));
+  }
+}
+
+export function clearSavedRoom(): void {
+  try {
+    localStorage.removeItem(SAVED_ROOM_KEY);
+  } catch {
+    // ignore
+  }
 }
 
 export function findSessionByCode(code: string): StoredRoomSession | undefined {

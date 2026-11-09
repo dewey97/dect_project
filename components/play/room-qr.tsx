@@ -26,7 +26,7 @@ export function RoomQr({ url, size = 176 }: { url: string; size?: number }) {
     <div
       role="img"
       aria-label="Mã QR để vào phòng"
-      className="rounded-lg bg-[#f4efe6] p-2 [&_svg]:h-full [&_svg]:w-full"
+      className="bg-[#f4efe6] [&_svg]:h-full [&_svg]:w-full"
       style={{ width: size, height: size }}
       // SVG do thư viện qrcode sinh từ chính URL của phòng.
       dangerouslySetInnerHTML={svg ? { __html: svg } : undefined}

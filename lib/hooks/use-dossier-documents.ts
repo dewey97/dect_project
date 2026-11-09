@@ -174,3 +174,8 @@ export function useDossierDocuments(caseId: string): DossierDataState {
     findMatchingDocument
   }
 }
+
+/** Tải sẵn tài liệu hồ sơ vào cache (phòng chờ gọi trước khi vào bàn điều tra). */
+export async function prefetchDossierDocuments(caseId: string): Promise<void> {
+  await fetchDossierDocsShared(caseId.replace(/-/g, '_')).catch(() => undefined)
+}

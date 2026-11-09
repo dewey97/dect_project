@@ -80,7 +80,7 @@ export function PlayRoomClient({ info }: { info: PlayCaseInfo }) {
       />
     );
 
-  return <PlayShell>{body}</PlayShell>;
+  return <PlayShell wide backdrop>{body}</PlayShell>;
 }
 
 /**
@@ -126,6 +126,7 @@ export function PlayLobbyClient({ info }: { info: PlayCaseInfo }) {
         caseId={info.caseId}
         caseTitle={info.title}
         caseSynopsis={info.synopsis}
+        coverImageUrl={info.coverImageUrl}
       />
     );
   } else if (room.phase === "intro_scene" || room.phase === "intro_handover") {
@@ -134,7 +135,11 @@ export function PlayLobbyClient({ info }: { info: PlayCaseInfo }) {
     body = <Status>Đang mở bàn điều tra…</Status>;
   }
 
-  return <PlayShell wide>{body}</PlayShell>;
+  return (
+    <PlayShell wide backdrop className="max-w-6xl">
+      {body}
+    </PlayShell>
+  );
 }
 
 /** room/me của provider, kèm cờ vừa rời phòng (có phòng rồi mất phòng). */

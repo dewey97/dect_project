@@ -42,7 +42,7 @@ test("room code: normalize input", () => {
 });
 
 test("phase: order and Host rights", () => {
-  assert.equal(nextPhase("lobby"), "intro_scene");
+  assert.equal(nextPhase("lobby"), "investigating");
   assert.equal(nextPhase("intro_handover"), "investigating");
   assert.equal(nextPhase("epilogue"), null);
   assert.ok(hostCanAdvance("intro_scene"));

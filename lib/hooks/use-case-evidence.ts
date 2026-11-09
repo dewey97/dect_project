@@ -184,3 +184,8 @@ export function useCaseEvidence(
     refetch,
   };
 }
+
+/** Tải sẵn danh mục vật chứng vào cache (phòng chờ gọi trước khi vào bàn điều tra). */
+export async function prefetchCaseEvidence(caseId: string): Promise<void> {
+  await fetchCaseEvidenceShared(normalizeCaseId(caseId)).catch(() => undefined);
+}

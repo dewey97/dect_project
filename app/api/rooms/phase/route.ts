@@ -19,7 +19,8 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 /**
- * Host chuyển màn: lobby → intro_scene → intro_handover → investigating.
+ * Host chuyển màn: lobby → investigating (bối cảnh ban đầu nằm trong phòng chờ).
+ * Phòng cũ còn ở intro_scene / intro_handover cũng chuyển thẳng sang investigating.
  * Body: { from } là phase client đang thấy. Lệch phase thì 409 (bấm 2 lần, hoặc
  * Host khác đã chuyển), không bao giờ nhảy 2 màn.
  * intro_handover → investigating ghi started_at (mốc tính giờ, spec 2.6).

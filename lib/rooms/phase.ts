@@ -16,12 +16,12 @@ export function isRoomPhase(value: unknown): value is RoomPhase {
 }
 
 /**
- * Phase kế tiếp:
- * Hợp nhất màn bối cảnh ban đầu và bàn giao hồ sơ thành 1 màn duy nhất.
- * Từ lobby -> intro_scene -> nhảy thẳng sang investigating!
+ * Phase kế tiếp: bối cảnh ban đầu nằm ngay trong phòng chờ, nên
+ * lobby -> investigating. intro_scene / intro_handover chỉ còn cho phòng cũ
+ * đang dừng ở đó; từ đó cũng đi thẳng sang investigating.
  */
 export function nextPhase(phase: RoomPhase): RoomPhase | null {
-  if (phase === "lobby") return "intro_scene";
+  if (phase === "lobby") return "investigating";
   if (phase === "intro_scene" || phase === "intro_handover") return "investigating";
   return null;
 }

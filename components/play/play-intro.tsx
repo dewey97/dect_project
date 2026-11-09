@@ -28,7 +28,6 @@ export function PlayIntro({ info }: { info: PlayCaseInfo }) {
     advancePhase,
     markRead,
   } = useRoomSync();
-  const { getPhaseNarrative } = useCaseNarratives(info.caseId);
   const endRef = useRef<HTMLDivElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +53,6 @@ export function PlayIntro({ info }: { info: PlayCaseInfo }) {
 
   const entered = participants.filter((p) => p.enteredAt);
   const readCount = entered.filter((p) => readPhaseById[p.id] === phase).length;
-  const narrative = getPhaseNarrative(0);
 
   const next = async () => {
     setBusy(true);
@@ -64,61 +62,10 @@ export function PlayIntro({ info }: { info: PlayCaseInfo }) {
     if (!res.success) setError(res.error ?? "Không chuyển được màn.");
   };
 
-  const coverSrc =
-    info.coverImageUrl && !info.coverImageUrl.includes("crime_scene_360")
-      ? info.coverImageUrl
-      : "/poster_c0.webp";
-
   return (
     <>
       <article className="space-y-6">
-        {/* Header Ngày & Tiêu đề vụ án */}
-        <div className="space-y-1">
-          <PlayLabel>{narrative.date || "HÀ NỘI · 1998"}</PlayLabel>
-          <h1 className="text-2xl font-black uppercase tracking-tight text-zinc-100 sm:text-3xl">
-            {info.title}
-          </h1>
-        </div>
-
-        {/* Ảnh hiện trường vụ án */}
-        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-none border border-zinc-800 bg-zinc-950 flex items-center justify-center">
-          <SafeImg
-            src={coverSrc}
-            fallbackSrc="/poster_c0.webp"
-            alt={`Hiện trường vụ án ${info.title}`}
-            className="h-full w-full object-contain"
-          />
-        </div>
-
-        {/* Bối cảnh dẫn truyện */}
-        {narrative.monologue && (
-          <div className="rounded-none border border-zinc-800/80 bg-zinc-950/60 p-4">
-            <PlayLabel>Bối cảnh ban đầu</PlayLabel>
-            <div className="mt-2 whitespace-pre-line text-sm leading-relaxed text-zinc-300 font-serif italic">
-              {narrative.monologue}
-            </div>
-          </div>
-        )}
-
-        {/* Thông tin ban đầu & Tóm tắt vụ án */}
-        {info.synopsis && (
-          <PlayCard>
-            <PlayLabel>Thông tin ban đầu</PlayLabel>
-            <p className="mt-2 whitespace-pre-line text-xs sm:text-sm leading-relaxed text-zinc-200">
-              {info.synopsis}
-            </p>
-          </PlayCard>
-        )}
-
-        {/* Nhiệm vụ phá án */}
-        <PlayCard>
-          <PlayLabel>Nhiệm vụ điều tra</PlayLabel>
-          <p className="mt-2 text-xs sm:text-sm leading-relaxed text-zinc-200">
-            Đối chiếu hồ sơ tài liệu, giải mã mâu thuẫn lời khai và xâu chuỗi vật chứng hiện trường.
-            Mọi thành viên đều có thể giải câu hỏi checkpoint; khi một người giải đúng, cả phòng cùng mở khóa manh mối mới.
-            Khi đã nắm vững động cơ và chứng cứ xác thực, tiến hành thẩm tra nghi phạm và kết luận vụ án.
-          </p>
-        </PlayCard>
+        <CaseBrief info={info} />
       </article>
 
       <div ref={endRef} aria-hidden className="h-px" />
@@ -147,5 +94,31 @@ export function PlayIntro({ info }: { info: PlayCaseInfo }) {
         )}
       </div>
     </>
+  );
+}
+
+/**
+ * Bối cảnh vụ án: ngày, tên vụ, ảnh hiện trường, bối cảnh ban đầu. Hiện ngay trong phòng chờ để cả nhóm đọc trong lúc chờ Host bắt đầu.
+ */
+export function CaseBrief({
+  info,
+}: {
+  info: Pick<PlayCaseInfo, "caseId" | "title" | "synopsis" | "coverImageUrl">;
+}) {
+  const { getPhaseNarrative } = useCaseNarratives(info.caseId);
+  const narrative = getPhaseNarrative(0);
+  return (
+    <div className="space-y-6">
+      <PlayLabel>{narrative.date || "HÀ NỘI · 1998"}</PlayLabel>
+
+      {/* Bối cảnh dẫn truyện */}
+      {narrative.monologue && (
+        <div>
+          <div className="whitespace-pre-line text-sm leading-relaxed text-zinc-300 font-serif italic">
+            {narrative.monologue}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

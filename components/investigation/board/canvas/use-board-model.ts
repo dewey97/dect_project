@@ -81,6 +81,37 @@ export interface BoardModelReturn {
  * - Cáo trạng (indictment)
  * - Các custom board nodes
  */
+/** Dữ liệu bàn điều tra của gameplay (checkpoint đã lọc đáp án). */
+function fetchGameplayBoard(caseId: string) {
+  return Promise.all([
+    getBoardNodes(caseId),
+    getBoardgamePinPositions(caseId),
+    getPublicCheckpointsByCase(caseId),
+    getCharactersByCase(caseId),
+    getCaseEvidence(caseId),
+  ]);
+}
+
+const PREFETCH_TTL_MS = 10 * 60_000;
+const prefetchedBoards = new Map<
+  string,
+  { at: number; promise: ReturnType<typeof fetchGameplayBoard> }
+>();
+
+/** Tải sẵn dữ liệu bàn điều tra khi còn ở phòng chờ. Bàn điều tra dùng lại đúng một lần. */
+export async function prefetchBoardModel(caseIdInput: string): Promise<void> {
+  const caseId = normalizeCaseId(caseIdInput);
+  const promise = fetchGameplayBoard(caseId);
+  prefetchedBoards.set(caseId, { at: Date.now(), promise });
+  await promise.catch(() => undefined);
+}
+
+function takePrefetchedBoard(caseId: string) {
+  const entry = prefetchedBoards.get(caseId);
+  prefetchedBoards.delete(caseId);
+  return entry && Date.now() - entry.at < PREFETCH_TTL_MS ? entry.promise : null;
+}
+
 export function useBoardModel(
   caseIdInput: string,
   options: UseBoardModelOptions = {},
@@ -132,22 +163,27 @@ export function useBoardModel(
     setIsLoading(true);
     setError(null);
     try {
+      // Phòng chờ có thể đã tải sẵn (prefetchBoardModel); chỉ dùng cho lần nạp đầu của gameplay.
+      const prefetched = options.isStudioMode
+        ? null
+        : takePrefetchedBoard(caseId);
       const [
         nodesRes,
         boardgameRes,
         checkpointsRes,
         charactersRes,
         evidenceRes,
-      ] = await Promise.all([
-        getBoardNodes(caseId),
-        getBoardgamePinPositions(caseId),
-        // Gameplay chỉ nhận checkpoint đã lọc đáp án; Studio (admin) đọc bản đầy đủ.
-        options.isStudioMode
-          ? getCheckpointsByCase(caseId)
-          : getPublicCheckpointsByCase(caseId),
-        getCharactersByCase(caseId),
-        getCaseEvidence(caseId),
-      ]);
+      ] = await (prefetched ??
+        Promise.all([
+          getBoardNodes(caseId),
+          getBoardgamePinPositions(caseId),
+          // Gameplay chỉ nhận checkpoint đã lọc đáp án; Studio (admin) đọc bản đầy đủ.
+          options.isStudioMode
+            ? getCheckpointsByCase(caseId)
+            : getPublicCheckpointsByCase(caseId),
+          getCharactersByCase(caseId),
+          getCaseEvidence(caseId),
+        ]));
 
       if (nodesRes.success && nodesRes.data) {
         setBoardNodes(nodesRes.data);

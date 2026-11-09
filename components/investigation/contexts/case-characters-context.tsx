@@ -118,3 +118,13 @@ export function useCaseCharacters(): CaseCharactersValue {
 export function useOptionalCaseCharacters(): CaseCharactersValue | null {
   return useContext(CaseCharactersContext);
 }
+
+/** Tải sẵn nhân vật vào cache, để bàn điều tra không hiện "Đang đồng bộ hồ sơ vụ án". */
+export async function prefetchCaseCharacters(caseId: string): Promise<void> {
+  if (loadedCases.has(caseId)) return;
+  try {
+    loadedCases.set(caseId, await fetchCharacters(caseId));
+  } catch {
+    // Bàn điều tra tự tải lại và có nút Thử lại.
+  }
+}

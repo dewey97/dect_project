@@ -187,3 +187,8 @@ export function useCaseDossiers(
     refetch: fetchDossiers,
   };
 }
+
+/** Tải sẵn danh mục bộ hồ sơ vào cache (phòng chờ gọi trước khi vào bàn điều tra). */
+export async function prefetchCaseDossiers(caseId: string): Promise<void> {
+  await fetchDossiersShared(normalizeCaseId(caseId)).catch(() => undefined);
+}

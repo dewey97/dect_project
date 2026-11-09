@@ -46,11 +46,9 @@ Nhóm người chơi cùng điều tra một vụ án trên nhiều thiết bị
                                                                        │
                     ┌──────────────────────────────────────────────────┘
                     ▼
-   lobby ──Host: Bắt đầu──► intro_scene ──Host: Tiếp tục──► intro_handover
-                                                               │
-                                          Host: Tiếp nhận vụ án│ (bắt đầu tính giờ)
-                                                               ▼
-                       epilogue ◄──nộp kết luận── investigating
+   lobby (kèm bối cảnh vụ án) ──Host: Bắt đầu──► investigating (bắt đầu tính giờ)
+                                                                  │
+                                                  epilogue ◄──nộp kết luận
 ```
 
 - **Phase là trạng thái của phòng**, lưu trên server. Mọi thiết bị đã vào cuộc render theo phase hiện tại.
@@ -113,7 +111,8 @@ Mọi người chơi bản hộp đều đi qua phòng chờ, kể cả khi chơ
 **Khi phòng đang ở `lobby`:**
 
 - Danh sách thành viên realtime: avatar, nickname, nhãn Host, trạng thái online (Supabase Presence).
-- Nút Sẵn sàng **không** có. Host bấm **[Bắt đầu]** lúc nào cũng được, cả phòng chuyển sang `intro_scene` cùng lúc.
+- Nút Sẵn sàng **không** có. Host bấm **[Bắt đầu]** lúc nào cũng được, cả phòng chuyển thẳng sang `investigating` cùng lúc.
+- **Cập nhật 2026-11-09:** phòng chờ hiện luôn bối cảnh vụ án (ngày, ảnh hiện trường, bối cảnh ban đầu) bên cạnh lưới ô thám tử 3:4. Thanh tải tài nguyên bàn điều tra chạy trong lúc chờ; nút **[Bắt đầu]** của Host mở khi tải xong.
 
 **Khi phòng đã bắt đầu (người vào muộn):**
 
@@ -133,7 +132,9 @@ Mọi người chơi bản hộp đều đi qua phòng chờ, kể cả khi chơ
 - **Rời phòng** (bấm nút): giải phóng chỗ. Quay lại thì vào như người mới, nếu phòng còn chỗ. Server nhận lại đúng nickname cũ nhờ token trên thiết bị.
 - **Mất kết nối** (tắt màn hình, mất mạng, F5): vẫn giữ chỗ. Mở lại là tự kết nối, không phải nhập lại gì.
 
-### 2.5. Giai đoạn 4.1 — Cảnh mở đầu (`intro_scene`)
+### 2.5. Giai đoạn 4.1 — Cảnh mở đầu (`intro_scene`) — ĐÃ GỘP VÀO PHÒNG CHỜ
+
+> Từ 2026-11-09 Host bắt đầu là vào thẳng `investigating`; mục 2.5 và 2.6 chỉ còn áp dụng cho phòng cũ đang dừng ở hai phase này (`lib/rooms/phase.ts`).
 
 - Ảnh hiện trường, đoạn mở đầu, voice người báo án.
 - Voice: người chơi tự bấm phát trên máy mình (trình duyệt mobile chặn autoplay). Không tự phát.
@@ -321,7 +322,7 @@ Phòng `dormant` (7 ngày không hoạt động) đương nhiên đã có `unran
 
 **Vì sao phải giải phóng mã phòng:** mã 4 ký tự chỉ có khoảng 920 nghìn tổ hợp. Nếu mọi phòng cũ giữ mã mãi, kho mã cạn dần và sinh mã mới ngày càng hay trùng. Mã chỉ cần cho phòng đang chơi.
 
-**Tiếp tục phòng cũ:** thiết bị lưu danh sách phòng đã tham gia (participant token) trong localStorage. Màn vào game hiển thị **[Tiếp tục phòng cũ]** nếu có.
+**Tiếp tục phòng cũ (cập nhật 2026-11-09):** thiết bị vẫn giữ token các phòng đã vào trong localStorage (`dect_room_sessions`) để F5 và link phòng tự nối lại. Màn vào game chỉ hiện **[Tiếp tục phòng cũ]** cho **một** phòng: phòng người chơi chọn **[Lưu phòng & thoát]** khi rời (`dect_saved_room`). Lưu phòng mới thì phòng đã lưu trước bị bỏ khỏi thiết bị. **[Rời hẳn]** trả chỗ (API `leave`) và xóa phiên.
 
 **Chi phí lưu trữ (ước tính):**
 

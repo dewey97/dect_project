@@ -543,7 +543,7 @@ function WebEvidencePageContent() {
   useEffect(() => {
     setStorageItem("play_experience", "web");
 
-    // Trong phòng, intro đã chiếu đồng bộ ở /play (intro_scene, intro_handover).
+    // Trong phòng, bối cảnh vụ án đã hiện ở phòng chờ /play (CaseBrief), không chiếu intro lại.
     const isIntroSeen =
       !!roomCode ||
       !!searchParams.get("room") ||

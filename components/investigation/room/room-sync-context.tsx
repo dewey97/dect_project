@@ -33,6 +33,7 @@ import { normalizeRoomCode } from "@/lib/rooms/code";
 import {
   findSessionByCode,
   readRoomSessions,
+  setSavedRoom,
   removeRoomSession,
   roomApi,
   saveRoomSession,
@@ -102,6 +103,8 @@ interface RoomSyncContextType {
   activePing: DetectivePing | null;
   joinRoom: (code: string, nickname?: string) => Promise<ActionResult>;
   leaveRoom: () => Promise<void>;
+  /** Rời phòng nhưng giữ chỗ: lưu làm phòng duy nhất để [Tiếp tục phòng cũ]. */
+  saveAndExitRoom: () => void;
   syncUpdate: (
     patch: Partial<RoomInvestigationState>,
     actionText?: string,
@@ -817,6 +820,13 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
     resetRoom(null);
   }, [call, resetRoom]);
 
+  const saveAndExitRoom = useCallback(() => {
+    const session = sessionRef.current;
+    if (!session) return;
+    setSavedRoom(session.roomId);
+    resetRoom(null);
+  }, [resetRoom]);
+
   const markRead = useCallback(
     (phase: RoomPhase) => {
       if (readPhaseRef.current === phase) return;
@@ -1054,6 +1064,7 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       activePing,
       joinRoom,
       leaveRoom,
+      saveAndExitRoom,
       syncUpdate,
       broadcastPing,
       room,
@@ -1094,6 +1105,7 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       activePing,
       joinRoom,
       leaveRoom,
+      saveAndExitRoom,
       syncUpdate,
       broadcastPing,
       isHost,
@@ -1141,6 +1153,7 @@ const DEFAULT_ROOM_SYNC_CONTEXT: RoomSyncContextType = {
   activePing: null,
   joinRoom: noop,
   leaveRoom: async () => {},
+  saveAndExitRoom: () => {},
   syncUpdate: async () => {},
   broadcastPing: () => {},
   room: null,

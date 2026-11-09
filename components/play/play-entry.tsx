@@ -9,13 +9,18 @@ import {
   History,
   Minus,
   Plus,
-  QrCode,
-  Users,
 } from "lucide-react";
 import { useRoomSync } from "@/components/investigation/room/room-sync-context";
 import { normalizeRoomCode } from "@/lib/rooms/code";
+import { readSavedRoomId } from "@/lib/rooms/client";
 import { NICKNAME_MAX_LENGTH, cleanNickname } from "@/lib/rooms/nickname";
-import { PlayButton, PlayCard, PlayError } from "@/components/play/play-ui";
+import {
+  PlayButton,
+  PlayCard,
+  PlayError,
+  inputClass,
+} from "@/components/play/play-ui";
+import { EvidenceMarker } from "@/components/public/evidence-marker";
 import { boardPath } from "@/lib/play/routes";
 
 const NICKNAME_KEY = "dect_player_nickname";
@@ -39,9 +44,13 @@ function rememberNickname(nickname: string): void {
 
 type Step = "choose" | "create" | "join";
 
+/** Nút quay lại ở góc trên trái của mỗi bước: rõ, đủ lớn để bấm. */
+const backClass =
+  "mb-4 -ml-1 inline-flex min-h-11 items-center gap-1.5 px-1 text-sm font-semibold text-zinc-300 transition hover:text-amber-400 cursor-pointer";
+
 /**
  * Màn vào game vụ án (spec 2.3) thiết kế chuẩn Figma XPLORE (responsive Mobile & Desktop):
- * - Bước 1 (choose): Lựa chọn phòng chơi (Tạo phòng mới / Tham gia phòng sẵn có).
+ * - Bước 1 (choose): Lựa chọn phòng chơi (Tạo phòng mới / Tham gia phòng).
  * - Bước 2 (create / join): Nhập thông tin người chơi & mã code / quét QR với các ngàm góc vàng hổ phách.
  */
 export function PlayEntry({
@@ -55,6 +64,7 @@ export function PlayEntry({
   access?: { online: boolean; box: boolean; groupCredits: number } | null;
 }) {
   const ownsCase = !!access && (access.box || access.online);
+  const canSolo = !access || ownsCase;
   const canCreate =
     !access || access.box || (access.online && access.groupCredits > 0);
   const createNote = !access
@@ -96,7 +106,14 @@ export function PlayEntry({
     }
   }, [pendingRoomCode]);
 
-  const oldRooms = savedSessions.filter((s) => s.caseId === caseId);
+  // Chỉ phòng người chơi đã chọn "Lưu phòng & thoát" (tối đa một phòng).
+  const [savedRoomId, setSavedRoomId] = useState<string | null>(null);
+  useEffect(() => {
+    setSavedRoomId(readSavedRoomId());
+  }, [savedSessions]);
+  const oldRooms = savedSessions.filter(
+    (s) => s.roomId === savedRoomId && s.caseId === caseId,
+  );
 
   const exitMessage =
     exitReason === "kicked"
@@ -144,32 +161,60 @@ export function PlayEntry({
       {/* BƯỚC 1: LỰA CHỌN PHÒNG CHƠI (Node Figma 410:568 / 418:1814) */}
       {/* ========================================================= */}
       {step === "choose" && (
-        <div className="w-full max-w-2xl animate-in fade-in zoom-in-95 duration-200">
-          <PlayCard className="relative overflow-hidden p-6 sm:p-8 md:p-10">
-            {/* Header tiêu đề chuẩn Figma */}
+        <div
+          className={`w-full ${canSolo ? "max-w-4xl" : "max-w-2xl"} animate-in fade-in zoom-in-95 duration-200`}
+        >
+          <PlayCard className="relative p-5 sm:p-8 md:p-10">
+            <Link
+              href={`/cases/${caseId}`}
+              className={backClass}
+            >
+              <ArrowLeft className="size-4" />
+              Quay lại trang vụ án
+            </Link>
+
+            {/* Header tiêu đề */}
             <div className="text-center mb-8">
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-wide text-amber-400 mb-2">
-                Chọn cách tham gia vụ án
-              </h1>
-              <p className="text-xs sm:text-sm text-zinc-400 font-serif italic">
+              <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-zinc-50">
                 {caseTitle}
+              </h1>
+              <p className="mt-2 text-base sm:text-lg text-zinc-400">
+                Phá án một mình hay cùng đồng đội?
               </p>
             </div>
 
-            {/* Hai thẻ chọn phương thức tham gia (Responsive: 1 cột mobile, 2 cột desktop) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
-              {/* Thẻ 1: Tạo phòng chơi mới */}
-              <div className="rounded-2xl border border-zinc-800 bg-[#212124]/90 p-6 flex flex-col items-center text-center justify-between hover:border-amber-500/50 hover:bg-[#252529] transition-all group shadow-md">
-                <div className="flex flex-col items-center w-full">
-                  <div className="size-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-4 group-hover:scale-105 transition-transform">
-                    <Users className="size-8" />
+            {/* Các thẻ chọn cách tham gia: Chơi một mình (nếu được), Tạo phòng, Tham gia phòng */}
+            <div
+              className={`grid grid-cols-1 gap-4 sm:gap-5 ${canSolo ? "md:grid-cols-3" : "md:grid-cols-2"}`}
+            >
+              {/* Thẻ 1: Chơi một mình */}
+              {canSolo && (
+                <div className="border border-zinc-800 bg-zinc-900/50 p-5 sm:p-6 flex flex-col justify-between gap-6 hover:border-amber-500/50 transition-colors">
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-end gap-3">
+                      <EvidenceMarker n={1} className="shrink-0 -rotate-[3deg]" />
+                      <h2 className="text-lg sm:text-xl font-bold tracking-tight text-stone-200">
+                        Chơi một mình
+                      </h2>
+                    </div>
                   </div>
-                  <h2 className="text-lg font-bold text-zinc-100 mb-2">
-                    Tạo phòng chơi mới
-                  </h2>
-                  <p className="text-xs text-zinc-400 leading-relaxed mb-6">
-                    Khởi tạo phòng và mời đồng đội cùng tham gia
-                  </p>
+                  <Link
+                    href={boardPath(caseId)}
+                    className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-none bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 px-5 text-sm font-bold uppercase tracking-wider text-zinc-950 shadow-lg shadow-amber-500/20 transition-all hover:brightness-105"
+                  >
+                    Chơi ngay
+                  </Link>
+                </div>
+              )}
+              {/* Thẻ: Tạo phòng chơi mới */}
+              <div className="border border-zinc-800 bg-zinc-900/50 p-5 sm:p-6 flex flex-col justify-between gap-6 hover:border-amber-500/50 transition-colors">
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-end gap-3">
+                    <EvidenceMarker n={canSolo ? 2 : 1} className="shrink-0 -rotate-[6deg]" />
+                    <h2 className="text-lg sm:text-xl font-bold tracking-tight text-stone-200">
+                      Tạo phòng chơi mới
+                    </h2>
+                  </div>
                 </div>
 
                 <div className="w-full space-y-2">
@@ -181,7 +226,7 @@ export function PlayEntry({
                     Tạo phòng ngay
                   </PlayButton>
                   {createNote && !canCreate && (
-                    <p className="text-[11px] text-amber-400/90 leading-tight pt-1">
+                    <p className="text-xs text-amber-400/90 leading-tight pt-1">
                       {ownsCase ? "Mua thêm lượt tạo phòng" : "Cần mua vụ án"}{" "}
                       <Link
                         href={`/cases/${caseId}#online`}
@@ -194,18 +239,15 @@ export function PlayEntry({
                 </div>
               </div>
 
-              {/* Thẻ 2: Tham gia phòng sẵn có */}
-              <div className="rounded-2xl border border-zinc-800 bg-[#212124]/90 p-6 flex flex-col items-center text-center justify-between hover:border-amber-500/50 hover:bg-[#252529] transition-all group shadow-md">
-                <div className="flex flex-col items-center w-full">
-                  <div className="size-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-4 group-hover:scale-105 transition-transform">
-                    <QrCode className="size-8" />
+              {/* Thẻ: Tham gia phòng */}
+              <div className="border border-zinc-800 bg-zinc-900/50 p-5 sm:p-6 flex flex-col justify-between gap-6 hover:border-amber-500/50 transition-colors">
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-end gap-3">
+                    <EvidenceMarker n={canSolo ? 3 : 2} className="shrink-0 rotate-[5deg]" />
+                    <h2 className="text-lg sm:text-xl font-bold tracking-tight text-stone-200">
+                      Tham gia phòng
+                    </h2>
                   </div>
-                  <h2 className="text-lg font-bold text-zinc-100 mb-2">
-                    Tham gia phòng sẵn có
-                  </h2>
-                  <p className="text-xs text-zinc-400 leading-relaxed mb-6">
-                    Nhập mã phòng hoặc quét QR để tham gia
-                  </p>
                 </div>
 
                 <div className="w-full">
@@ -214,17 +256,18 @@ export function PlayEntry({
                   </PlayButton>
                 </div>
               </div>
+
             </div>
 
             {/* Danh sách phòng cũ đã tham gia (nếu có) */}
             {oldRooms.length > 0 && (
-              <div className="mb-6 p-4 rounded-2xl border border-zinc-800 bg-zinc-900/60">
+              <div className="mt-6 p-4 border border-zinc-800 bg-zinc-900/50">
                 <div className="text-xs font-mono uppercase tracking-widest text-zinc-400 mb-3 flex items-center gap-2">
                   <History className="size-3.5 text-amber-400" />
                   Tiếp tục phòng cũ
                 </div>
                 <div className="space-y-2">
-                  {oldRooms.slice(0, 3).map((s) => (
+                  {oldRooms.map((s) => (
                     <button
                       key={s.roomId}
                       type="button"
@@ -235,13 +278,13 @@ export function PlayEntry({
                         if (!res.success)
                           setError(res.error ?? "Không mở lại được phòng.");
                       }}
-                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-950/70 hover:border-amber-500/40 hover:bg-zinc-900 transition text-left cursor-pointer"
+                      className="w-full flex items-center justify-between px-4 py-3 border border-zinc-800 bg-zinc-950/70 hover:border-amber-500/40 hover:bg-zinc-900 transition text-left cursor-pointer"
                     >
                       <span className="font-semibold text-sm text-zinc-200">
                         {s.nickname}
                       </span>
                       <span className="font-mono text-xs font-bold text-amber-400">
-                        #{s.code ?? "MỞ LẠI"}
+                        {s.code ?? "MỞ LẠI"}
                       </span>
                     </button>
                   ))}
@@ -249,23 +292,6 @@ export function PlayEntry({
               </div>
             )}
 
-            {/* Các tùy chọn phụ bên dưới */}
-            <div className="flex flex-col items-center gap-3 pt-2">
-              {(!access || ownsCase) && (
-                <Link
-                  href={boardPath(caseId)}
-                  className="text-xs text-zinc-400 hover:text-amber-400 transition underline underline-offset-4"
-                >
-                  Chơi một mình (không qua phòng)
-                </Link>
-              )}
-              <Link
-                href={`/cases/${caseId}`}
-                className="text-xs text-zinc-500 hover:text-zinc-300 transition"
-              >
-                Quay lại trang vụ án
-              </Link>
-            </div>
           </PlayCard>
         </div>
       )}
@@ -277,25 +303,33 @@ export function PlayEntry({
         <div className="w-full max-w-lg animate-in fade-in zoom-in-95 duration-200">
           <PlayCard className="p-6 sm:p-8">
             <form onSubmit={submitCreate} className="space-y-6">
+              <button
+                type="button"
+                onClick={() => go("choose")}
+                className={backClass}
+              >
+                <ArrowLeft className="size-4" />
+                Quay lại
+              </button>
+
               {/* Header tiêu đề */}
               <div className="text-center pb-2">
-                <h1 className="text-xl sm:text-2xl font-bold tracking-wide text-amber-400 uppercase">
-                  Nhập thông tin người chơi
-                </h1>
-                <p className="text-xs text-zinc-400 mt-1">
-                  Khởi tạo phòng chơi cho vụ án: {caseTitle}
+                <p className="font-mono text-xs uppercase tracking-[0.25em] text-amber-400 mb-2">
+                  {caseTitle}
                 </p>
+                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-zinc-50">
+                  Tạo phòng chơi mới
+                </h1>
               </div>
 
               {/* Trường nhập Tên hiển thị chuẩn Figma */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-4 bg-amber-500 rounded-full" />
                   <label
                     htmlFor="create-nick"
-                    className="text-xs font-bold uppercase tracking-wider text-zinc-200"
+                    className="font-mono text-xs font-medium uppercase tracking-widest text-zinc-400"
                   >
-                    TÊN HIỂN THỊ:
+                    Tên hiển thị
                   </label>
                 </div>
                 <input
@@ -306,46 +340,48 @@ export function PlayEntry({
                   maxLength={NICKNAME_MAX_LENGTH}
                   autoComplete="nickname"
                   placeholder="Nhập tên của bạn"
-                  className="w-full min-h-12 rounded-xl bg-[#ececed] text-zinc-950 placeholder:text-zinc-500 font-medium px-4 text-base focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-inner transition"
+                  className={inputClass}
                 />
-                <p className="text-[11px] text-zinc-400">
+                <p className="text-xs text-zinc-500">
                   Tên dùng để hiển thị trong phòng chờ và trên bảng vụ án.
                 </p>
               </div>
 
-              {/* Tùy chỉnh số lượng người chơi */}
-              <div className="space-y-2 pt-1">
-                <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-4 bg-amber-500 rounded-full" />
-                  <span className="text-xs font-bold uppercase tracking-wider text-zinc-200">
-                    SỐ THÁM TỬ TỐI ĐA:
+              {/* Số thám tử tối đa: nhãn và nút +/- trên cùng một dòng */}
+              <div className="flex items-center justify-between gap-3 pt-1">
+                <span
+                  id="max-players-label"
+                  className="font-mono text-xs font-medium uppercase tracking-widest text-zinc-400"
+                >
+                  Số thám tử tối đa
+                </span>
+                <div
+                  role="group"
+                  aria-labelledby="max-players-label"
+                  className="flex items-center gap-3"
+                >
+                  <button
+                    type="button"
+                    aria-label="Giảm số người"
+                    onClick={() => setMaxPlayers((n) => Math.max(1, n - 1))}
+                    className="size-10 border border-zinc-700 bg-zinc-900 flex items-center justify-center text-zinc-200 hover:border-amber-500 transition cursor-pointer"
+                  >
+                    <Minus className="size-4" />
+                  </button>
+                  <span
+                    aria-live="polite"
+                    className="font-mono text-lg font-bold text-amber-400 min-w-6 text-center"
+                  >
+                    {maxPlayers}
                   </span>
-                </div>
-                <div className="flex items-center justify-between p-3 rounded-xl border border-zinc-800 bg-[#212124]">
-                  <span className="text-xs text-zinc-400">
-                    Quy mô đội điều tra
-                  </span>
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      aria-label="Giảm số người"
-                      onClick={() => setMaxPlayers((n) => Math.max(1, n - 1))}
-                      className="size-8 rounded-lg border border-zinc-700 bg-zinc-800 flex items-center justify-center text-zinc-200 hover:border-amber-500 transition cursor-pointer"
-                    >
-                      <Minus className="size-4" />
-                    </button>
-                    <span className="font-mono text-lg font-bold text-amber-400 min-w-6 text-center">
-                      {maxPlayers}
-                    </span>
-                    <button
-                      type="button"
-                      aria-label="Tăng số người"
-                      onClick={() => setMaxPlayers((n) => Math.min(8, n + 1))}
-                      className="size-8 rounded-lg border border-zinc-700 bg-zinc-800 flex items-center justify-center text-zinc-200 hover:border-amber-500 transition cursor-pointer"
-                    >
-                      <Plus className="size-4" />
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    aria-label="Tăng số người"
+                    onClick={() => setMaxPlayers((n) => Math.min(8, n + 1))}
+                    className="size-10 border border-zinc-700 bg-zinc-900 flex items-center justify-center text-zinc-200 hover:border-amber-500 transition cursor-pointer"
+                  >
+                    <Plus className="size-4" />
+                  </button>
                 </div>
               </div>
 
@@ -356,19 +392,11 @@ export function PlayEntry({
                 <PlayButton
                   type="submit"
                   disabled={isConnecting || !canCreate}
-                  className="w-full text-base uppercase tracking-wider"
+                  className="w-full"
                 >
                   {isConnecting ? "Đang tạo phòng…" : "Vào phòng chờ"}
                 </PlayButton>
 
-                <button
-                  type="button"
-                  onClick={() => go("choose")}
-                  className="w-full py-2 text-xs text-zinc-400 hover:text-zinc-200 transition text-center cursor-pointer flex items-center justify-center gap-1.5"
-                >
-                  <ArrowLeft className="size-3.5" />
-                  Quay lại
-                </button>
               </div>
             </form>
           </PlayCard>
@@ -382,19 +410,28 @@ export function PlayEntry({
         <div className="w-full max-w-lg animate-in fade-in zoom-in-95 duration-200">
           <PlayCard className="p-6 sm:p-8">
             <form onSubmit={submitJoin} className="space-y-6">
+              <button
+                type="button"
+                onClick={() => go("choose")}
+                className={backClass}
+              >
+                <ArrowLeft className="size-4" />
+                Quay lại
+              </button>
+
               {/* Nếu chưa có mã phòng từ URL QR: Hiển thị Khung quét QR Viewfinder chuẩn Figma */}
               {!pendingRoomCode && (
                 <div className="space-y-4">
                   {/* Viewfinder Camera với 4 ngàm góc hổ phách */}
-                  <div className="relative w-full max-w-[240px] aspect-square mx-auto rounded-3xl bg-[#212124] border border-zinc-800 flex flex-col items-center justify-center p-6 shadow-inner">
+                  <div className="relative w-full max-w-[240px] aspect-square mx-auto bg-zinc-900/50 border border-zinc-800 flex flex-col items-center justify-center p-6">
                     {/* 4 ngàm góc vàng hổ phách */}
-                    <div className="absolute top-4 left-4 w-7 h-7 border-t-2 border-l-2 border-amber-400 rounded-tl-xl" />
-                    <div className="absolute top-4 right-4 w-7 h-7 border-t-2 border-r-2 border-amber-400 rounded-tr-xl" />
-                    <div className="absolute bottom-4 left-4 w-7 h-7 border-b-2 border-l-2 border-amber-400 rounded-bl-xl" />
-                    <div className="absolute bottom-4 right-4 w-7 h-7 border-b-2 border-r-2 border-amber-400 rounded-br-xl" />
+                    <div className="absolute top-4 left-4 w-7 h-7 border-t-2 border-l-2 border-amber-400" />
+                    <div className="absolute top-4 right-4 w-7 h-7 border-t-2 border-r-2 border-amber-400" />
+                    <div className="absolute bottom-4 left-4 w-7 h-7 border-b-2 border-l-2 border-amber-400" />
+                    <div className="absolute bottom-4 right-4 w-7 h-7 border-b-2 border-r-2 border-amber-400" />
 
                     <Camera className="size-14 text-amber-400/90 mb-3 animate-pulse" />
-                    <span className="text-xs text-zinc-400 text-center font-medium">
+                    <span className="text-sm text-zinc-400 text-center">
                       Quét mã QR để tiếp tục
                     </span>
                   </div>
@@ -413,22 +450,21 @@ export function PlayEntry({
               {/* Nhập mã phòng hoặc hiển thị mã phòng đã có */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-4 bg-amber-500 rounded-full" />
                   <label
                     htmlFor="join-code"
-                    className="text-xs font-bold uppercase tracking-wider text-zinc-200"
+                    className="font-mono text-xs font-medium uppercase tracking-widest text-zinc-400"
                   >
-                    NHẬP MÃ CODE TỪ HỘP GAME / MÃ PHÒNG:
+                    Mã phòng
                   </label>
                 </div>
 
                 {pendingRoomCode ? (
-                  <div className="p-4 rounded-xl border border-amber-500/50 bg-[#212124] flex items-center justify-between">
+                  <div className="p-4 border border-amber-500/50 bg-zinc-900/50 flex items-center justify-between">
                     <span className="text-xs text-zinc-400">
                       Mã phòng đã nhận:
                     </span>
                     <span className="font-mono text-2xl font-extrabold tracking-widest text-amber-400">
-                      #{pendingRoomCode}
+                      {pendingRoomCode}
                     </span>
                   </div>
                 ) : (
@@ -446,7 +482,7 @@ export function PlayEntry({
                       setError(null);
                     }}
                     placeholder="Nhập mã code (VD: 4827)"
-                    className="w-full min-h-12 rounded-xl bg-[#ececed] text-zinc-950 font-mono text-xl font-bold tracking-widest placeholder:text-zinc-500 placeholder:font-sans placeholder:text-sm placeholder:tracking-normal px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-inner transition"
+                    className={`${inputClass} font-mono text-xl font-bold tracking-widest placeholder:font-sans placeholder:text-sm placeholder:font-normal placeholder:tracking-normal`}
                   />
                 )}
               </div>
@@ -454,12 +490,11 @@ export function PlayEntry({
               {/* Trường nhập Tên hiển thị */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-4 bg-amber-500 rounded-full" />
                   <label
                     htmlFor="join-nick"
-                    className="text-xs font-bold uppercase tracking-wider text-zinc-200"
+                    className="font-mono text-xs font-medium uppercase tracking-widest text-zinc-400"
                   >
-                    TÊN HIỂN THỊ:
+                    Tên hiển thị
                   </label>
                 </div>
                 <input
@@ -470,7 +505,7 @@ export function PlayEntry({
                   maxLength={NICKNAME_MAX_LENGTH}
                   autoComplete="nickname"
                   placeholder="Nhập tên của bạn"
-                  className="w-full min-h-12 rounded-xl bg-[#ececed] text-zinc-950 placeholder:text-zinc-500 font-medium px-4 text-base focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-inner transition"
+                  className={inputClass}
                 />
               </div>
 
@@ -481,19 +516,11 @@ export function PlayEntry({
                 <PlayButton
                   type="submit"
                   disabled={isConnecting}
-                  className="w-full text-base uppercase tracking-wider"
+                  className="w-full"
                 >
                   {isConnecting ? "Đang kết nối…" : "Vào phòng chờ"}
                 </PlayButton>
 
-                <button
-                  type="button"
-                  onClick={() => go("choose")}
-                  className="w-full py-2 text-xs text-zinc-400 hover:text-zinc-200 transition text-center cursor-pointer flex items-center justify-center gap-1.5"
-                >
-                  <ArrowLeft className="size-3.5" />
-                  Quay lại
-                </button>
               </div>
             </form>
           </PlayCard>
