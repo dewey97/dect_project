@@ -5,25 +5,38 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { LandingPhoneShowcase } from "./landing-phone-showcase";
 import { LandingScene360Showcase } from "./landing-scene-360-showcase";
 import { LandingLogoMotion } from "./landing-logo-motion";
+import { LandingGroupSyncShowcase } from "./landing-group-sync-showcase";
 
 export function LandingFeaturesShowcase() {
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
+  // Sentinel sits where the logo naturally starts; it hits viewport centre exactly when
+  // the (lg-sticky) logo pins to the middle of the screen. Motion only starts from there.
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const [centerOffset, setCenterOffset] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(false);
+  // Logo scale while centred (big) and once pinned in the left column (moderate).
+  const [scaleRange, setScaleRange] = useState({ big: 1.25, pinned: 1.0 });
 
   // Measure container and title widths to calculate exact horizontal center offset on desktop
   useEffect(() => {
     const updateOffset = () => {
       if (typeof window === "undefined") return;
       if (window.innerWidth < 1024) {
+        setIsDesktop(false);
         setCenterOffset(0);
+        setScaleRange({ big: 1.25, pinned: 1.0 });
         return;
       }
+      const big = 1.8;
+      const pinned = window.innerWidth >= 1280 ? 0.92 : 0.85;
+      setIsDesktop(true);
+      setScaleRange({ big, pinned });
       if (containerRef.current && titleRef.current) {
         const containerW = containerRef.current.clientWidth - 48; // accounting for px-5 / px-6 padding
         const titleW = titleRef.current.offsetWidth;
-        // Center offset accounting for 1.4x enlargement when centered
-        const offset = Math.max(0, (containerW - titleW * 1.4) / 2);
+        // Center offset accounting for enlargement when centered
+        const offset = Math.max(0, (containerW - titleW * big) / 2);
         setCenterOffset(offset);
       }
     };
@@ -33,44 +46,54 @@ export function LandingFeaturesShowcase() {
     return () => window.removeEventListener("resize", updateOffset);
   }, []);
 
-  // Track scroll progress through the entry and showcase sequence
+  // 0 = logo reaches viewport centre; 1 = 0.9 viewport heights later.
   const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start 65%", "start 0%"],
+    target: sentinelRef,
+    offset: ["start center", "start -40%"],
   });
 
-  // 1. Logo internal motion (Glass zooms from X -> sweeps right -> reveals letters): 0.0 -> 0.48
-  const logoProgress = useTransform(scrollYProgress, [0.0, 0.48], [0, 1]);
+  // Phase boundaries. Desktop has a 90vh spacer before the right column so the pinned
+  // logo can play fully; mobile scrolls naturally, so phases are compressed.
+  const phase = isDesktop
+    ? { logoEnd: 0.5, pullEnd: 0.78, contentStart: 0.67, contentEnd: 0.94 }
+    : { logoEnd: 0.3, pullEnd: 0.4, contentStart: 0.2, contentEnd: 0.4 };
 
-  // 2. Title scale: starts BIG (1.4x) when in center, then shrinks to 1.0x as it pulls to left
+  const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
+  const pullFactor = (v: number) =>
+    clamp01((v - phase.logoEnd) / (phase.pullEnd - phase.logoEnd));
+
+  // 1. Logo internal motion (emblem -> glass travels to O -> letters pulled out)
+  const logoProgress = useTransform(scrollYProgress, (v) => clamp01(v / phase.logoEnd));
+
+  // 2. Title scale: starts BIG when centred, then shrinks moderately as it pulls to left
   const titleScale = useTransform(scrollYProgress, (v) => {
-    if (v >= 0.72) return 1.0;
-    if (v <= 0.48) return 1.4;
-    const factor = (v - 0.48) / (0.72 - 0.48);
-    return 1.4 - factor * 0.4;
+    const { big, pinned } = scaleRange;
+    return big - pullFactor(v) * (big - pinned);
   });
 
-  // 3. Title slides from horizontal center to left column: 0.48 -> 0.72
-  const titleX = useTransform(scrollYProgress, (v) => {
-    if (v >= 0.72 || centerOffset === 0) return 0;
-    if (v <= 0.48) return centerOffset;
-    const factor = 1 - (v - 0.48) / (0.72 - 0.48);
-    return factor * centerOffset;
-  });
+  // 3. Title slides from horizontal center to left column
+  const titleX = useTransform(scrollYProgress, (v) => (1 - pullFactor(v)) * centerOffset);
 
-  // 4. Sub-sections on the right fade & slide up into view: 0.65 -> 0.88
-  const contentOpacity = useTransform(scrollYProgress, [0.65, 0.88], [0, 1]);
-  const contentY = useTransform(scrollYProgress, [0.65, 0.88], [40, 0]);
+  // 4. Sub-sections on the right fade & slide up into view
+  const contentFactor = (v: number) =>
+    clamp01((v - phase.contentStart) / (phase.contentEnd - phase.contentStart));
+  const contentOpacity = useTransform(scrollYProgress, contentFactor);
+  const contentY = useTransform(scrollYProgress, (v) => 40 * (1 - contentFactor(v)));
   const contentPointerEvents = useTransform(scrollYProgress, (v) =>
-    v > 0.65 ? "auto" : "none"
+    v > phase.contentStart ? "auto" : "none"
   );
 
   return (
     <section
       ref={containerRef}
-      id="trai-nghiem"
+      id="tinh-nang"
       className="relative w-full max-w-6xl px-5 sm:px-6 mt-12 sm:mt-20 lg:mt-28 pt-16 sm:pt-24 lg:pt-32 pb-16 lg:pb-24 z-10 select-none scroll-mt-24"
     >
+      <div
+        ref={sentinelRef}
+        aria-hidden="true"
+        className="absolute left-0 top-16 sm:top-24 lg:top-32 h-0 w-0 pointer-events-none"
+      />
       <div className="flex flex-col lg:flex-row items-start gap-8 lg:gap-14 relative">
         {/* ========================================================================= */}
         {/* CỘT TRÁI: LOGO MOTION TỪ GIỮA TRƯỢT SANG TRÁI KHI CUỘN, SAU ĐÓ GHIM CỐ ĐỊNH */}
@@ -98,7 +121,7 @@ export function LandingFeaturesShowcase() {
             y: contentY,
             pointerEvents: contentPointerEvents,
           }}
-          className="flex-1 w-full flex flex-col gap-8 sm:gap-12 min-w-0 will-change-transform"
+          className="flex-1 w-full grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 sm:gap-y-14 min-w-0 lg:pt-[90vh] will-change-transform"
         >
           {/* SECTION CON 01: ĐIỆN THOẠI TANG VẬT */}
           <div className="w-full">
@@ -108,6 +131,11 @@ export function LandingFeaturesShowcase() {
           {/* SECTION CON 02: HIỆN TRƯỜNG 360° */}
           <div className="w-full">
             <LandingScene360Showcase />
+          </div>
+
+          {/* SECTION CON 03: CHƠI NHÓM, ĐỒNG BỘ TIẾN TRÌNH (full width row) */}
+          <div className="w-full md:col-span-2">
+            <LandingGroupSyncShowcase />
           </div>
         </motion.div>
       </div>

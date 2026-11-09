@@ -75,7 +75,7 @@ public/
 
 | Tên File                                | Mục Đích Sử Dụng                                   | Vị Trí Hiển Thị Trong Code / UI                                |
 | :-------------------------------------- | :------------------------------------------------- | :------------------------------------------------------------- |
-| `corkboard_vertical_empty.jpg`          | Mặt bảng gỗ bần dọc trống để cắm ghim              | Bảng ghim án Boardgame (`/play/case_000/box`)                 |
+| `corkboard_vertical_empty.jpg`          | Mặt bảng gỗ bần dọc trống để cắm ghim              | Bảng ghim án Boardgame (`/play/case_000/box`)                  |
 | `crime_scene_outline_bg.jpg`            | Hình nền hiện trường kẻ vệt phấn                   | Background màn hình phân tích hiện trường                      |
 | `mobile_evidence_board_bg.jpg`          | Hình nền tối ưu cho giao diện di động              | Bảng điều tra Mobile View                                      |
 | `ios7_wallpaper.jpg`                    | Hình nền màn hình khóa điện thoại tang vật         | Trình giả lập iPhone (`components/investigation/iphone`)       |
@@ -137,6 +137,7 @@ Toàn bộ giấy note ghi chú nghiệp vụ trên bảng điều tra hiện đ
 
 - `poster_c0.webp`: Poster chính thức vụ án #000 Trốn Tìm (thay thế bản PNG 3.48MB bằng WebP 186KB).
 - `phone.png` / `victim_phone_node.png`: Ảnh kết xuất thiết bị iPhone tang vật kèm ghim đỏ cắm trên bảng điều tra Canvas (`HeroInteractive` & `MainInvestigationCanvas`). Cho phép click mở trực tiếp `PhoneModal` / trình giả lập iPhone.
+- `victim_phone_bag.webp` (`public/images/cases/case_000/`): Ảnh iPhone nạn nhân trong túi zip tang vật, nền trong suốt, cắt sát túi, 600 x 777px, WebP 85 (~50KB). Dùng ở mục "Điện thoại nạn nhân" trên landing (`LandingPhoneShowcase`). Ảnh gốc 1920 x 1080: `docs/cases/case_000/02_photos/victim_phone_bag_source.webp`.
 - `phone/*.webp`: Các ảnh nền, lockscreen và homescreen iPhone của nạn nhân đã được chuyển sang định dạng WebP gọn nhẹ.
 - `hanoi_master_map.png`: Bản đồ đồ họa toàn thành phố và phân khu cảng Hà Nội kết xuất độ phân giải cao (`2474 x 1732px`) từ Figma Frame `96:9215`. Dùng làm Single Source of Truth cho ứng dụng Maps trong điện thoại, radar theo dõi di chuyển và hệ tọa độ vụ án. Cập nhật tự động qua lệnh `npm run sync:map`.
 

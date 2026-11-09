@@ -1,55 +1,58 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { CASE_FOLDERS } from "@/lib/data/landing-data";
 
 export function WorldArchiveSection() {
   const sectionRef = useRef<HTMLElement>(null);
 
-  // Mapped 1:1 trực tiếp theo hành trình cuộn: từ lúc section chạm 90% màn hình đến khi vào tâm màn hình (50%)
+  // Section cao hơn màn hình, phần nội dung sticky: tài liệu bay vào hết rồi mới cuộn tiếp.
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start 90%", "center 50%"],
+    offset: ["start 60%", "end end"],
   });
+  // Spring làm mượt bước nhảy của bánh xe chuột; bay vào xong ở 80% hành trình, 20% còn lại giữ yên.
+  const smooth = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.35 });
+  const progress = useTransform(smooth, [0, 0.8], [0, 1]);
 
   // =========================================================================
   // BÊN TRÁI: TÀI LIỆU VĂNG TỪ NGOÀI CÙNG MÉP MÀN HÌNH BÊN TRÁI VÀO (KHÔNG SCALE)
   // =========================================================================
-  const xLeftNote = useTransform(scrollYProgress, [0, 1], [-1150, 0]);
-  const rotLeftNote = useTransform(scrollYProgress, [0, 1], [-45, -14]);
-  const opLeftNote = useTransform(scrollYProgress, [0, 0.4, 1], [0, 0.6, 0.85]);
+  const xLeftNote = useTransform(progress, [0, 1], [-1150, 0]);
+  const rotLeftNote = useTransform(progress, [0, 1], [-45, -14]);
+  const opLeftNote = useTransform(progress, [0, 0.4, 1], [0, 0.6, 0.85]);
 
-  const xLeft0 = useTransform(scrollYProgress, [0, 0.88], [-1250, 0]);
-  const rotLeft0 = useTransform(scrollYProgress, [0, 0.88], [-55, -12]);
-  const opLeft0 = useTransform(scrollYProgress, [0, 0.4, 1], [0, 0.7, 1]);
+  const xLeft0 = useTransform(progress, [0, 0.88], [-1250, 0]);
+  const rotLeft0 = useTransform(progress, [0, 0.88], [-55, -12]);
+  const opLeft0 = useTransform(progress, [0, 0.4, 1], [0, 0.7, 1]);
 
-  const xLeft1 = useTransform(scrollYProgress, [0.06, 0.94], [-1350, 0]);
-  const rotLeft1 = useTransform(scrollYProgress, [0.06, 0.94], [-40, -4]);
-  const opLeft1 = useTransform(scrollYProgress, [0.06, 0.45, 1], [0, 0.7, 1]);
+  const xLeft1 = useTransform(progress, [0.06, 0.94], [-1350, 0]);
+  const rotLeft1 = useTransform(progress, [0.06, 0.94], [-40, -4]);
+  const opLeft1 = useTransform(progress, [0.06, 0.45, 1], [0, 0.7, 1]);
 
-  const xLeft2 = useTransform(scrollYProgress, [0.12, 1], [-1450, 0]);
-  const rotLeft2 = useTransform(scrollYProgress, [0.12, 1], [-30, 6]);
-  const opLeft2 = useTransform(scrollYProgress, [0.12, 0.5, 1], [0, 0.7, 1]);
+  const xLeft2 = useTransform(progress, [0.12, 1], [-1450, 0]);
+  const rotLeft2 = useTransform(progress, [0.12, 1], [-30, 6]);
+  const opLeft2 = useTransform(progress, [0.12, 0.5, 1], [0, 0.7, 1]);
 
   // =========================================================================
   // BÊN PHẢI: ẢNH HIỆN TRƯỜNG VĂNG TỪ NGOÀI CÙNG MÉP MÀN HÌNH BÊN PHẢI VÀO (KHÔNG SCALE)
   // =========================================================================
-  const xRight0 = useTransform(scrollYProgress, [0, 0.88], [1250, 0]);
-  const rotRight0 = useTransform(scrollYProgress, [0, 0.88], [45, 8]);
-  const opRight0 = useTransform(scrollYProgress, [0, 0.4, 1], [0, 0.7, 1]);
+  const xRight0 = useTransform(progress, [0, 0.88], [1250, 0]);
+  const rotRight0 = useTransform(progress, [0, 0.88], [45, 8]);
+  const opRight0 = useTransform(progress, [0, 0.4, 1], [0, 0.7, 1]);
 
-  const xRight1 = useTransform(scrollYProgress, [0.06, 0.94], [1350, 0]);
-  const rotRight1 = useTransform(scrollYProgress, [0.06, 0.94], [-35, -6]);
-  const opRight1 = useTransform(scrollYProgress, [0.06, 0.45, 1], [0, 0.7, 1]);
+  const xRight1 = useTransform(progress, [0.06, 0.94], [1350, 0]);
+  const rotRight1 = useTransform(progress, [0.06, 0.94], [-35, -6]);
+  const opRight1 = useTransform(progress, [0.06, 0.45, 1], [0, 0.7, 1]);
 
-  const xRight2 = useTransform(scrollYProgress, [0.12, 1], [1450, 0]);
-  const rotRight2 = useTransform(scrollYProgress, [0.12, 1], [30, 12]);
-  const opRight2 = useTransform(scrollYProgress, [0.12, 0.5, 1], [0, 0.7, 0.9]);
+  const xRight2 = useTransform(progress, [0.12, 1], [1450, 0]);
+  const rotRight2 = useTransform(progress, [0.12, 1], [30, 12]);
+  const opRight2 = useTransform(progress, [0.12, 0.5, 1], [0, 0.7, 0.9]);
 
   // KHỐI TEXT TRUNG TÂM
-  const opText = useTransform(scrollYProgress, [0.15, 0.8], [0.3, 1]);
-  const yText = useTransform(scrollYProgress, [0.15, 0.8], [25, 0]);
+  const opText = useTransform(progress, [0.15, 0.8], [0.3, 1]);
+  const yText = useTransform(progress, [0.15, 0.8], [25, 0]);
 
   const folderTransforms = [
     { x: xLeft0, rotate: rotLeft0, opacity: opLeft0 },
@@ -61,9 +64,10 @@ export function WorldArchiveSection() {
     <section
       ref={sectionRef}
       id="bocanh"
-      className="w-full overflow-x-clip z-10 bg-card/5 relative min-h-0 lg:min-h-[560px] flex items-center justify-center select-none py-12 sm:py-16 lg:py-24"
+      className="w-full z-10 bg-card/5 relative h-[200vh] select-none"
     >
-      <div className="w-full max-w-6xl px-6 relative flex items-center justify-center min-h-0 lg:min-h-[560px]">
+      <div className="sticky top-0 h-svh w-full overflow-x-clip flex items-center justify-center">
+      <div className="w-full max-w-6xl px-6 relative flex items-center justify-center h-full max-h-[640px]">
         {/* Background ambient lighting */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-destructive/5 rounded-full blur-[140px] pointer-events-none" />
 
@@ -87,7 +91,7 @@ export function WorldArchiveSection() {
           {CASE_FOLDERS.map((f, i) => {
             const t = folderTransforms[i] || folderTransforms[0];
             return (
-              <motion.button
+              <motion.div
                 key={f.idx}
                 style={{
                   position: "absolute",
@@ -100,7 +104,7 @@ export function WorldArchiveSection() {
                   transformOrigin: "bottom left",
                   outline: "none",
                 }}
-                className="w-[145px] sm:w-[165px] lg:w-[185px] h-[210px] sm:h-[235px] lg:h-[255px] flex flex-col select-none cursor-pointer hover:-translate-y-4 hover:z-50 transition-transform duration-300 pointer-events-auto"
+                className="w-[145px] sm:w-[165px] lg:w-[185px] h-[210px] sm:h-[235px] lg:h-[255px] flex flex-col select-none pointer-events-auto"
               >
               {/* Tab Folder */}
               <div
@@ -165,7 +169,7 @@ export function WorldArchiveSection() {
                     border: "1.5px solid rgba(180,30,30,0.6)",
                     color: "rgba(175,28,28,0.72)",
                     fontFamily: "monospace",
-                    fontSize: "0.34rem",
+                    fontSize: "0.5rem",
                     textTransform: "uppercase",
                     letterSpacing: "0.15em",
                     padding: "2px 4px",
@@ -180,7 +184,7 @@ export function WorldArchiveSection() {
                   <span
                     style={{
                       fontFamily: "monospace",
-                      fontSize: "0.42rem",
+                      fontSize: "0.55rem",
                       color: "rgba(60,35,5,0.65)",
                       letterSpacing: "0.2em",
                       textTransform: "uppercase",
@@ -191,7 +195,7 @@ export function WorldArchiveSection() {
                   <h3
                     style={{
                       fontFamily: "monospace",
-                      fontSize: "0.62rem",
+                      fontSize: "0.75rem",
                       fontWeight: 900,
                       color: "rgba(25,12,0,0.88)",
                       lineHeight: 1.35,
@@ -210,7 +214,7 @@ export function WorldArchiveSection() {
                   }}
                 />
               </div>
-            </motion.button>
+            </motion.div>
           );
         })}
       </div>
@@ -222,7 +226,7 @@ export function WorldArchiveSection() {
         {/* Ảnh 1: Hiện trường Chalk Outline ném từ phải lên */}
         <motion.div
           style={{ x: xRight0, rotate: rotRight0, opacity: opRight0 }}
-          className="absolute top-2 right-8 sm:right-12 w-32 sm:w-40 lg:w-44 shadow-2xl hover:rotate-3 hover:z-30 transition-all duration-300 cursor-pointer overflow-hidden z-20 border border-white/20 rounded-xs pointer-events-auto"
+          className="absolute top-2 right-8 sm:right-12 w-32 sm:w-40 lg:w-44 shadow-2xl overflow-hidden z-20 border border-white/20 rounded-xs pointer-events-auto"
         >
           <img
             src="/images/landing/chalk_outline.png"
@@ -234,14 +238,14 @@ export function WorldArchiveSection() {
         {/* Ảnh 2: Ảnh án mạng phòng kín Polaroid ném từ phải chếch xuống */}
         <motion.div
           style={{ x: xRight1, rotate: rotRight1, opacity: opRight1 }}
-          className="absolute top-24 sm:top-28 right-0 sm:right-2 w-36 sm:w-44 lg:w-48 shadow-2xl hover:rotate-[-2deg] hover:z-30 transition-all duration-300 cursor-pointer overflow-hidden z-30 border border-white/25 rounded-xs p-1.5 bg-[#f5ede0] pointer-events-auto"
+          className="absolute top-24 sm:top-28 right-0 sm:right-2 w-36 sm:w-44 lg:w-48 shadow-2xl overflow-hidden z-30 border border-white/25 rounded-xs p-1.5 bg-[#f5ede0] pointer-events-auto"
         >
           <img
             src="/images/cases/case_000/crime_scene.png"
             alt="Ảnh chụp hiện trường vụ án"
             className="w-full h-auto object-cover filter contrast-110"
           />
-          <div className="pt-1.5 pb-0.5 text-center font-mono text-[0.5rem] sm:text-[0.55rem] font-bold text-zinc-800 tracking-wider uppercase">
+          <div className="pt-1.5 pb-0.5 text-center font-mono text-[0.62rem] sm:text-xs font-bold text-zinc-800 tracking-wider uppercase">
             #EVD-000 // HIỆN TRƯỜNG KHÓA TRÁI
           </div>
         </motion.div>
@@ -249,7 +253,7 @@ export function WorldArchiveSection() {
         {/* Ảnh 3: Mẩu báo rách góc ném từ phải xuống dưới */}
         <motion.div
           style={{ x: xRight2, rotate: rotRight2, opacity: opRight2 }}
-          className="absolute top-56 sm:top-64 right-10 sm:right-16 w-28 sm:w-34 lg:w-36 shadow-xl hover:rotate-6 hover:z-30 transition-all duration-300 cursor-pointer overflow-hidden z-10 border border-white/10 rounded-xs pointer-events-auto"
+          className="absolute top-56 sm:top-64 right-10 sm:right-16 w-28 sm:w-34 lg:w-36 shadow-xl overflow-hidden z-10 border border-white/10 rounded-xs pointer-events-auto"
         >
           <img
             src="/images/landing/newspaper_clipping.webp"
@@ -266,24 +270,21 @@ export function WorldArchiveSection() {
         style={{ opacity: opText, y: yText }}
         className="max-w-xl mx-auto text-center flex flex-col gap-4 items-center z-20 relative"
       >
-        <span className="font-mono text-[0.68rem] font-bold uppercase tracking-widest text-amber-400">
-          CHUYÊN ÁN HÌNH SỰ ĐẶC BIỆT
-        </span>
-
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-foreground tracking-tight leading-tight text-center font-sans">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black uppercase text-foreground tracking-tight leading-tight text-center text-balance font-sans">
           Chào mừng các bạn đến với{" "}
-          <span className="text-primary font-bold">Tổ Điều Tra Đặc Biệt</span>
+          <span className="text-primary font-bold">Tổ Điều Tra Đặc Biệt XPLORE</span>
         </h2>
 
-        <div className="py-2 px-4 sm:px-6 flex flex-col gap-3 text-xs sm:text-[0.84rem] text-muted-foreground leading-relaxed font-sans text-center">
+        <div className="py-2 px-4 sm:px-6 flex flex-col gap-3 text-sm sm:text-base text-muted-foreground leading-relaxed font-sans text-center">
           <p>
             Khi cảnh sát địa phương hoàn toàn bế tắc trước những kỳ án chấn
-            động, tập hồ sơ niêm phong sẽ được chuyển giao thẳng cho nhóm thám
-            tử tập sự của bạn. Hãy cùng các cộng sự mở hộp tang vật, phân chia
-            nhiệm vụ và đối chiếu từng manh mối nhỏ nhất.
+            động, hồ sơ sẽ được chuyển giao đến tổ điều tra. Hãy chứng minh năng
+            lực của mình bằng cách lần theo từng manh mối và vạch mặt kẻ thủ ác
+            thực sự.
           </p>
         </div>
       </motion.div>
+      </div>
       </div>
     </section>
   );

@@ -42,14 +42,14 @@ export default function MarketingLandingPage() {
       {/* World Archive & Lore */}
       <WorldArchiveSection />
 
-      {/* Dual Play / Hybrid Model Section (Nhấn mạnh kết hợp tài liệu online và boardgame vật lý) */}
+      {/* Features Showcase: logo motion "XPLORE Có Gì Đặc Biệt?" + điện thoại + hiện trường 360 */}
+      <LandingFeaturesShowcase />
+
+      {/* Hai hình thức chơi: bản hộp hồ sơ & bản trực tuyến */}
       <LandingDualPlaySection />
 
-      {/* Case Dispatch: Chuyên Án Tiếp Theo & Bản In Giới Hạn */}
+      {/* Waitlist: nhận vụ án mới */}
       <CaseDispatchSection />
-
-      {/* Unified Features Showcase: Sticky Sidebar "XPLORE Có Gì Đặc Biệt?" & 2 Sub-sections */}
-      <LandingFeaturesShowcase />
 
       {/* Reviews & FAQ */}
       <ReviewsAndFaqSection />

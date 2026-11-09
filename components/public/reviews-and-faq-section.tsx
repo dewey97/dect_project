@@ -43,36 +43,36 @@ export function ReviewsAndFaqSection() {
     <>
       {/* COMMUNITY ENGAGEMENT (ĐẶT NGAY TRÊN ĐÁNH GIÁ) */}
       <section className="w-full max-w-6xl px-6 pt-14 pb-4 z-10">
-        <div className="max-w-4xl mx-auto border border-border/80 bg-card/30 rounded-lg p-6 lg:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/[0.04] rounded-bl-full pointer-events-none" />
-          <div className="max-w-xl">
-            <h3 className="text-xl font-black text-foreground uppercase tracking-tight font-sans">
-              CỘNG ĐỒNG MÊ TRINH THÁM
+        <div className="max-w-4xl mx-auto border border-amber-500/50 bg-amber-500/[0.03] rounded-xl p-6 lg:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-amber-500/[0.1] rounded-bl-full pointer-events-none" />
+          <div className="relative z-10 max-w-md">
+            <h3 className="text-xl font-black text-foreground tracking-tight font-sans">
+              Kết nối với những thám tử khác
             </h3>
-            <p className="text-xs sm:text-[0.84rem] text-muted-foreground mt-2 leading-relaxed font-sans">
-              Gia nhập mạng lưới hàng nghìn thám tử toàn quốc. Cập nhật bản tin kỳ án trên <strong className="text-zinc-200">Fanpage Facebook</strong>, xem video dựng lại hiện trường tại <strong className="text-zinc-200">TikTok</strong>, và soi chi tiết ảnh bằng chứng trên <strong className="text-zinc-200">Instagram</strong>.
+            <p className="text-sm text-muted-foreground mt-2 leading-relaxed font-sans">
+              Đừng phá án một mình. Gặp gỡ những người cùng đam mê và cập nhật hồ sơ mới sớm nhất.
             </p>
           </div>
 
           {/* Social Channels Buttons (Theo chiều dọc) */}
-          <div className="flex flex-col gap-2 w-full sm:w-44 shrink-0">
+          <div className="relative z-10 flex flex-wrap gap-2 shrink-0">
             <a
               href="https://facebook.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-md bg-amber-500 hover:bg-amber-400 text-zinc-950 font-mono text-xs font-bold uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer"
+              className="group inline-flex items-center justify-center gap-2 min-h-11 px-5 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] text-zinc-100 font-sans text-sm font-semibold transition-colors active:scale-95 cursor-pointer"
             >
-              <FacebookIcon className="size-3.5 fill-current" />
-              <span>Fanpage FB</span>
+              <FacebookIcon className="size-5 fill-current text-zinc-400 group-hover:text-amber-400 transition-colors" />
+              <span>Facebook</span>
             </a>
 
             <a
               href="https://tiktok.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-secondary/60 hover:bg-secondary text-zinc-200 border border-border/70 font-mono text-xs font-semibold uppercase tracking-wider transition-all active:scale-95 cursor-pointer"
+              className="group inline-flex items-center justify-center gap-2 min-h-11 px-5 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] text-zinc-100 font-sans text-sm font-semibold transition-colors active:scale-95 cursor-pointer"
             >
-              <TikTokIcon className="size-3.5 fill-current" />
+              <TikTokIcon className="size-5 fill-current text-zinc-400 group-hover:text-amber-400 transition-colors" />
               <span>TikTok</span>
             </a>
 
@@ -80,9 +80,9 @@ export function ReviewsAndFaqSection() {
               href="https://instagram.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-secondary/60 hover:bg-secondary text-zinc-200 border border-border/70 font-mono text-xs font-semibold uppercase tracking-wider transition-all active:scale-95 cursor-pointer"
+              className="group inline-flex items-center justify-center gap-2 min-h-11 px-5 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] text-zinc-100 font-sans text-sm font-semibold transition-colors active:scale-95 cursor-pointer"
             >
-              <InstagramIcon className="size-3.5" />
+              <InstagramIcon className="size-5 text-zinc-400 group-hover:text-amber-400 transition-colors" />
               <span>Instagram</span>
             </a>
           </div>
@@ -92,8 +92,8 @@ export function ReviewsAndFaqSection() {
       {/* DETECTIVE TESTIMONIALS (Auto-scrolling Marquee & Social Proof) */}
       <section id="danhgia" className="w-full py-12 z-10 overflow-hidden flex flex-col items-center">
         <div className="text-center max-w-2xl mx-auto mb-8 px-6 flex flex-col items-center">
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tight text-foreground font-sans">
-            Đánh Giá Từ Thám Tử Đi Trước
+          <h2 className="text-2xl lg:text-3xl font-black tracking-tight text-foreground font-sans">
+            Thám tử đi trước nói gì
           </h2>
         </div>
 
@@ -119,18 +119,18 @@ export function ReviewsAndFaqSection() {
 
                 <div>
                   <div className="flex items-center justify-between border-b border-dashed border-[#a3977c] pb-2 mb-3 font-mono">
-                    <span className="text-[0.7rem] font-bold text-zinc-900 uppercase tracking-wide">
+                    <span className="text-xs font-bold text-zinc-900 uppercase tracking-wide">
                       {t.author}
                     </span>
-                    <span className="text-[0.65rem] text-amber-700">★★★★★</span>
+                    <span className="text-xs text-amber-700">★★★★★</span>
                   </div>
 
-                  <p className="text-xs text-zinc-800 leading-relaxed italic">
+                  <p className="text-sm text-zinc-800 leading-relaxed italic">
                     "{t.quote}"
                   </p>
                 </div>
 
-                <div className="mt-3 pt-2 border-t border-[#a3977c]/30 text-[0.65rem] font-mono text-zinc-600 truncate">
+                <div className="mt-3 pt-2 border-t border-[#a3977c]/30 text-xs font-mono text-zinc-600 truncate">
                   {t.div}
                 </div>
               </div>
@@ -142,8 +142,8 @@ export function ReviewsAndFaqSection() {
       {/* FAQ SECTION (Accordions) */}
       <section id="faq" className="w-full max-w-4xl px-6 py-12 z-10 flex flex-col items-center">
         <div className="text-center max-w-2xl mx-auto mb-8 flex flex-col items-center">
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tight text-foreground font-sans">
-            Có Thể Bạn Thắc Mắc
+          <h2 className="text-2xl lg:text-3xl font-black tracking-tight text-foreground font-sans">
+            Câu hỏi thường gặp
           </h2>
         </div>
 
@@ -158,7 +158,8 @@ export function ReviewsAndFaqSection() {
                 >
                   <button
                     onClick={() => toggleFaq(idx)}
-                    className="w-full px-5 py-4 flex items-center justify-between text-left font-bold text-xs lg:text-sm text-foreground hover:text-primary transition-colors cursor-pointer"
+                    aria-expanded={isOpen}
+                    className="w-full min-h-11 px-5 py-4 flex items-center justify-between text-left font-bold text-sm lg:text-base text-foreground hover:text-primary transition-colors cursor-pointer"
                   >
                     <span>{faq.q}</span>
                     <ChevronDown className={cn(
@@ -167,8 +168,8 @@ export function ReviewsAndFaqSection() {
                     )} />
                   </button>
                   <div className={cn(
-                    "px-5 overflow-hidden transition-all duration-300 ease-in-out font-mono text-[0.65rem] text-muted-foreground leading-relaxed border-t border-border/10",
-                    isOpen ? "max-h-40 py-3.5 opacity-100" : "max-h-0 py-0 opacity-0 pointer-events-none border-t-transparent"
+                    "px-5 overflow-hidden transition-all duration-300 ease-in-out font-sans text-sm text-muted-foreground leading-relaxed border-t border-border/10",
+                    isOpen ? "max-h-60 py-3.5 opacity-100" : "max-h-0 py-0 opacity-0 pointer-events-none border-t-transparent"
                   )}>
                     {faq.a}
                   </div>
@@ -177,7 +178,7 @@ export function ReviewsAndFaqSection() {
             })}
           </div>
         ) : (
-          <div className="w-full py-8 px-6 rounded-lg border border-dashed border-border/60 bg-card/10 text-center font-mono text-xs text-muted-foreground/70">
+          <div className="w-full py-8 px-6 rounded-lg border border-dashed border-border/60 bg-card/10 text-center font-mono text-sm text-muted-foreground/70">
             [ MỤC CÂU HỎI THƯỜNG GẶP ĐANG ĐƯỢC TỔ ĐIỀU TRA BIÊN SOẠN & CẬP NHẬT ]
           </div>
         )}

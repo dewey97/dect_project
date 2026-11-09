@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, Lock } from "lucide-react";
 import { POSTER_ITEMS } from "@/lib/data/landing-data";
 
 interface HeroCaseCarouselProps {
@@ -152,16 +152,16 @@ export function HeroCaseCarousel({
           <span
             className={
               isTrontim
-                ? "text-xs sm:text-sm text-amber-400 font-black tracking-widest uppercase"
-                : "text-xs sm:text-sm text-zinc-500 font-bold tracking-widest uppercase"
+                ? "text-sm text-amber-400 font-black tracking-widest uppercase"
+                : "text-sm text-zinc-500 font-bold tracking-widest uppercase"
             }
           >
             {currentCase.code}
           </span>
           {!isTrontim && currentCase.title && (
             <>
-              <span className="text-zinc-600 text-xs">/</span>
-              <span className="text-xs sm:text-sm text-zinc-400 font-bold uppercase tracking-wider">
+              <span className="text-zinc-600 text-sm">/</span>
+              <span className="text-sm text-zinc-400 font-bold uppercase tracking-wider">
                 {currentCase.title}
               </span>
             </>
@@ -169,7 +169,7 @@ export function HeroCaseCarousel({
         </div>
 
         {/* Quick parameters - Vertical stack */}
-        <div className="flex flex-col items-center justify-center gap-0.5 text-[0.68rem] sm:text-[0.74rem] text-muted-foreground mt-0.5">
+        <div className="flex flex-col items-center justify-center gap-0.5 text-xs sm:text-sm text-muted-foreground mt-0.5">
           <div className="flex items-center gap-1.5">
             <span className="text-zinc-400">Độ khó:</span>
             {isTrontim ? (
@@ -197,18 +197,26 @@ export function HeroCaseCarousel({
         </div>
       </div>
 
-      {/* Action CTA: Phá Án (kính lúp + độ rộng vừa phải) */}
-      {isTrontim && (
-        <div className="mt-3.5 sm:mt-4 flex items-center justify-center font-mono">
+      {/* Action CTA: Phá Án (kính lúp + độ rộng vừa phải); vụ chưa mở thì hiện nút khóa */}
+      <div className="mt-3.5 sm:mt-4 flex items-center justify-center font-mono">
+        {isTrontim ? (
           <Link
             href="/cases/case_000"
-            className="inline-flex items-center justify-center gap-2 h-9.5 sm:h-10 px-7 sm:px-8 text-xs sm:text-sm font-black uppercase tracking-wider rounded-md bg-amber-500 hover:bg-amber-400 text-black shadow-[0_0_18px_rgba(245,158,11,0.35)] hover:shadow-[0_0_26px_rgba(245,158,11,0.5)] transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 h-9.5 sm:h-10 px-7 sm:px-8 text-sm font-black uppercase tracking-wider rounded-md bg-amber-500 hover:bg-amber-400 text-black shadow-[0_0_18px_rgba(245,158,11,0.35)] hover:shadow-[0_0_26px_rgba(245,158,11,0.5)] transition-all active:scale-95 cursor-pointer"
           >
             <Search className="size-4 shrink-0 stroke-[2.5]" />
             <span>PHÁ ÁN</span>
           </Link>
-        </div>
-      )}
+        ) : (
+          <span
+            aria-disabled="true"
+            className="inline-flex items-center justify-center gap-2 h-9.5 sm:h-10 px-7 sm:px-8 text-sm font-black uppercase tracking-wider rounded-md border border-zinc-600 bg-zinc-800/80 text-zinc-400 cursor-not-allowed select-none"
+          >
+            <Lock className="size-4 shrink-0 stroke-[2.5]" />
+            <span>Niêm phong</span>
+          </span>
+        )}
+      </div>
     </div>
   );
 }

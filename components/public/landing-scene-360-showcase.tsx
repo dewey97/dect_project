@@ -2,19 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import {
-  CAMERA_FOV,
-  REST_DISTANCE,
-  SLOT_CX,
-  SLOT_CY,
-  SLOT_PATH,
-} from "./landing-keyhole-geometry";
+import { EvidenceMarker } from "./evidence-marker";
 
 // three.js / R3F chỉ tải sau khi trang đã hydrate, không nằm trong bundle đầu.
-const LandingKeyholeModel = dynamic(
-  () => import("./landing-keyhole-model").then((m) => m.LandingKeyholeModel),
-  { ssr: false },
-);
 const LandingMagnifierModel = dynamic(
   () => import("./landing-magnifier-model").then((m) => m.LandingMagnifierModel),
   { ssr: false },
@@ -22,6 +12,12 @@ const LandingMagnifierModel = dynamic(
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 const PANORAMA = "/images/cases/case_000/PANORAMA.webp";
+const LandingLensPanorama = dynamic(
+  () => import("./landing-lens-panorama").then((m) => m.LandingLensPanorama),
+  { ssr: false },
+);
+// View direction that frames the room when the mouse is at screen centre.
+const BASE_LON = 0;
 
 export function LandingScene360Showcase() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -43,11 +39,12 @@ export function LandingScene360Showcase() {
     const handleScroll = () => {
       const el = sectionRef.current;
       if (!el) return;
-      const rect = el.getBoundingClientRect();
       const viewportH = window.innerHeight;
-      const start = viewportH * 0.85;
-      const end = viewportH * 0.25;
-      const p = (start - rect.top) / (start - end);
+      // Gentle zoom while the lens travels from fully on screen up to the header.
+      const lens = (portalRef.current ?? el).getBoundingClientRect();
+      const start = viewportH - lens.height - 24;
+      const end = Math.min(start - 1, viewportH * 0.06);
+      const p = (start - lens.top) / (start - end);
       setProgress(clamp01(p));
       if (portalRef.current) {
         const portalRect = portalRef.current.getBoundingClientRect();
@@ -91,93 +88,41 @@ export function LandingScene360Showcase() {
     };
   }, [reduced]);
 
-  // Reduced motion: already inside the room, no scroll hijack.
-  const p = reduced ? 0.92 : progress;
+  // Reduced motion: fixed framing, no scroll-driven zoom.
+  const p = reduced ? 0.5 : progress;
 
-  // Head-on straight view from the start (no top-down tilt)
-  const pitch = 0;
-  const lookY = 0;
-
-  // Deep camera dolly straight into and through the 3D keyway tunnel into the room
-  const zoomRaw = clamp01(p / 0.88);
-  const eased =
-    zoomRaw < 0.5
-      ? 4 * zoomRaw * zoomRaw * zoomRaw
-      : 1 - Math.pow(-2 * zoomRaw + 2, 3) / 2;
-
-  // Approach distance from outside down to entrance lip (5.2 -> 0.02)
-  const approach = REST_DISTANCE * Math.pow(0.02 / REST_DISTANCE, eased);
-  // Physical travel into and through the brass tunnel (depth 0.40, entering inside at p > 0.62)
-  const tunnelProgress = clamp01((p - 0.62) / 0.38);
-  const tunnelDepth = 0.40 * Math.pow(tunnelProgress, 1.4);
-  const distance = approach - tunnelDepth;
-  const brightness = 0.45 + eased * 0.65;
-
-  // The 3D solid brass lock NEVER fades; camera flies straight through the physical keyway opening
-  const modelOpacity = 1;
-
-  // Deep optical room zoom: from a peephole view to full immersive room scale
-  const roomScale =
-    1.12 + Math.pow(eased, 1.8) * 3.8 + clamp01((p - 0.68) / 0.32) * 1.2;
-
-  // Follow up by opening the black surround into full 360 panorama view
-  const maskOpacity = 1 - clamp01((p - 0.72) / 0.22);
+  // Static still shown until the 360° texture is ready (no black lens while loading).
+  const roomScale = 1.1 + p * 0.35;
+  const brightness = 0.85;
+  // 360° view: mouse sweeps across the screen width = one full turn; scroll pushes in (FOV 85° -> 65°).
+  const panoLon = BASE_LON + mouse.x * 180;
+  const panoLat = -mouse.y * 30;
+  const panoFov = 85 - p * 20;
   const portalRadius = size.w > 0 ? size.w / 2 : 240;
-
-  // Blow the aperture open around the screen centre as camera enters and passes through
-  const apertureBurst = Math.pow(clamp01((p - 0.62) / 0.38), 2.2);
-  const maskSpread = 1 + apertureBurst * 18.0;
-
-  // Dynamic optical depth-of-field: as camera approaches the keyhole,
-  // the metal rim blurs and dissolves smoothly, removing harsh cut edges.
-  const blurAmount = 2.0 + clamp01(p / 0.7) * 14;
-
-  // Project the slot through the head-on camera onto the viewport,
-  // compensating subtly with mouse parallax to track the 3D lock's tilt.
-  const { w, h } = size;
-  let maskPath = "";
-  if (w > 0 && h > 0) {
-    const focal = h / (2 * Math.tan((CAMERA_FOV * Math.PI) / 360));
-    const mouseWeight = Math.max(0, Math.min(1, (distance - 0.15) / 1.2));
-    const mx = mouse.x * mouseWeight;
-    const my = mouse.y * mouseWeight;
-    const effDepth = Math.max(0.015, distance);
-    const pts = SLOT_PATH.map(([x, y]) => {
-      const px = x - SLOT_CX;
-      const py = y - SLOT_CY;
-      const sx = w / 2 + ((focal * px) / effDepth) * maskSpread + mx * 28;
-      const sy = h / 2 - ((focal * py) / effDepth) * maskSpread + my * 22;
-      return `${sx.toFixed(1)},${sy.toFixed(1)}`;
-    });
-    maskPath = `M${pts.join("L")}Z`;
-  }
 
   return (
     <div
       ref={sectionRef}
       id="hien-truong-360"
       aria-label="Hiện trường vụ án 000 — không gian 360 độ"
-      className="relative w-full rounded-2xl border border-cyan-500/25 bg-gradient-to-br from-cyan-950/20 via-zinc-900/60 to-zinc-950/80 p-5 sm:p-7 shadow-[0_12px_32px_rgba(0,0,0,0.5)] overflow-hidden transition-all duration-300 hover:border-cyan-500/40 select-none"
+      className="relative w-full pt-6 sm:pt-8 select-none"
     >
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-        {/* Right Column: Story / Context (Mobile: order-1, Desktop: order-2) */}
-        <div className="flex flex-col items-start text-left gap-3 max-w-lg z-10 order-1 md:order-2">
+      <div className="w-full flex flex-col gap-4 sm:gap-5">
+        {/* Story / Context */}
+        <div className="flex flex-col items-start text-left gap-3 max-w-lg z-10 order-1">
           <div>
-            <h3 className="text-lg sm:text-xl font-bold uppercase tracking-tight text-cyan-200 font-sans">
-              Hiện Trường 360°
-            </h3>
-            <span className="text-[0.68rem] font-mono text-cyan-400/70 uppercase tracking-wider">
-              Khám nghiệm hiện trường phòng kín khóa trái
-            </span>
+            <div className="flex items-end gap-3">
+              <EvidenceMarker n={2} className="shrink-0 rotate-[5deg]" />
+              <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-stone-200 font-sans">
+                Hiện trường 360°
+              </h3>
+            </div>
           </div>
 
-          <p className="text-xs sm:text-[0.84rem] text-muted-foreground font-sans leading-relaxed">
-            Căn phòng án mạng bị khóa trái từ bên trong. Ghé mắt nhìn vào không gian hiện trường 360 độ: xoay chuyển góc nhìn, soi tìm từng vết máu ẩn và lật mở cơ chế phòng kín bí ẩn.
-          </p>
         </div>
 
-        {/* Left Column: Detective Magnifying Glass Stage (Mobile: order-2, Desktop: order-1) */}
-        <div className="relative w-full flex items-center justify-center md:justify-start py-2 order-2 md:order-1">
+        {/* Detective Magnifying Glass Stage */}
+        <div className="relative w-full flex items-center justify-center md:justify-start py-2 order-2">
             <div
               className="relative transition-transform duration-150 ease-out"
               style={{
@@ -187,12 +132,12 @@ export function LandingScene360Showcase() {
               {/* 1. Circular Magnifying Glass Lens Portal (Khung nhìn tròn qua thấu kính) */}
               <div
                 ref={portalRef}
-                className="relative z-10 w-[260px] h-[260px] sm:w-[340px] sm:h-[340px] lg:w-[390px] lg:h-[390px] xl:w-[420px] xl:h-[420px] rounded-full overflow-hidden bg-[#070503]"
+                className="relative z-10 w-[240px] h-[240px] sm:w-[300px] sm:h-[300px] lg:w-[270px] lg:h-[270px] xl:w-[320px] xl:h-[320px] rounded-full overflow-hidden bg-[#070503]"
                 style={{
                   boxShadow: "0 0 50px rgba(245,158,11,0.12)",
                 }}
               >
-                {/* Room seen through the keyway with interactive optical peephole parallax */}
+                {/* Crime-scene room seen through the lens, with optical parallax */}
                 <div
                   aria-hidden="true"
                   className="absolute inset-0 z-0 transition-transform duration-100 ease-out"
@@ -206,60 +151,15 @@ export function LandingScene360Showcase() {
                   }}
                 />
 
-                {/* Everything outside the projected keyway stays softly shadowed */}
-                <svg
-                  aria-hidden="true"
-                  className="absolute inset-0 z-10 h-full w-full pointer-events-none"
-                  viewBox={`0 0 ${Math.max(1, w)} ${Math.max(1, h)}`}
-                  preserveAspectRatio="none"
-                >
-                  <defs>
-                    <filter id="keyhole-soft-blur" x="-30%" y="-30%" width="160%" height="160%">
-                      <feGaussianBlur stdDeviation={blurAmount.toFixed(1)} />
-                    </filter>
-                    <mask id="keyhole-mask" maskUnits="userSpaceOnUse">
-                      <rect x="0" y="0" width="100%" height="100%" fill="#fff" />
-                      {maskPath ? (
-                        <path
-                          d={maskPath}
-                          fill="#000"
-                          filter="url(#keyhole-soft-blur)"
-                        />
-                      ) : null}
-                    </mask>
-                  </defs>
-                  <rect
-                    x="0"
-                    y="0"
-                    width="100%"
-                    height="100%"
-                    fill="#070503"
-                    fillOpacity={maskOpacity}
-                    mask="url(#keyhole-mask)"
+                {/* Real 360° panorama, rotated by the mouse */}
+                <div aria-hidden="true" className="absolute inset-0 z-[1]">
+                  <LandingLensPanorama
+                    src={PANORAMA}
+                    lon={panoLon}
+                    lat={panoLat}
+                    fov={panoFov}
                   />
-
-                  {/* Subtle light leak / warm amber rim glow around the keyhole opening */}
-                  {maskPath && maskOpacity > 0.05 ? (
-                    <path
-                      d={maskPath}
-                      fill="none"
-                      stroke="rgba(245, 158, 11, 0.4)"
-                      strokeWidth={Math.max(1.5, 3 * (1 - p * 0.8))}
-                      opacity={Math.min(1, Math.max(0, 1 - p * 1.2))}
-                      style={{ filter: "blur(2.5px)" }}
-                    />
-                  ) : null}
-                </svg>
-
-                <LandingKeyholeModel
-                  distance={distance}
-                  pitch={pitch}
-                  lookY={lookY}
-                  opacity={modelOpacity}
-                  mouseX={mouse.x}
-                  mouseY={mouse.y}
-                  zoomProgress={zoomRaw}
-                />
+                </div>
 
                 {/* Glass Glare Sheen Reflection (Vệt phản quang mặt kính quang học) */}
                 <div
@@ -289,6 +189,7 @@ export function LandingScene360Showcase() {
                 mouseX={mouse.x}
                 mouseY={mouse.y}
               />
+
             </div>
           </div>
         </div>

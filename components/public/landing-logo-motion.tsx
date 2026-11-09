@@ -34,6 +34,10 @@ const EMBLEM_SHIFT_Y = `${(((122.4 - GLASS_CY) / 250) * 100).toFixed(3)}%`;
 const EMBLEM_ROTATE = 8.5;
 const CENTER_SHIFT = `${(((980 - 272) / 2 / 980) * 100).toFixed(3)}%`; // X → container centre
 
+// Clip right inset aligned to glass centre x: emblem centre 136.4 → home centre GLASS_CX.
+const CLIP_EMBLEM = `${(((980 - 136.4) / 980) * 100).toFixed(2)}%`;
+const CLIP_HOME = `${(((980 - GLASS_CX) / 980) * 100).toFixed(2)}%`;
+
 const RING_R = 69.25;
 const RING_W = 15.5;
 const HANDLE_W = 24;
@@ -64,11 +68,12 @@ export function LandingLogoMotion({
   const glassScale = useTransform(progress, [0.15, 0.6], [EMBLEM_SCALE, 1]);
   const glassRotate = useTransform(progress, [0.15, 0.6], [EMBLEM_ROTATE, 0]);
 
-  // Letters pulled out trailing the glass' right edge, then the rest (R, E).
+  // Letters pulled out from under the glass CENTRE (not its right edge): the rectangular clip edge
+  // stays hidden under the round lens, so no letter corner pokes out above/below the ring.
   const lettersClipRight = useTransform(
     progress,
     [0.15, 0.6, 0.75],
-    ["80%", "31.2%", "0%"],
+    [CLIP_EMBLEM, CLIP_HOME, "0%"],
   );
   const lettersClip = useTransform(
     lettersClipRight,
@@ -81,6 +86,18 @@ export function LandingLogoMotion({
     [0.1, 0.2, 0.65, 0.85],
     [0, 1, 1, 0],
   );
+  // Glow ôm sát vòng kính + cán (drop-shadow theo hình), không dùng đốm radial phía sau.
+  const glassGlow = useTransform(
+    glowOpacity,
+    (g) =>
+      `drop-shadow(0 0 ${(6 * g).toFixed(1)}px rgba(251,191,36,${(0.75 * g).toFixed(2)})) drop-shadow(0 0 ${(16 * g).toFixed(1)}px rgba(245,158,11,${(0.35 * g).toFixed(2)}))`,
+  );
+  // Viền cắt màu nền chỉ cần ở trạng thái emblem và ở vị trí chữ O; khi kính đang rời X thì thu về 0
+  // để không khoét rãnh tối vào X và để lộ mẩu vàng mảnh ở mép.
+  const cutStroke = useTransform(progress, [0.15, 0.25, 0.5, 0.6], [STROKE, 0, 0, STROKE]);
+  const ringCutWidth = useTransform(cutStroke, (v) => RING_W + v * 2);
+  const handleCutWidth = useTransform(cutStroke, (v) => HANDLE_W + v * 2);
+
   const lettersGlowStrength = useTransform(
     progress,
     [0.15, 0.3, 0.7, 0.9],
@@ -141,32 +158,30 @@ export function LandingLogoMotion({
           }}
           className="absolute inset-0 w-full h-full pointer-events-none will-change-transform"
         >
-          {/* Amber halo travelling with the glass while the wordmark is pulled out */}
-          <motion.div
-            style={{
-              opacity: glowOpacity,
-              left: `${(GLASS_CX / 980) * 100}%`,
-              top: `${(GLASS_CY / 250) * 100}%`,
-            }}
-            className="absolute w-[30%] aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle_closest-side,rgba(251,191,36,0.5)_0%,rgba(245,158,11,0.22)_50%,transparent_100%)]"
-          />
+          {/* Cut-out: same shapes, wider, in page background colour */}
           <svg
             viewBox="0 0 980 250"
-            className="w-full h-full overflow-visible"
+            className="absolute inset-0 w-full h-full overflow-visible"
             aria-hidden="true"
           >
-            {/* Stroke: same shapes, wider, in page background colour (emblem cut-out) */}
             <g stroke="var(--background)" fill="none" strokeLinecap="round">
-              <circle
+              <motion.circle
                 cx={GLASS_CX}
                 cy={GLASS_CY}
                 r={RING_R}
                 fill="var(--background)"
-                strokeWidth={RING_W + STROKE * 2}
+                style={{ strokeWidth: ringCutWidth }}
               />
-              <line {...HANDLE} strokeWidth={HANDLE_W + STROKE * 2} />
+              <motion.line {...HANDLE} style={{ strokeWidth: handleCutWidth }} />
             </g>
-            {/* Glass */}
+          </svg>
+          {/* Glass, glow theo đúng hình kính */}
+          <motion.svg
+            viewBox="0 0 980 250"
+            style={{ filter: glassGlow }}
+            className="absolute inset-0 w-full h-full overflow-visible"
+            aria-hidden="true"
+          >
             <g stroke="#dbdbdb" fill="none" strokeLinecap="round">
               <line {...HANDLE} strokeWidth={HANDLE_W} />
               <circle
@@ -178,7 +193,7 @@ export function LandingLogoMotion({
               <path d={GLINT_TOP} strokeWidth={8} />
               <path d={GLINT_SIDE} strokeWidth={8} />
             </g>
-          </svg>
+          </motion.svg>
         </motion.div>
       </motion.div>
 

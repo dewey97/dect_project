@@ -1,15 +1,31 @@
 export const FAQ_DATA: { q: string; a: string }[] = [
   {
-    q: "Cần chuẩn bị những gì trước khi bắt đầu một chuyên án?",
-    a: "Bạn chỉ cần một không gian yên tĩnh, tập hồ sơ vụ án (hoặc thiết bị truy cập Bàn Điều Tra Trực Tuyến), sổ tay ghi chép và tinh thần quan sát tỉ mỉ cùng các cộng sự.",
+    q: "Cần chuẩn bị gì để chơi?",
+    a: "Bộ hồ sơ vụ án (bản hộp hoặc bản trực tuyến), giấy bút để ghi chép. Có thêm vài người bạn thì càng vui.",
   },
   {
-    q: "Một vụ án có thể chơi lại nhiều lần không?",
-    a: "Mỗi chuyên án có một cốt truyện và chân tướng duy nhất. Tuy nhiên, bạn hoàn toàn có thể chia sẻ bộ hồ sơ cho bạn bè hoặc đóng vai trò người dẫn dắt (Game Master) để theo dõi suy luận của nhóm mới.",
+    q: "Cần bao nhiêu người?",
+    a: "Chơi một mình được. Vui nhất là nhóm 2–4 người, ngồi chung một bàn hoặc mỗi người một máy ở nhà.",
   },
   {
-    q: "Nếu gặp bế tắc trong quá trình phá án thì có gợi ý không?",
-    a: "Có. Hệ thống điều tra hỗ trợ gợi ý nghiệp vụ nhiều cấp độ (Hint System) giúp bạn tháo gỡ điểm nghẽn mà không làm mất đi cảm giác tự mình phá án.",
+    q: "Một vụ án chơi trong bao lâu?",
+    a: "Khoảng 60–90 phút. Bạn có thể dừng giữa chừng, tiến độ được lưu lại.",
+  },
+  {
+    q: "Chơi trên điện thoại được không?",
+    a: "Được. Bản trực tuyến chạy ngay trên trình duyệt điện thoại và máy tính, không cần cài ứng dụng.",
+  },
+  {
+    q: "Mua bản hộp thì phần trên web chơi thế nào?",
+    a: "Trong hộp có mã QR. Quét mã là mở được phần điều tra trên web đi kèm vụ án.",
+  },
+  {
+    q: "Bí quá thì có gợi ý không?",
+    a: "Có. Gợi ý mở dần từng mức, từ nhẹ đến rõ, để bạn vẫn là người tự tìm ra lời giải.",
+  },
+  {
+    q: "Một vụ án chơi lại được không?",
+    a: "Mỗi vụ chỉ có một sự thật, biết hung thủ rồi thì chơi lại sẽ mất bất ngờ. Bạn có thể tặng bộ hồ sơ cho nhóm bạn khác.",
   },
 ];
 
@@ -18,7 +34,7 @@ export const POSTER_ITEMS = [
     id: 0,
     img: "/poster_c0.webp",
     title: "",
-    code: "Vụ án 001",
+    code: "Vụ án #000",
     status: "Đang mở điều tra",
     difficulty: "★★★☆☆",
     horror: "★★☆☆☆",
@@ -28,7 +44,7 @@ export const POSTER_ITEMS = [
     id: 1,
     img: "/images/landing/poster_classified.png",
     title: "",
-    code: "Vụ án 002",
+    code: "Vụ án #001",
     status: "Sắp ra mắt",
     difficulty: "?????",
     horror: "?????",
@@ -38,7 +54,7 @@ export const POSTER_ITEMS = [
     id: 2,
     img: "/images/landing/poster_classified.png",
     title: "",
-    code: "Vụ án 003",
+    code: "Vụ án #002",
     status: "Sắp ra mắt",
     difficulty: "?????",
     horror: "?????",
@@ -58,7 +74,7 @@ export const CASE_FOLDERS = [
   },
   {
     label: "C-001",
-    title: "HỒ SƠ MẬT PHÂN KHU 2",
+    title: "HỒ SƠ MẬT",
     status: "SẮP RA MẮT",
     idx: 1,
     defaultR: "-4deg",
@@ -67,7 +83,7 @@ export const CASE_FOLDERS = [
   },
   {
     label: "C-002",
-    title: "HỒ SƠ MẬT PHÂN KHU 3",
+    title: "HỒ SƠ MẬT",
     status: "PHONG TỎA",
     idx: 2,
     defaultR: "6deg",
@@ -110,7 +126,7 @@ export const TESTIMONIALS_DATA = [
     div: "Cộng Đồng Mê Trinh Thám Cổ Điển",
     stars: 5,
     quote:
-      "Phần bẻ khóa điện thoại và nhìn qua ổ khóa 360 độ đỉnh thật sự. Nút thắt hung thủ làm cả nhóm mình ngỡ ngàng!",
+      "Lục điện thoại nạn nhân và xoay hiện trường 360 độ đỉnh thật sự. Nút thắt hung thủ làm cả nhóm mình ngỡ ngàng!",
   },
   {
     author: "Trung Kiên",

@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { LandingHeroBackdrop } from "@/components/public/landing-hero-backdrop";
 import { HeroCaseCarousel } from "@/components/public/hero-case-carousel";
 import { LandingNavbar } from "@/components/public/landing-navbar";
@@ -52,7 +51,7 @@ export function LandingHero({
         setQuoteIndex((prev) => (prev + 1) % DETECTIVE_QUOTES.length);
         setIsFading(false);
       }, 400); // 400ms fade-out, sau đó đổi quote và fade-in
-    }, 6000); // Đổi câu trích dẫn mỗi 6 giây
+    }, 8000); // Đổi câu trích dẫn mỗi 8 giây
 
     return () => clearInterval(timer);
   }, []);
@@ -80,23 +79,28 @@ export function LandingHero({
           {/* CỘT TRÁI (Desktop) / PHẦN TRÊN (Mobile): Title, Quote */}
           <div className="w-full max-w-md lg:max-w-[460px] xl:max-w-[500px] flex flex-col items-center lg:items-start text-center lg:text-left gap-4 sm:gap-5 pointer-events-auto">
             {/* TIÊU ĐỀ CHÍNH H1 */}
-            <h1 className="text-balance text-xl sm:text-2xl lg:text-3xl xl:text-[2.05rem] font-black leading-[1.25] tracking-tight uppercase font-sans">
-              Nền Tảng Phá Án Đa Hình Thức:{" "}
+            <h1 className="text-balance text-3xl sm:text-4xl xl:text-5xl font-black leading-[1.15] tracking-tight uppercase font-sans">
+              Những vụ án{" "}
               <span className="block mt-1.5 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-200 to-amber-500">
-                Trực Tuyến Online × Boardgame Hồ Sơ Vật Lý
+                chưa có lời giải...
               </span>
             </h1>
 
-            {/* Animated Rotating Detective Quote */}
-            <div className="w-full min-h-[48px] sm:min-h-[52px] flex items-center justify-center lg:justify-start">
+            <p className="text-pretty text-base lg:text-lg leading-relaxed text-zinc-200 font-sans">
+              Nền tảng chơi game trinh thám đa phương thức tại Việt Nam, phá án
+              cùng bạn bè ngay trên màn hình hoặc mở bộ hồ sơ vật lý chân thực.
+            </p>
+
+            {/* Animated Rotating Detective Quote (desktop only) */}
+            <div className="hidden w-full min-h-[52px] lg:flex items-center justify-start">
               <p
                 className={cn(
-                  "text-pretty text-xs lg:text-sm leading-relaxed text-muted-foreground font-mono italic transition-all duration-400 ease-in-out",
+                  "text-pretty text-xs lg:text-sm leading-relaxed text-muted-foreground/80 font-mono italic lg:border-l-2 lg:border-amber-500/50 lg:pl-4 transition-all duration-400 ease-in-out",
                   isFading ? "opacity-0 -translate-y-1" : "opacity-100 translate-y-0"
                 )}
               >
                 "{DETECTIVE_QUOTES[quoteIndex].quote}"
-                <span className="block mt-1 not-italic text-primary/75 font-sans font-semibold text-[0.75rem] tracking-wider uppercase">
+                <span className="block mt-1 not-italic text-primary/75 font-sans font-semibold text-sm tracking-wider uppercase">
                   — {DETECTIVE_QUOTES[quoteIndex].author}
                 </span>
               </p>

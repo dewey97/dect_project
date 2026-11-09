@@ -80,8 +80,9 @@ function MagnifierMesh({ mouseX = 0, mouseY = 0 }: { mouseX?: number; mouseY?: n
       }
     });
 
-    // Rotate around Z axis so the handle points fixed at the bottom-left (-75 degrees)
-    cloned.rotation.set(0, 0, -75 * (Math.PI / 180));
+    // Rotate around Z axis so the handle points right and slightly down (~-25deg),
+    // away from the pinned logo and below the text column
+    cloned.rotation.set(0, 0, 35 * (Math.PI / 180));
     return cloned;
   }, [scene]);
 
@@ -163,7 +164,7 @@ export function LandingMagnifierModel({
         transform: "translate(-50%, -50%)",
         width: `${canvasSize}px`,
         height: `${canvasSize}px`,
-        filter: "drop-shadow(-12px 22px 30px rgba(0,0,0,0.88))",
+        filter: "drop-shadow(12px 22px 30px rgba(0,0,0,0.88))",
       }}
     >
       <Canvas

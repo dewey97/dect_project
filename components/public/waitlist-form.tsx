@@ -97,16 +97,16 @@ export function WaitlistForm({
   if (status === "success") {
     return (
       <div
-        className={`flex items-center gap-3 p-3.5 rounded-lg border border-emerald-500/40 bg-emerald-950/40 text-emerald-300 text-xs sm:text-sm font-mono backdrop-blur-md shadow-[0_0_15px_rgba(16,185,129,0.15)] animate-in fade-in duration-300 ${className}`}
+        className={`flex items-center gap-3 p-3.5 rounded-lg border border-emerald-500/40 bg-emerald-950/40 text-emerald-300 text-sm font-mono backdrop-blur-md shadow-[0_0_15px_rgba(16,185,129,0.15)] animate-in fade-in duration-300 ${className}`}
       >
         <CheckCircle2 className="size-5 shrink-0 text-emerald-400" />
         <div>
           <span className="font-bold text-emerald-200">
-            ĐÃ NIÊM PHONG HỒ SƠ!
+            Đã ghi danh!
           </span>
-          <p className="text-[0.75rem] text-emerald-300/80 mt-0.5">
-            Bạn sẽ nhận được mật mã điều tra sớm & thông báo phát hành qua email{" "}
-            <strong className="text-emerald-100">{email}</strong>.
+          <p className="text-sm text-emerald-300/80 mt-0.5">
+            Chúng tôi sẽ báo qua{" "}
+            <strong className="text-emerald-100">{email}</strong> khi có vụ án mới.
           </p>
         </div>
       </div>
@@ -131,12 +131,12 @@ export function WaitlistForm({
             }}
             placeholder={placeholder}
             disabled={status === "submitting"}
-            className="w-full h-10 pl-9 pr-24 rounded-md border border-zinc-500/80 hover:border-zinc-400 bg-zinc-950/90 text-xs font-mono text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-amber-400 transition-all disabled:opacity-50"
+            className="w-full h-10 pl-9 pr-24 rounded-md border border-zinc-500/80 hover:border-zinc-400 bg-zinc-950/90 text-sm font-mono text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-amber-400 transition-all disabled:opacity-50"
           />
           <button
             type="submit"
             disabled={status === "submitting"}
-            className="absolute right-1 h-8 px-3 rounded bg-primary/90 hover:bg-primary text-primary-foreground font-mono text-[0.7rem] font-bold tracking-wider uppercase transition-all disabled:opacity-50 cursor-pointer flex items-center gap-1"
+            className="absolute right-1 h-8 px-3 rounded bg-primary/90 hover:bg-primary text-primary-foreground font-mono text-xs font-bold tracking-wider uppercase transition-all disabled:opacity-50 cursor-pointer flex items-center gap-1"
           >
             {status === "submitting" ? (
               <Loader2 className="size-3 animate-spin" />
@@ -146,7 +146,7 @@ export function WaitlistForm({
           </button>
         </div>
         {status === "error" && (
-          <p className="text-[0.7rem] text-destructive flex items-center gap-1 font-mono">
+          <p className="text-xs text-destructive flex items-center gap-1 font-mono">
             <AlertCircle className="size-3 shrink-0" />
             <span>{errorMessage}</span>
           </p>
@@ -166,14 +166,14 @@ export function WaitlistForm({
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500/20 via-amber-400 to-amber-500/20" />
 
         <div className="flex flex-col gap-1.5 text-left">
-          <div className="inline-flex items-center gap-2 text-[0.7rem] font-mono tracking-widest uppercase text-amber-400 font-bold">
+          <div className="inline-flex items-center gap-2 text-xs font-mono tracking-widest uppercase text-amber-400 font-bold">
             <span className="size-2 rounded-full bg-amber-400 animate-pulse" />
             ĐẶT TRƯỚC HỒ SƠ CHUYÊN ÁN (WAITLIST)
           </div>
           <h3 className="text-base sm:text-lg font-black tracking-tight text-zinc-100 uppercase font-sans">
             Gia Nhập Lực Lượng Điều Tra Đặc Nhiệm
           </h3>
-          <p className="text-xs text-zinc-400 font-mono leading-relaxed">
+          <p className="text-sm text-zinc-400 font-mono leading-relaxed">
             Để lại email để nhận thông báo sớm khi mở bản in Board Game vật lý
             và nhận gợi ý giải đố ẩn độc quyền.
           </p>
@@ -198,7 +198,7 @@ export function WaitlistForm({
           <button
             type="submit"
             disabled={status === "submitting"}
-            className="h-12 px-6 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 font-mono text-xs sm:text-sm font-black uppercase tracking-wider shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transition-all duration-300 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 shrink-0"
+            className="h-12 px-6 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 font-mono text-sm font-black uppercase tracking-wider shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transition-all duration-300 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 shrink-0"
           >
             {status === "submitting" ? (
               <>
@@ -215,7 +215,7 @@ export function WaitlistForm({
         </div>
 
         {status === "error" && (
-          <p className="text-xs text-rose-400 flex items-center gap-1.5 font-mono text-left">
+          <p className="text-sm text-rose-400 flex items-center gap-1.5 font-mono text-left">
             <AlertCircle className="size-3.5 shrink-0" />
             <span>{errorMessage}</span>
           </p>
@@ -232,7 +232,8 @@ export function WaitlistForm({
       noValidate
     >
       <div className="flex flex-col sm:flex-row items-stretch gap-2 w-full">
-        <div className="relative flex-1">
+        <div className="relative flex-1 flex items-center">
+          <Mail className="absolute left-3 size-4 text-muted-foreground/60 pointer-events-none" />
           <input
             type="email"
             value={email}
@@ -242,14 +243,14 @@ export function WaitlistForm({
             }}
             placeholder={placeholder}
             disabled={status === "submitting"}
-            className="w-full h-11 px-4 rounded-md border border-zinc-500/80 hover:border-zinc-400 bg-zinc-950/90 text-xs font-mono text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-amber-400 transition-all disabled:opacity-50 shadow-xs"
+            className="w-full h-11 pl-9 pr-4 rounded-md border border-zinc-500/80 hover:border-zinc-400 bg-zinc-950/90 text-sm font-mono text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-amber-400 transition-all disabled:opacity-50 shadow-xs"
           />
         </div>
 
         <button
           type="submit"
           disabled={status === "submitting"}
-          className="h-11 px-6 rounded-md bg-amber-500/90 hover:bg-amber-400 text-zinc-950 font-mono text-xs font-black uppercase tracking-wider shadow-md hover:shadow-amber-500/30 transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center disabled:opacity-50 shrink-0"
+          className="h-11 px-6 rounded-md bg-amber-500/90 hover:bg-amber-400 text-zinc-950 font-mono text-sm font-black uppercase tracking-wider shadow-md hover:shadow-amber-500/30 transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center disabled:opacity-50 shrink-0"
         >
           {status === "submitting" ? (
             <Loader2 className="size-3.5 animate-spin" />
@@ -260,7 +261,7 @@ export function WaitlistForm({
       </div>
 
       {status === "error" && (
-        <p className="text-[0.7rem] text-destructive flex items-center gap-1 font-mono text-left">
+        <p className="text-xs text-destructive flex items-center gap-1 font-mono text-left">
           <AlertCircle className="size-3 shrink-0" />
           <span>{errorMessage}</span>
         </p>
