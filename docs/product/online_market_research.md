@@ -1,8 +1,8 @@
 # Nghiên cứu thị trường: game phá án chơi online
 
 > **Trạng thái:** Nghiên cứu bàn giấy (desk research), chưa có dữ liệu người dùng của mình
-> **Cập nhật:** 2026-11-09 (bổ sung: độ mạnh bằng chứng, chiến lược marketing theo giai đoạn, kịch bản sẵn sàng 20/11, dòng tiền theo tốc độ ra case, tiêu chí dừng)
-> **Liên quan:** [`business_model.md`](business_model.md), [`financial_founder_model.md`](financial_founder_model.md), [`license_access.md`](license_access.md), [`../ROADMAP.md`](../ROADMAP.md) việc #17 (thanh toán bản online)
+> **Cập nhật:** 2026-11-09 (bổ sung: độ mạnh bằng chứng, chiến lược marketing theo giai đoạn, kịch bản sẵn sàng 20/11, tiêu chí dừng)
+> **Liên quan:** [`business_model.md`](business_model.md), [`license_access.md`](license_access.md), [`../ROADMAP.md`](../ROADMAP.md) việc #17 (thanh toán bản online)
 
 ---
 
@@ -11,7 +11,7 @@
 - Bản online là **cơ hội chưa được kiểm chứng**, không phải hướng đã thất bại. Hiện chưa có dữ liệu Việt Nam nghiêng về phía nào.
 - Bằng chứng mạnh nhất hiện có là hộp giấy bán được (Trace ~5.400 bộ/năm chỉ riêng TikTok Shop). Bằng chứng ủng hộ online đến từ thị trường nước ngoài, nơi có cả một nhóm sản phẩm thu tiền theo case.
 - Online chỉ có lãi khi có kho case. **Nút thắt quyết định là tốc độ làm case**, không phải giá.
-- Thứ tự ưu tiên: hộp giấy là nguồn tiền chính; online là thí nghiệm có giới hạn, có tiêu chí dừng viết sẵn từ trước (mục 10).
+- Thứ tự ưu tiên: hộp giấy là nguồn tiền chính; online là thí nghiệm có giới hạn, có tiêu chí dừng viết sẵn từ trước (mục 9).
 
 ---
 
@@ -31,7 +31,7 @@
 | Trace bán ~5.400 hộp/năm trên TikTok Shop                                                               | Hộp giấy có cầu              | **Mạnh**                | Trực tiếp, cùng thị trường Việt Nam                                                                 |
 | Ở nước ngoài có nhiều sản phẩm thu tiền cho case online (DetectiveOS, Cold Case Inc, Forgotten Mystery) | **Online có người trả tiền** | Trung bình              | Thị trường khác. DetectiveOS tự công bố chỉ ~3.300 người chơi                                       |
 | Chỉ 7–10% người chơi game mobile Việt Nam trả tiền                                                      | Online khó thu tiền          | Yếu                     | Game mobile là thể loại khác                                                                        |
-| App kịch bản sát online ở Trung Quốc khó có lãi                                                         | Online khó thu tiền          | Yếu đến trung bình      | Chỉ là phép so sánh, lối chơi khác (mục 2.4)                                                        |
+| App kịch bản sát online ở Trung Quốc khó có lãi                                                         | Online khó thu tiền          | Yếu đến trung bình      | Chỉ là phép so sánh, lối chơi khác (mục 3.4)                                                        |
 | Bản online của UCVN không có dấu hiệu bán chạy                                                          | —                            | **Rất yếu, không dùng** | Hộp giấy của UCVN cũng chỉ ~16 triệu/năm. Họ yếu ở phân phối nói chung, không tách được nguyên nhân |
 
 ---
@@ -170,7 +170,7 @@ Xếp theo mức độ nghiêm trọng với mình.
 1. **Chưa biết người chơi Việt có chịu trả tiền cho nội dung số không.** Bằng chứng hiện có đều yếu và gián tiếp: tỉ lệ trả tiền thấp của game mobile Việt Nam, và các app kịch bản sát ở Trung Quốc khó có lãi. Đây là câu hỏi lớn nhất, và chỉ trả lời được bằng một bài kiểm chứng có giá (mục 8).
 2. **Đọc nhiều chữ trên điện thoại rất mệt.** DetectiveOS khuyến nghị dùng màn hình lớn. Người Việt chủ yếu dùng điện thoại, và review các bộ hộp giấy đã có phàn nàn "nhiều chữ". Trên màn hình nhỏ, vấn đề này nặng hơn.
 3. **Ngược với lý do khách chọn boardgame.** Nghiên cứu thị trường của nhóm cho thấy người chơi boardgame tìm đến nó để rời khỏi màn hình. Bản online phải phục vụ tệp khác (nhóm ở xa, người chơi solo), không giành khách với hộp giấy.
-4. **Chỉ chơi được một lần.** Biết đáp án rồi thì hết giá trị chơi lại, nên phải ra case mới liên tục (mục 9). Review hộp giấy có 9–18% người "pass" (bán lại sau khi chơi). Với bản online, rủi ro tương ứng là chia sẻ tài khoản hoặc đáp án.
+4. **Chỉ chơi được một lần.** Biết đáp án rồi thì hết giá trị chơi lại, nên phải ra case mới liên tục. Online chỉ có lãi khi có kho case, nên tốc độ làm case quyết định bản online có đáng đầu tư không. Review hộp giấy có 9–18% người "pass" (bán lại sau khi chơi). Với bản online, rủi ro tương ứng là chia sẻ tài khoản hoặc đáp án.
 5. **Bị kẹt và gợi ý kém.** Review game trinh thám phàn nàn về gợi ý vô dụng, manh mối không logic, ghi chép rườm rà, khó nhớ tên nhân vật. Kẹt mà không có ai giúp là lý do hàng đầu khiến người chơi bỏ.
 6. **Chơi nhóm online tốn công phối hợp.** Phải hẹn giờ, dùng thêm app gọi riêng, chờ người vào phòng. Hộp giấy chỉ cần ngồi chung một bàn.
 7. **Khó tin để trả tiền cho thương hiệu mới.** Chưa có rating công khai. Các đối thủ đều xử lý bằng cách cho chơi thử miễn phí trước.
@@ -193,7 +193,7 @@ Xếp theo mức độ nghiêm trọng với mình.
 - **Giá rẻ để hút khách ban đầu là hợp lý, với 3 điều kiện:**
   1. Ghi rõ "giá ra mắt, áp dụng đến ngày X", để giá rẻ là ưu đãi có hạn, không thành mức giá khách quen.
   2. Giá không chắc là rào cản chính: Giai đoạn 0 đã miễn phí. Người chơi thử xong mà không mua thường là do phần thử chưa đủ cuốn, hoặc họ không đủ thời gian và hứng thú. Hạ giá không sửa được hai điều đó.
-  3. Giá càng rẻ thì càng cần nhiều đơn và nhiều case (mục 9).
+  3. Giá càng rẻ thì càng cần nhiều đơn và nhiều case.
 
 ---
 
@@ -234,69 +234,13 @@ Kể cả khi hộp bán giá ưu đãi ~200k, miễn phí cả case online là 
 | Nhóm ở xa là tệp chính                   | Tỉ lệ license có tạo phòng nhóm, số người mỗi phòng                                         |
 | Gợi ý không làm hỏng trải nghiệm         | Số gợi ý đã dùng, checkpoint bị kẹt lâu nhất                                                |
 
-Ngưỡng cụ thể cho các chỉ số này nằm ở mục 10 (tiêu chí dừng), phải chốt **trước** khi mở bán.
+Ngưỡng cụ thể cho các chỉ số này nằm ở mục 9 (tiêu chí dừng), phải chốt **trước** khi mở bán.
 
 **Ràng buộc kỹ thuật:** luồng thanh toán PayOS đã có code nhưng chưa chặn vào game theo license (ROADMAP #17). Trước khi bán bản online phải nối license với quyền chơi và gắn sự kiện đo cho các chỉ số trên.
 
 ---
 
-## 9. Dòng tiền theo tốc độ ra case
-
-Tính theo cách chủ dự án chọn: **không quy công làm ra tiền**, chỉ tính chi phí bằng tiền mặt. Các con số đánh dấu (giả định) cần thay bằng số thật.
-
-### 9.1. Chi phí
-
-**Cố định mỗi tháng:**
-
-| Khoản      | Ước tính/tháng                                                            | Nguồn                                                      |
-| ---------- | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| VPS        | 150–300k                                                                  | [`financial_founder_model.md`](financial_founder_model.md) |
-| Supabase   | 0đ (gói miễn phí); có thể cần gói Pro ~$25 (~650k) cho chơi nhóm realtime | ROADMAP #12 còn chờ xác nhận gói                           |
-| Công cụ AI | ~500k                                                                     | Giả định                                                   |
-| Tên miền   | ~30–40k (~400k/năm)                                                       | Giả định                                                   |
-| **Tổng**   | **~0,7–1,5 triệu/tháng; dùng 1,2 triệu để tính**                          |                                                            |
-
-**Mỗi case (không tính công):** ảnh và giọng đọc AI, đạo cụ chụp ảnh, in 5–10 bộ mẫu để chơi thử, quà cho người chơi thử. Giả định **~3 triệu/case**.
-
-**Ra mắt mỗi case:** lấy theo ngân sách marketing hiện tại, **~3,7 triệu**.
-
-### 9.2. Mỗi đơn mang về bao nhiêu
-
-Chưa trừ marketing, khách trả ship.
-
-| Sản phẩm          | Giá  | Còn lại mỗi đơn                |
-| ----------------- | ---- | ------------------------------ |
-| Hộp               | 269k | ~185k (trừ in 80k và đóng gói) |
-| Hộp ưu đãi        | 200k | ~115k                          |
-| Online            | 69k  | ~67k (trừ ~2% phí PayOS)       |
-| Online giá ra mắt | 49k  | ~48k                           |
-
-Chỉ riêng chi phí cố định 1,2 triệu/tháng cần khoảng **7 hộp giá 269k, hoặc 11 hộp giá 200k, hoặc 18 đơn online giá 69k mỗi tháng**. Mức này không đáng lo.
-
-### 9.3. Số đơn cần cho mỗi case
-
-Chi phí mỗi chu kỳ = 3 triệu làm case + 3,7 triệu ra mắt + 1,2 triệu × số tháng.
-
-| Tốc độ ra case | Chi phí/chu kỳ | Chỉ bán hộp 269k | Chỉ bán hộp 200k | Chỉ bán online 69k |
-| -------------- | -------------- | ---------------- | ---------------- | ------------------ |
-| 2 tháng/case   | ~9,1 triệu     | ~49 hộp          | ~79 hộp          | ~136 đơn           |
-| 3 tháng/case   | ~10,3 triệu    | ~56 hộp          | ~90 hộp          | ~154 đơn           |
-| 6 tháng/case   | ~13,9 triệu    | ~75 hộp          | ~121 hộp         | ~207 đơn           |
-
-**Cách đọc:**
-
-- **Ra case chậm không làm dòng tiền xấu đi nhiều**, vì chi phí cố định thấp. Thứ thay đổi là tổng doanh thu cả năm.
-- **Online chỉ đáng đầu tư khi tốc độ ra case đủ nhanh.** Ra được 1 case mỗi 6–8 tuần thì chiến lược "giá rẻ cộng nhiều case" khả thi. Mỗi case mất 4–6 tháng thì giá rẻ không gom đủ đơn để bù. Trace ra 4 case trong 12 tháng; mình hiện có 1 case. **Cần đo thời gian thật để làm một case**, và xem Studio đã rút ngắn case #001 được bao nhiêu.
-- **Mỗi case mới bán được cả hộp giấy và online.** Đây là điểm mạnh của mô hình hai dạng, nhưng chỉ phát huy khi ra case đủ nhanh.
-- **Hộp giấy cần bỏ tiền trước:** in 50 bộ tốn ~4 triệu trước khi bán được bộ nào. Online không có tồn kho, nhưng cần khoảng 2,8 lần số đơn để mang về cùng số tiền.
-- **Case cũ vẫn ra tiền:** bán lại case cũ trên online gần như không tốn thêm; hộp thì phải in lô mới. Không nên trông chờ quá nhiều: doanh số R302 của Trace giảm 81% sau khoảng một năm.
-- **Giá hộp 200k cần gần gấp đôi số hộp so với 269k.** Chỉ nên dùng cho đợt đầu, có giới hạn số lượng.
-
-**Giới hạn của bảng:** bảng chỉ trả lời "dự án có tự nuôi được hạ tầng không". Nếu sau này thuê người viết case, hoặc chủ dự án cần thu nhập từ dự án, phải tính lại toàn bộ.
-
----
-
-## 10. Thiên kiến và tiêu chí dừng
+## 9. Thiên kiến và tiêu chí dừng
 
 **Những lực kéo về phía online cần nhận diện:**
 
@@ -322,9 +266,9 @@ Chi phí mỗi chu kỳ = 3 triệu làm case + 3,7 triệu ra mắt + 1,2 tri�
 
 ---
 
-## 11. Marketing theo giai đoạn
+## 10. Marketing theo giai đoạn
 
-### 11.1. Giai đoạn 1: bán hộp giấy (từ 16/11/2026)
+### 10.1. Giai đoạn 1: bán hộp giấy (từ 16/11/2026)
 
 - **Không có ngân sách, chiến dịch hay bài đăng riêng cho online.** Tiền và công sức dồn vào 50 bộ hộp đầu.
 - **Chưa nói "có bán bản online".** Chỉ nói "đang hoàn thiện, để lại thông tin để được báo". Lý do:
@@ -338,7 +282,7 @@ Chi phí mỗi chu kỳ = 3 triệu làm case + 3,7 triệu ra mắt + 1,2 tri�
   - Một dòng trong FAQ fanpage.
 - Không công bố giá bản online.
 
-### 11.2. Kịch bản: bản online sẵn sàng sớm (khoảng 20/11)
+### 10.2. Kịch bản: bản online sẵn sàng sớm (khoảng 20/11)
 
 **"Sẵn sàng" nghĩa là đủ checklist này.** Thiếu mục nào thì chưa tính:
 
@@ -346,7 +290,7 @@ Chi phí mỗi chu kỳ = 3 triệu làm case + 3,7 triệu ra mắt + 1,2 tri�
 - **Toàn bộ tài liệu case #000 đã có bản số trên Dossier Studio.** Hộp giấy có tài liệu in, người chơi online thì không; thiếu một tờ là kẹt case.
 - Đã chơi trọn từ đầu đến cuối trên điện thoại thật (Android đời cũ, trình duyệt trong Zalo, 4G yếu), cả chơi một mình lẫn phòng nhóm.
 - Có kênh hỗ trợ khi khách bị kẹt hoặc lỗi thanh toán.
-- Đã chốt giá (mục 7) và tiêu chí dừng (mục 10).
+- Đã chốt giá (mục 7) và tiêu chí dừng (mục 9).
 
 **20/11 đến khoảng 5/12: mở lặng lẽ.** Không đăng bài, không chạy quảng cáo. Chỉ bán ở 3 chỗ:
 
@@ -356,11 +300,11 @@ Chi phí mỗi chu kỳ = 3 triệu làm case + 3,7 triệu ra mắt + 1,2 tri�
 
 **Lý do không công bố rộng ngay:** 16/11 mở bán hộp và 20/11 mở online thì cùng một tuần phải lo chốt đơn, ship và hỗ trợ lỗi web. Mở lặng lẽ giữ khối lượng hỗ trợ nhỏ, đồng thời đo được bản online có kéo khách khỏi hộp hay không.
 
-**Khoảng 5/12: quyết định** dựa trên tiêu chí dừng ở mục 10.
+**Khoảng 5/12: quyết định** dựa trên tiêu chí dừng ở mục 9.
 
-### 11.3. Giai đoạn 2: công bố bản online
+### 10.3. Giai đoạn 2: công bố bản online
 
-Chỉ khi đạt tiêu chí ở mục 10 và đã bán xong đợt hộp đầu tiên.
+Chỉ khi đạt tiêu chí ở mục 9 và đã bán xong đợt hộp đầu tiên.
 
 - Mở cho danh sách đăng ký chờ trước; nhóm này cho phản hồi và review đầu tiên.
 - Thông điệp: **"phá án cùng nhau khi không ngồi cùng một chỗ"**. Tách hẳn khỏi hộp giấy, không nói "bản rẻ hơn".
@@ -370,15 +314,14 @@ Chỉ khi đạt tiêu chí ở mục 10 và đã bán xong đợt hộp đầu 
 
 ---
 
-## 12. Việc cần làm
+## 11. Việc cần làm
 
-1. Chủ dự án điền 3 con số thật: chi phí AI mỗi tháng, gói Supabase sẽ dùng, chi phí tiền mặt của case #000 (không tính công). Sau đó tính lại mục 9 và đưa vào [`financial_founder_model.md`](financial_founder_model.md).
-2. Đo thời gian thật để làm một case (case #000 và tiến độ case #001 với Studio).
-3. Điền ngưỡng tiêu chí dừng ở mục 10 trước khi mở bán online.
-4. Gắn đo lường cho Giai đoạn 0 ngay, vì đây là phễu chung cho hộp và online.
-5. Tạo trang đăng ký chờ bản online; gắn link vào FAQ và tờ hướng dẫn trong hộp.
-6. Chơi thử case miễn phí của DetectiveOS và phần miễn phí của UCVN online; ghi lại cách họ hướng dẫn người mới, gợi ý và buộc tội.
-7. Hoàn thành checklist "sẵn sàng" ở mục 11.2 nếu muốn mở lặng lẽ khoảng 20/11.
+1. Đo thời gian thật để làm một case (case #000 và tiến độ case #001 với Studio).
+2. Điền ngưỡng tiêu chí dừng ở mục 9 trước khi mở bán online.
+3. Gắn đo lường cho Giai đoạn 0 ngay, vì đây là phễu chung cho hộp và online.
+4. Tạo trang đăng ký chờ bản online; gắn link vào FAQ và tờ hướng dẫn trong hộp.
+5. Chơi thử case miễn phí của DetectiveOS và phần miễn phí của UCVN online; ghi lại cách họ hướng dẫn người mới, gợi ý và buộc tội.
+6. Hoàn thành checklist "sẵn sàng" ở mục 10.2 nếu muốn mở lặng lẽ khoảng 20/11.
 
 ---
 
