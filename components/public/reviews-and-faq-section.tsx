@@ -1,36 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Quote, ChevronDown, MessageSquare } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Quote, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TESTIMONIALS_DATA, FAQ_DATA } from '@/lib/data/landing-data'
-
-function FacebookIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-    </svg>
-  );
-}
-
-function TikTokIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" />
-    </svg>
-  );
-}
-
-function InstagramIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-    </svg>
-  );
-}
 
 export function ReviewsAndFaqSection() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -41,58 +14,10 @@ export function ReviewsAndFaqSection() {
 
   return (
     <>
-      {/* COMMUNITY ENGAGEMENT (ĐẶT NGAY TRÊN ĐÁNH GIÁ) */}
-      <section className="w-full max-w-6xl px-6 pt-14 pb-4 z-10">
-        <div className="max-w-4xl mx-auto border border-amber-500/50 bg-amber-500/[0.03] rounded-xl p-6 lg:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-40 h-40 bg-amber-500/[0.1] rounded-bl-full pointer-events-none" />
-          <div className="relative z-10 max-w-md">
-            <h3 className="text-xl font-black text-foreground tracking-tight font-sans">
-              Kết nối với những thám tử khác
-            </h3>
-            <p className="text-sm text-muted-foreground mt-2 leading-relaxed font-sans">
-              Đừng phá án một mình. Gặp gỡ những người cùng đam mê và cập nhật hồ sơ mới sớm nhất.
-            </p>
-          </div>
-
-          {/* Social Channels Buttons (Theo chiều dọc) */}
-          <div className="relative z-10 flex flex-wrap gap-2 shrink-0">
-            <a
-              href="https://facebook.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center justify-center gap-2 min-h-11 px-5 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] text-zinc-100 font-sans text-sm font-semibold transition-colors active:scale-95 cursor-pointer"
-            >
-              <FacebookIcon className="size-5 fill-current text-zinc-400 group-hover:text-amber-400 transition-colors" />
-              <span>Facebook</span>
-            </a>
-
-            <a
-              href="https://tiktok.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center justify-center gap-2 min-h-11 px-5 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] text-zinc-100 font-sans text-sm font-semibold transition-colors active:scale-95 cursor-pointer"
-            >
-              <TikTokIcon className="size-5 fill-current text-zinc-400 group-hover:text-amber-400 transition-colors" />
-              <span>TikTok</span>
-            </a>
-
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center justify-center gap-2 min-h-11 px-5 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] text-zinc-100 font-sans text-sm font-semibold transition-colors active:scale-95 cursor-pointer"
-            >
-              <InstagramIcon className="size-5 text-zinc-400 group-hover:text-amber-400 transition-colors" />
-              <span>Instagram</span>
-            </a>
-          </div>
-        </div>
-      </section>
-
       {/* DETECTIVE TESTIMONIALS (Auto-scrolling Marquee & Social Proof) */}
       <section id="danhgia" className="w-full py-12 z-10 overflow-hidden flex flex-col items-center">
         <div className="text-center max-w-2xl mx-auto mb-8 px-6 flex flex-col items-center">
-          <h2 className="text-2xl lg:text-3xl font-black tracking-tight text-foreground font-sans">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-foreground font-sans">
             Thám tử đi trước nói gì
           </h2>
         </div>
@@ -142,7 +67,7 @@ export function ReviewsAndFaqSection() {
       {/* FAQ SECTION (Accordions) */}
       <section id="faq" className="w-full max-w-4xl px-6 py-12 z-10 flex flex-col items-center">
         <div className="text-center max-w-2xl mx-auto mb-8 flex flex-col items-center">
-          <h2 className="text-2xl lg:text-3xl font-black tracking-tight text-foreground font-sans">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-foreground font-sans">
             Câu hỏi thường gặp
           </h2>
         </div>
@@ -154,7 +79,7 @@ export function ReviewsAndFaqSection() {
               return (
                 <div
                   key={idx}
-                  className="border border-border/60 bg-card/20 rounded-lg overflow-hidden transition-all duration-300"
+                  className="border border-zinc-700 bg-card/40 rounded-lg overflow-hidden transition-all duration-300"
                 >
                   <button
                     onClick={() => toggleFaq(idx)}
@@ -178,7 +103,7 @@ export function ReviewsAndFaqSection() {
             })}
           </div>
         ) : (
-          <div className="w-full py-8 px-6 rounded-lg border border-dashed border-border/60 bg-card/10 text-center font-mono text-sm text-muted-foreground/70">
+          <div className="w-full py-8 px-6 rounded-lg border border-dashed border-border/60 bg-card/10 text-center font-sans text-sm text-muted-foreground/70">
             [ MỤC CÂU HỎI THƯỜNG GẶP ĐANG ĐƯỢC TỔ ĐIỀU TRA BIÊN SOẠN & CẬP NHẬT ]
           </div>
         )}

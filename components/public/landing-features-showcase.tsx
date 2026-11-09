@@ -63,7 +63,9 @@ export function LandingFeaturesShowcase() {
     clamp01((v - phase.logoEnd) / (phase.pullEnd - phase.logoEnd));
 
   // 1. Logo internal motion (emblem -> glass travels to O -> letters pulled out)
-  const logoProgress = useTransform(scrollYProgress, (v) => clamp01(v / phase.logoEnd));
+  const logoProgress = useTransform(scrollYProgress, (v) =>
+    clamp01(v / phase.logoEnd),
+  );
 
   // 2. Title scale: starts BIG when centred, then shrinks moderately as it pulls to left
   const titleScale = useTransform(scrollYProgress, (v) => {
@@ -72,15 +74,39 @@ export function LandingFeaturesShowcase() {
   });
 
   // 3. Title slides from horizontal center to left column
-  const titleX = useTransform(scrollYProgress, (v) => (1 - pullFactor(v)) * centerOffset);
+  const titleX = useTransform(
+    scrollYProgress,
+    (v) => (1 - pullFactor(v)) * centerOffset,
+  );
+
+  // Desk lamp: fades on as the user scrolls in (first 30% of the logo phase),
+  // stays lit while the logo is centred, then fades off as the logo pulls left.
+  const lampOn = (v: number) => clamp01(v / (phase.logoEnd * 0.3));
+  const lampOpacity = useTransform(scrollYProgress, (v) =>
+    Math.min(lampOn(v), 1 - pullFactor(v)),
+  );
+  // Nón sáng: đỉnh hẹp cố định, đáy loe; khi logo kéo sang trái, đáy khép dần về một điểm.
+  const beamClip = useTransform(scrollYProgress, (v) => {
+    const open = 1 - pullFactor(v);
+    const top = 4 * open;
+    const bottom = 50 * open;
+    return `polygon(${50 - top}% 0%, ${50 + top}% 0%, ${50 + bottom}% 100%, ${50 - bottom}% 100%)`;
+  });
+  const poolScale = useTransform(
+    scrollYProgress,
+    (v) => 1 - 0.7 * pullFactor(v),
+  );
 
   // 4. Sub-sections on the right fade & slide up into view
   const contentFactor = (v: number) =>
     clamp01((v - phase.contentStart) / (phase.contentEnd - phase.contentStart));
   const contentOpacity = useTransform(scrollYProgress, contentFactor);
-  const contentY = useTransform(scrollYProgress, (v) => 40 * (1 - contentFactor(v)));
+  const contentY = useTransform(
+    scrollYProgress,
+    (v) => 40 * (1 - contentFactor(v)),
+  );
   const contentPointerEvents = useTransform(scrollYProgress, (v) =>
-    v > phase.contentStart ? "auto" : "none"
+    v > phase.contentStart ? "auto" : "none",
   );
 
   return (
@@ -106,8 +132,43 @@ export function LandingFeaturesShowcase() {
               scale: titleScale,
               transformOrigin: "top left",
             }}
-            className="w-full flex flex-col items-start text-left will-change-transform"
+            className="relative w-full flex flex-col items-start text-left will-change-transform"
           >
+            {/* Đèn dọi: chùm sáng hình nón rọi từ trên xuống logo, khép lại khi logo trượt sang trái */}
+            {/* Blur sits on the wrapper: on the same element, clip-path would cut the blur and leave hard edges */}
+            <motion.div
+              aria-hidden="true"
+              className="pointer-events-none absolute -z-10 left-1/2 -translate-x-1/2 bottom-[25%] w-[150%] h-[50vh] lg:h-[38vh]"
+              style={{ opacity: lampOpacity, filter: "blur(22px)" }}
+            >
+              <motion.div
+                className="absolute inset-0"
+                style={{
+                  clipPath: beamClip,
+                  background:
+                    "linear-gradient(to bottom, rgba(255,228,165,0.3), rgba(255,205,120,0.14) 55%, rgba(255,190,90,0.04))",
+                  maskImage:
+                    "linear-gradient(to bottom, #000 55%, transparent)",
+                  WebkitMaskImage:
+                    "linear-gradient(to bottom, #000 55%, transparent)",
+                }}
+              />
+            </motion.div>
+            {/* Vũng sáng dưới logo */}
+            <motion.div
+              aria-hidden="true"
+              className="pointer-events-none absolute -z-10 left-1/2 -translate-x-1/2 top-[5%] w-[170%] h-[160%]"
+              style={{
+                opacity: lampOpacity,
+                scaleX: poolScale,
+                background:
+                  "radial-gradient(ellipse 50% 45% at 50% 40%, rgba(245,183,10,0.14), rgba(200,120,30,0.06) 50%, transparent 75%)",
+                maskImage:
+                  "radial-gradient(ellipse 50% 45% at 50% 40%, #000 30%, transparent 72%)",
+                WebkitMaskImage:
+                  "radial-gradient(ellipse 50% 45% at 50% 40%, #000 30%, transparent 72%)",
+              }}
+            />
             <LandingLogoMotion progress={logoProgress} />
           </motion.div>
         </div>

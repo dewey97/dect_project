@@ -1,31 +1,19 @@
 export const FAQ_DATA: { q: string; a: string }[] = [
   {
-    q: "Cần chuẩn bị gì để chơi?",
-    a: "Bộ hồ sơ vụ án (bản hộp hoặc bản trực tuyến), giấy bút để ghi chép. Có thêm vài người bạn thì càng vui.",
+    q: "XPLORE phù hợp với đối tượng nào?",
+    a: "Người từ 16 tuổi trở lên thích trinh thám và giải đố. Chơi một mình được, vui nhất là nhóm 2–4 người.",
   },
   {
-    q: "Cần bao nhiêu người?",
-    a: "Chơi một mình được. Vui nhất là nhóm 2–4 người, ngồi chung một bàn hoặc mỗi người một máy ở nhà.",
+    q: "Chơi online có cần cài ứng dụng không?",
+    a: "Không. Bạn chơi ngay trên trình duyệt của điện thoại hoặc máy tính, tiến độ tự lưu theo tài khoản nên có thể dừng và chơi tiếp bất kỳ lúc nào.",
   },
   {
-    q: "Một vụ án chơi trong bao lâu?",
-    a: "Khoảng 60–90 phút. Bạn có thể dừng giữa chừng, tiến độ được lưu lại.",
+    q: "Làm sao nếu không giải được game?",
+    a: "Hệ thống có gợi ý mở dần từng mức, từ nhẹ đến rõ, để bạn gỡ chỗ bí mà vẫn tự tìm ra lời giải.",
   },
   {
-    q: "Chơi trên điện thoại được không?",
-    a: "Được. Bản trực tuyến chạy ngay trên trình duyệt điện thoại và máy tính, không cần cài ứng dụng.",
-  },
-  {
-    q: "Mua bản hộp thì phần trên web chơi thế nào?",
-    a: "Trong hộp có mã QR. Quét mã là mở được phần điều tra trên web đi kèm vụ án.",
-  },
-  {
-    q: "Bí quá thì có gợi ý không?",
-    a: "Có. Gợi ý mở dần từng mức, từ nhẹ đến rõ, để bạn vẫn là người tự tìm ra lời giải.",
-  },
-  {
-    q: "Một vụ án chơi lại được không?",
-    a: "Mỗi vụ chỉ có một sự thật, biết hung thủ rồi thì chơi lại sẽ mất bất ngờ. Bạn có thể tặng bộ hồ sơ cho nhóm bạn khác.",
+    q: "Game có chơi lại được không?",
+    a: "Vì mỗi vụ án có đáp án cố định nên lần chơi thứ hai sẽ không còn bất ngờ. Bạn có thể tặng lại hộp cho người thân hoặc bạn bè chưa chơi.",
   },
 ];
 
