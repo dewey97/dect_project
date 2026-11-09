@@ -35,10 +35,25 @@ Hệ thống màu tối đa tầng, sử dụng biến ngữ nghĩa Tailwind / C
 
 ## 🔤 3. Typography & Nhãn Hệ Thống
 
-Sử dụng 2 họ font chính:
+Website dùng 3 font (token tên `--font-geist-*` giữ lại vì lý do lịch sử, font thật là Inter / Roboto Mono):
 
-- **Geist Sans (`font-sans`):** Nội dung tài liệu, tiêu đề hồ sơ, mô tả vụ án, nút bấm.
-- **Geist Mono (`font-mono`):** Dành riêng cho dữ liệu máy tính: Mã SHA-256, mốc thời gian ISO, tọa độ GPS, mã vật chứng, thẻ trạng thái.
+- **Inter (`font-sans`):** giao diện, tiêu đề, nội dung, nút bấm.
+- **EB Garamond italic (`font-serif italic`):** trích dẫn (quote ở hero), tài liệu giấy diegetic, epilogue.
+- **Roboto Mono (`font-mono`):** nhãn, mã hồ sơ, mã vật chứng, mốc thời gian, thẻ trạng thái.
+- Chữ viết tay (`font-handwriting`, Playpen Sans) chỉ dùng cho ghi chú trên bảng điều tra trong game.
+
+### Thang chữ landing (nguồn hiển thị: mục 3 trang `/brand`)
+
+| Kiểu               | Font                                     | Cỡ (mobile / tablet / desktop) |
+| :----------------- | :--------------------------------------- | :----------------------------- |
+| Tiêu đề chính H1   | Inter Black 900, in hoa                  | 30 / 36 / 48px                 |
+| Tiêu đề section H2 | Inter Black 900                          | 24 / 30 / 36px                 |
+| Tiêu đề khối H3    | Inter Bold 700                           | 20 / 24px                      |
+| Nội dung           | Inter Regular 400, giãn dòng 1.6         | 14 / 16px                      |
+| Trích dẫn          | EB Garamond Italic 400                   | 16 / 18px                      |
+| Nhãn & mã hồ sơ    | Roboto Mono Medium 500, in hoa, giãn chữ | 12px                           |
+
+Không thêm kiểu chữ mới ngoài bảng này; nội dung không nhỏ hơn 14px.
 
 ### Nhãn chuẩn (System Labels):
 
@@ -65,19 +80,23 @@ Sử dụng 2 họ font chính:
 ## 🗄️ 5. Không Gian Phòng Vật Chứng & Dynamic Pin Cards
 
 ### 1. Không Gian Phòng Vật Chứng 3 Vùng (Evidence Workspace — 3-Region Layout):
+
 Áp dụng tại `app/(investigation)/play/[caseId]/board/board-client.tsx` nhằm tối ưu hóa khả năng đối chiếu hồ sơ song song:
+
 - **Vùng 1 (Dossier Selector - ~180px Desktop)**: Thanh điều hướng chọn danh mục hồ sơ theo từng chặng vụ án (`Tất cả`, `Ban Đầu`, `Bộ A`, `Bộ B`, `Bộ C`) kèm chỉ báo số lượng tài liệu đã mở khóa. Hỗ trợ nút thu gọn trên màn hình hẹp.
 - **Vùng 2 (Evidence & Document Grid - ~260px Desktop)**: Danh sách cuộn độc lập hiển thị thẻ vật chứng:
-  - *Vật chứng ảnh*: Hiển thị thumbnail ảnh chụp hiện trường thực tế, overlay mã vật chứng (`📸 A-06`...).
-  - *Hồ sơ văn bản*: Hiển thị badge icon `PDF` màu amber viền nâu cổ điển, mã hồ sơ và trích yếu tiêu đề.
-  - *Dải chỉ báo Active*: Strip dọc màu hổ phách (`#d9a066`) đánh dấu tài liệu đang xem.
+  - _Vật chứng ảnh_: Hiển thị thumbnail ảnh chụp hiện trường thực tế, overlay mã vật chứng (`📸 A-06`...).
+  - _Hồ sơ văn bản_: Hiển thị badge icon `PDF` màu amber viền nâu cổ điển, mã hồ sơ và trích yếu tiêu đề.
+  - _Dải chỉ báo Active_: Strip dọc màu hổ phách (`#d9a066`) đánh dấu tài liệu đang xem.
 - **Vùng 3 (Inspector Viewer - Flex-1 mở rộng)**: Khung soi chi tiết tài liệu toàn màn hình:
-  - *Vật chứng hiện trường*: Hiển thị ảnh chụp độ nét cao ở tỉ lệ tối đa (Full Viewport Object-Contain), nền tối sâu có họa tiết grid tế vi, khử hoàn toàn viền rườm rà.
-  - *Hồ sơ pháp y PDF*: Nhúng trực tiếp iframe Google Drive hoặc PDF local đã chuẩn hóa URL (triệt tiêu thanh công cụ trình duyệt bằng `#toolbar=0&navpanes=0`).
-  - *Nút Mở Rộng / Chuẩn*: Cho phép phóng to vùng soi tài liệu chiếm trọn toàn bộ khung nhìn bên phải để đọc văn bản cỡ chữ nhỏ.
+  - _Vật chứng hiện trường_: Hiển thị ảnh chụp độ nét cao ở tỉ lệ tối đa (Full Viewport Object-Contain), nền tối sâu có họa tiết grid tế vi, khử hoàn toàn viền rườm rà.
+  - _Hồ sơ pháp y PDF_: Nhúng trực tiếp iframe Google Drive hoặc PDF local đã chuẩn hóa URL (triệt tiêu thanh công cụ trình duyệt bằng `#toolbar=0&navpanes=0`).
+  - _Nút Mở Rộng / Chuẩn_: Cho phép phóng to vùng soi tài liệu chiếm trọn toàn bộ khung nhìn bên phải để đọc văn bản cỡ chữ nhỏ.
 
 ### 2. Thẻ Ghim Điều Tra Động (Dynamic Pin Cards & Canvas Composite):
+
 Áp dụng tại `HeroInteractive` và `MainInvestigationCanvas`:
+
 - **Vẽ thẻ ảnh động trên Canvas**: Khung ảnh Polaroid kèm băng dính dán tường răng cưa được dựng trực tiếp bằng `card-composite.ts` và lưu vào `OffscreenCanvas` trong bộ nhớ RAM, đạt tốc độ kết xuất 60 FPS mà không cần phụ thuộc vào ảnh tĩnh pre-render.
 - **Avatar Placeholder Chuẩn (`/images/avatar_placeholder.svg`)**: Đảm bảo nhân vật mới hoặc nghi phạm mở rộng từ Live CMS luôn có hình đại diện đồng nhất trước khi gắn ảnh hồ sơ chính thức.
 
@@ -86,13 +105,17 @@ Sử dụng 2 họ font chính:
 ## 📑 6. Các Thành Phần Giao Diện Nâng Cao (Advanced UI Components)
 
 ### 1. Hiệu Ứng Tập Tài Liệu Xếp Chồng Gối Đầu (Overlapping Dossier Paper Stack):
+
 Áp dụng tại danh sách hồ sơ PDF trong `app/(investigation)/play/[caseId]/board/board-client.tsx`:
+
 - **Gối đầu tự nhiên (`-mt-2`)**: Các tài liệu không được chọn xếp chồng gối đầu lên nhau như một tệp hồ sơ lưu trữ thật trong ngăn kéo điều tra viên.
 - **Thanh Header kẹp ghim (`Paperclip`)**: Luôn hiển thị mã số hồ sơ (`DOC A-01`...), tên tài liệu vắn tắt và giai đoạn vụ án (`BAN ĐẦU` / `BỘ A` / `BỘ B`).
 - **Mở rộng linh hoạt (Expanded State)**: Khi người chơi click chọn một tài liệu, tấm thẻ bung rộng với viền amber nổi bật (`#d9a066`), đổ bóng đa tầng (`shadow-[0_8px_24px_rgba(0,0,0,0.7)]`), hiện trích yếu và nút gọi hành động mở đọc toàn văn hồ sơ.
 
 ### 2. Sổ Tay Trinh Thám Lật Trang 3 Tầng (Detective Flip Notebook Modal):
+
 Áp dụng tại `components/investigation/board/gameplay-guide-modal.tsx`:
+
 - **Cấu trúc lật sách (Book Page Flipping)**: Mô phỏng cuốn sổ tay bìa da/giấy bồi ghi chép nghiệp vụ của điều tra viên kỳ cựu với 3 trang nội dung chuyên sâu:
   - **Trang 1 / 3 (Quy Trình Nghiệp Vụ)**: 4 bước điều tra cốt lõi (Rà soát hiện trường ➔ Bóc tách lời khai ➔ Đối chiếu mâu thuẫn ➔ Kết luận điều tra).
   - **Trang 2 / 3 (Sơ Đồ Manh Mối)**: Giải thích hệ thống đường nối chỉ đỏ, logic liên kết vật chứng và cách suy luận từ các mẩu tin nhắn điện thoại.
@@ -100,12 +123,16 @@ Sử dụng 2 họ font chính:
 - **Chỉ báo trang sách**: Dãy chấm tròn (dots indicator) và nút lật trang trước/sau có âm thanh bấm tactile typewriter.
 
 ### 3. Thanh Cuộn Tài Liệu Trinh Thám & Giấy Cũ (Detective & Paper Scrollbars):
+
 Áp dụng trong `app/globals.css`:
+
 - **Dark Mode Workspace Scrollbar**: Thanh cuộn siêu mảnh ($6\text{ px}$), không nút bấm, nền trong suốt hoàn toàn, thanh trượt màu hổ phách mờ (`rgba(180, 130, 80, 0.35)`) và sáng lên khi hover.
 - **Paper Scrollbar (`.paper-scrollbar`, `[data-paper-modal]`)**: Dành riêng cho các modal tài liệu giấy cũ (`AddSuspectModal`, `FollowupQuestionModal`), sử dụng tông màu nâu gỗ đất cổ điển (`rgba(92, 64, 38, 0.3)`), hài hòa 100% với nền giấy kraft vàng.
 
 ### 4. Hiệu Ứng Nhìn Qua Ổ Khoá — Landing 360 (`LandingScene360Showcase` + `LandingKeyholeModel`):
+
 Áp dụng tại `components/public/landing-scene-360-showcase.tsx`:
+
 - **Mô hình 3D thật (React Three Fiber)**: Mặt khoá đồng thau dựng bằng `ExtrudeGeometry` dày `0.15` đơn vị, bevel siêu nhỏ `0.002` + lỗ xuyên tâm (bevel lớn từng tạo vết cắt phẳng ở đỉnh nên chỉ dùng đúng mức bắt sáng mép). Silhouette `PLATE_OUTLINE` và lỗ khoá `SLOT_POINTS` được trace trực tiếp từ ảnh chính diện (quét pixel) nên viền ngoài và mép lỗ khớp với ảnh. Lỗ khoá được densify rồi Chaikin 2 lượt để mép cắt không còn bậc thang pixel; texture có alpha cut-out theo silhouette nên không lộ nền xám studio.
 - **Hai pha theo scroll**: (1) camera bắt đầu ở góc nhìn từ trên xuống (`PITCH_REST = 0.85 rad`), xoay dần về chính diện; (2) khi đã chính diện, camera dolly theo hàm mũ xuyên qua lỗ khoá vào trong phòng. `distance`, `pitch`, `lookY` và `opacity` là các prop điều khiển rig; `opacity` làm mặt khoá mờ dần khi camera chạm lỗ để không còn mảng đồng thau nhoè ở góc khung.
 - **Texture & ánh sáng**: mặt trước dùng `keyhole_plate_albedo.webp` với `MeshBasicMaterial` (`toneMapped: false`) để giữ nguyên highlight/scratch đã bake trong ảnh; thành khoá dùng `MeshStandardMaterial` đồng thau + `RoomEnvironment` (PMREM) để bắt sáng ở mép và lòng lỗ.
@@ -114,6 +141,6 @@ Sử dụng 2 họ font chính:
 - **Sticky & overflow**: `html, body` phải dùng `overflow-x: clip`, **tuyệt đối không dùng `hidden`** — `hidden` biến body thành scroll container không cuộn và vô hiệu hoá toàn bộ `position: sticky` trong app.
 
 ### 5. Trung Tâm Tải Tài Nguyên & Banner Mạng Xã Hội (Brand Asset Download Center):Áp dụng tại trang `app/brand/page.tsx`:
-- **OpenGraph Social Banner (Featured)**: Hiển thị khung xem trước độ nét cao tỉ lệ vàng $1.91 : 1$ ($1200 \times 630\text{ px}$) kèm nút tải trực tiếp file `xplore_og_image.jpg`.
-- **Bộ nhận diện chuẩn hóa 3 khối**: Khung tải Logo chính ($1920 \times 1080$), Biểu tượng X ($512 \times 512$), và Gói Favicon trình duyệt đa kích thước ($16\times16$, $32\times32$, $48\times48$).
 
+- **OpenGraph Social Banner (Featured)**: Hiển thị khung xem trước độ nét cao tỉ lệ vàng $1.91 : 1$ ($1200 \times 630\text{ px}$) kèm nút tải trực tiếp file `xplore_og_image.jpg`.
+- **Bộ nhận diện chuẩn hóa 3 khối**: Khung tải Logo chính (`logo-dark.png` / `logo-light.png`), Biểu tượng X (`mark-dark.png` / `mark-light.png`, $512 \times 512$), và Favicon (`/favicon.ico` 16/32/48; tab dùng `favicon-dark.png` / `favicon-light.png` theo `prefers-color-scheme`). Bản nền tối dùng cho giao diện mặc định; bản nền sáng dùng khi nền sáng, không dùng filter `invert`.

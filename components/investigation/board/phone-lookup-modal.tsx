@@ -216,7 +216,7 @@ export function PhoneLookupModal({
                         }));
                         if (errorMsg) setErrorMsg("");
                       }}
-                      className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-base text-[#0e2b5c] font-[family-name:var(--font-handwriting)] font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
+                      className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-base text-[#0e2b5c] font-handwriting font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
                     />
                   </div>
                 );

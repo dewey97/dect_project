@@ -149,9 +149,21 @@ Mọi tính năng, trang hoặc thành phần mới phải đảm bảo chạy �
   - Trình biên dịch Turbopack trong Next.js 16 dính lỗi nghiêm trọng (Next.js Issue #99114: `next/font/google queries have exactly one entry` khi Google Fonts API trả về các URL extensionless hoặc có ký tự `&`/nhiều query parameters trong quá trình CI/CD build Docker).
   - Lỗi này gây ra hiện tượng build flake ngẫu nhiên (chạy local có thể pass do cache nhưng CI/CD trên Docker/Linux bị exit code 1).
 - **Chuẩn tải Font áp dụng cho toàn bộ dự án**:
-  - Toàn bộ font Google (`Inter`, `Roboto Mono`, `Caveat`, `Playpen Sans`, `Courier Prime`, `Special Elite`) **BẮT BUỘC** phải được nạp thông qua `@import url("https://fonts.googleapis.com/css2?...")` trực tiếp ở dòng đầu của `app/globals.css`.
-  - Khai báo CSS variables (`--font-geist-sans`, `--font-geist-mono`, `--font-handwriting`) trực tiếp trong block `:root` và `@theme inline` của `app/globals.css`.
-  - Không import hoặc inject font thông qua `layout.tsx` bằng `next/font/google`.
+  - Toàn bộ font Google được nạp bằng **một thẻ `<link rel="stylesheet">` trong `<head>` của `app/layout.tsx`** (kèm `preconnect` tới `fonts.googleapis.com` và `fonts.gstatic.com`, `subset=vietnamese`, `display=swap`).
+  - **Không dùng `@import url("https://fonts.googleapis.com/...")` trong `app/globals.css`**: Turbopack (cả `next dev` lẫn `next build`) âm thầm bỏ dòng import này khỏi CSS đầu ra, khiến toàn site rơi về font hệ thống.
+  - Không import hoặc inject font thông qua `next/font/google`.
+- **Bộ font chuẩn (chỉ dùng font có hỗ trợ tiếng Việt cho nội dung tiếng Việt)**:
+
+  | Utility | Font | Dùng cho |
+  | :--- | :--- | :--- |
+  | `font-sans` | Inter (400–900) | Giao diện, tiêu đề, nội dung |
+  | `font-mono` | Roboto Mono | Nhãn kỹ thuật, mã hồ sơ, giấy đánh máy |
+  | `font-serif` | EB Garamond | Tiêu đề hồ sơ giấy, epilogue, tài liệu diegetic |
+  | `font-handwriting` | Playpen Sans (dự phòng Caveat) | Ghi chú viết tay trên bảng điều tra |
+
+  - Token khai báo trong `:root` (`--font-geist-sans`, `--font-geist-mono`) và `@theme inline` của `app/globals.css`. Dùng utility, không viết `font-[family-name:...]`, `fontFamily: "monospace"` hay tên font cứng trong JSX.
+  - `Dancing Script` chỉ dùng cho chữ ký trong Dossier Studio.
+  - Không dùng `Special Elite` / `Courier Prime`: hai font này không có glyph tiếng Việt, dấu bị tách.
 
 ---
 

@@ -169,7 +169,7 @@ export function HeroCaseCarousel({
         </div>
 
         {/* Quick parameters - Vertical stack */}
-        <div className="flex flex-col items-center justify-center gap-0.5 text-xs sm:text-sm text-muted-foreground mt-0.5">
+        <div className="flex flex-col items-center justify-center gap-0.5 font-sans text-sm text-muted-foreground mt-0.5">
           <div className="flex items-center gap-1.5">
             <span className="text-zinc-400">Độ khó:</span>
             {isTrontim ? (
@@ -198,7 +198,7 @@ export function HeroCaseCarousel({
       </div>
 
       {/* Action CTA: Phá Án (kính lúp + độ rộng vừa phải); vụ chưa mở thì hiện nút khóa */}
-      <div className="mt-3.5 sm:mt-4 flex items-center justify-center font-mono">
+      <div className="mt-3.5 sm:mt-4 flex items-center justify-center font-sans">
         {isTrontim ? (
           <Link
             href="/cases/case_000"

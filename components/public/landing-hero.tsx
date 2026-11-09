@@ -95,7 +95,7 @@ export function LandingHero({
             <div className="hidden w-full min-h-[52px] lg:flex items-center justify-start">
               <p
                 className={cn(
-                  "text-pretty text-xs lg:text-sm leading-relaxed text-muted-foreground/80 font-mono italic lg:border-l-2 lg:border-amber-500/50 lg:pl-4 transition-all duration-400 ease-in-out",
+                  "text-pretty text-base lg:text-lg leading-snug text-zinc-300/90 font-serif italic lg:border-l-2 lg:border-amber-500/50 lg:pl-4 transition-all duration-400 ease-in-out",
                   isFading ? "opacity-0 -translate-y-1" : "opacity-100 translate-y-0"
                 )}
               >

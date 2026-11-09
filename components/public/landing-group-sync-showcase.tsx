@@ -58,7 +58,7 @@ export function LandingGroupSyncShowcase() {
                         isSolver ? "bg-amber-400" : "bg-emerald-400/80"
                       }`}
                     />
-                    <span className="text-[0.65rem] font-mono text-zinc-300">
+                    <span className="text-xs font-mono text-zinc-300">
                       {name}
                     </span>
                   </div>
@@ -75,7 +75,7 @@ export function LandingGroupSyncShowcase() {
                       );
                     })}
                   </ul>
-                  <div className="mt-2 text-[0.6rem] font-mono text-zinc-500 tabular-nums">
+                  <div className="mt-2 text-xs font-mono text-zinc-500 tabular-nums">
                     {solved}/{CHECKPOINTS.length}
                   </div>
                 </div>

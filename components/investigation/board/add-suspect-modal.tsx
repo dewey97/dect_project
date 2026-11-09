@@ -786,7 +786,7 @@ export function AddSuspectModal({
                 ? "MÂU THUẪN LỜI KHAI:"
                 : "THẨM TRA ĐỐI TƯỢNG:"}
           </h3>
-          <div className="font-[family-name:var(--font-handwriting)] text-base sm:text-lg font-bold text-[#0e2b5c] normal-case tracking-normal">
+          <div className="font-handwriting text-base sm:text-lg font-bold text-[#0e2b5c] normal-case tracking-normal">
             {name || editingSuspect?.name || "Đối tượng điều tra"}
           </div>
           {errorMsg && (
@@ -814,7 +814,7 @@ export function AddSuspectModal({
                 className="size-10 rounded-full object-cover border border-[#2b1f14]/20 shadow-xs shrink-0"
               />
             )}
-            <div className="font-[family-name:var(--font-handwriting)] text-base sm:text-xl font-bold text-[#0e2b5c] normal-case tracking-normal">
+            <div className="font-handwriting text-base sm:text-xl font-bold text-[#0e2b5c] normal-case tracking-normal">
               {name || editingSuspect?.name || "Đối tượng điều tra"}
             </div>
           </div>

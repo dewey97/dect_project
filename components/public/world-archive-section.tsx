@@ -161,14 +161,13 @@ export function WorldArchiveSection() {
                   }}
                 />
                 {/* Dấu Stamp Niêm Phong */}
-                <div
+                <div className="font-mono"
                   style={{
                     position: "absolute",
                     top: 8,
                     right: 6,
                     border: "1.5px solid rgba(180,30,30,0.6)",
                     color: "rgba(175,28,28,0.72)",
-                    fontFamily: "monospace",
                     fontSize: "0.5rem",
                     textTransform: "uppercase",
                     letterSpacing: "0.15em",
@@ -181,9 +180,8 @@ export function WorldArchiveSection() {
                   {f.status}
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                  <span
+                  <span className="font-mono"
                     style={{
-                      fontFamily: "monospace",
                       fontSize: "0.55rem",
                       color: "rgba(60,35,5,0.65)",
                       letterSpacing: "0.2em",
@@ -192,9 +190,8 @@ export function WorldArchiveSection() {
                   >
                     {f.label}
                   </span>
-                  <h3
+                  <h3 className="font-mono"
                     style={{
-                      fontFamily: "monospace",
                       fontSize: "0.75rem",
                       fontWeight: 900,
                       color: "rgba(25,12,0,0.88)",

@@ -83,6 +83,12 @@ export default function RootLayout({
       className="dark font-sans"
       suppressHydrationWarning
     >
+      <head>
+        {/* Google Fonts via <link>: Turbopack drops a remote @import from globals.css, and next/font/google is banned (AGENTS.md §11). */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Roboto+Mono:wght@400;500;600;700&family=Caveat:wght@400;700&family=Playpen+Sans:wght@600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700&family=Dancing+Script:wght@500;700&subset=vietnamese&display=swap" />
+      </head>
       <body suppressHydrationWarning className="min-h-dvh w-full bg-background font-sans text-foreground antialiased">
         {children}
         <FeedbackModal />

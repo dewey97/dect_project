@@ -27,7 +27,7 @@ export function DossierEModal({ isOpen, onClose }: DossierEModalProps) {
         >
           {/* MỞ TÚI HỒ SƠ E CALLOUT */}
           <div className="p-6 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm text-center">
-            <span className="font-typewriter text-lg sm:text-xl font-bold text-[#8c1d1d] uppercase tracking-widest block">
+            <span className="font-mono text-lg sm:text-xl font-bold text-[#8c1d1d] uppercase tracking-widest block">
               📂 MỞ TÚI HỒ SƠ E
             </span>
           </div>
@@ -39,7 +39,7 @@ export function DossierEModal({ isOpen, onClose }: DossierEModalProps) {
               detectiveAudio.playPaperRustle()
               onClose()
             }}
-            className="w-full py-3 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-typewriter text-xs sm:text-sm font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 border-2 border-[#2b1f14] shadow-sm active:scale-95"
+            className="w-full py-3 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs sm:text-sm font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 border-2 border-[#2b1f14] shadow-sm active:scale-95"
           >
             <span>TIẾP TỤC ĐIỀU TRA</span>
             <ArrowRight className="size-4 text-[#d9a066]" />

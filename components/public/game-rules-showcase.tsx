@@ -93,7 +93,7 @@ export function GameRulesShowcase() {
             >
               <RuleIcon className={`size-4 sm:size-4.5 ${isActive ? "text-amber-400" : "text-zinc-500"}`} />
               <div className="flex flex-col items-center sm:items-start text-left">
-                <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">
+                <span className="font-mono text-xs uppercase tracking-widest text-zinc-500">
                   {rule.code}
                 </span>
                 <span className="text-xs sm:text-sm font-bold uppercase tracking-wider">
@@ -126,7 +126,7 @@ export function GameRulesShowcase() {
 
           {/* Checklist */}
           <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-            <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-zinc-300 flex items-center gap-1.5">
+            <span className="font-mono text-xs font-bold uppercase tracking-wider text-zinc-300 flex items-center gap-1.5">
               <ShieldCheck className="size-3.5 text-amber-400" />
               Checklist nghiệp vụ bắt buộc:
             </span>
@@ -150,11 +150,11 @@ export function GameRulesShowcase() {
               alt={activeRule.title}
               className="h-full w-full object-contain grayscale contrast-125 transition-transform duration-300 hover:scale-105"
             />
-            <div className="absolute top-2 left-2 bg-black/80 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-amber-400">
+            <div className="absolute top-2 left-2 bg-black/80 px-2 py-0.5 font-mono text-xs uppercase tracking-wider text-amber-400">
               VẬT CHỨNG ĐỐI CHIẾU
             </div>
           </div>
-          <p className="mt-2 text-center font-mono text-[11px] text-zinc-500">
+          <p className="mt-2 text-center font-sans text-sm text-zinc-500">
             {activeRule.evidenceCaption}
           </p>
         </div>

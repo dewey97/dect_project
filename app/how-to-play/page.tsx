@@ -31,7 +31,7 @@ export default function HowToPlayPage() {
       <main className="flex-1 w-full flex flex-col items-center pb-20">
         {/* Hero Header */}
         <div className="w-full max-w-4xl px-4 pt-12 pb-8 sm:px-6 sm:pt-16 sm:pb-12 text-center flex flex-col items-center gap-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-none border border-amber-500/30 bg-amber-500/10 text-amber-400 font-mono text-[11px] font-bold tracking-widest uppercase">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-none border border-amber-500/30 bg-amber-500/10 text-amber-400 font-mono text-xs font-bold tracking-widest uppercase">
             <ShieldAlert className="size-3.5 text-amber-400" />
             <span>CẨM NANG NGHIỆP VỤ THỰC CHIẾN</span>
           </div>
@@ -72,7 +72,7 @@ export default function HowToPlayPage() {
                   <div className="size-9 rounded-none bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center font-mono font-bold text-xs">
                     01
                   </div>
-                  <span className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">
+                  <span className="font-mono text-xs text-zinc-500 uppercase tracking-widest">
                     BƯỚC KHỞI ĐẦU
                   </span>
                 </div>
@@ -87,7 +87,7 @@ export default function HowToPlayPage() {
                 </p>
               </div>
 
-              <div className="border-t border-zinc-900 pt-3 text-[11px] font-mono text-zinc-500">
+              <div className="border-t border-zinc-900 pt-3 text-sm font-sans text-zinc-500">
                 Mục tiêu: Xác định thời điểm và cơ chế tử vong.
               </div>
             </div>
@@ -99,7 +99,7 @@ export default function HowToPlayPage() {
                   <div className="size-9 rounded-none bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center font-mono font-bold text-xs">
                     02
                   </div>
-                  <span className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">
+                  <span className="font-mono text-xs text-zinc-500 uppercase tracking-widest">
                     BÓC TÁCH MANH MỐI
                   </span>
                 </div>
@@ -114,7 +114,7 @@ export default function HowToPlayPage() {
                 </p>
               </div>
 
-              <div className="border-t border-zinc-900 pt-3 text-[11px] font-mono text-zinc-500">
+              <div className="border-t border-zinc-900 pt-3 text-sm font-sans text-zinc-500">
                 Mục tiêu: Lật tẩy các bằng chứng ngoại phạm giả tạo.
               </div>
             </div>
@@ -126,7 +126,7 @@ export default function HowToPlayPage() {
                   <div className="size-9 rounded-none bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center font-mono font-bold text-xs">
                     03
                   </div>
-                  <span className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">
+                  <span className="font-mono text-xs text-zinc-500 uppercase tracking-widest">
                     KHÉP LẠI CHUYÊN ÁN
                   </span>
                 </div>
@@ -141,7 +141,7 @@ export default function HowToPlayPage() {
                 </p>
               </div>
 
-              <div className="border-t border-zinc-900 pt-3 text-[11px] font-mono text-zinc-500">
+              <div className="border-t border-zinc-900 pt-3 text-sm font-sans text-zinc-500">
                 Mục tiêu: Đưa sự thật ra ánh sáng và khép lại vụ án.
               </div>
             </div>

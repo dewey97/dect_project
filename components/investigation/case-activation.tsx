@@ -558,7 +558,7 @@ export function CaseActivation({ initialCases }: CaseActivationProps = {}) {
                       />
 
                       <Paperclip className="size-3.5 shrink-0 opacity-80 relative z-10" />
-                      <span className="font-[family-name:var(--font-handwriting)] text-sm font-bold tracking-wide relative z-10">
+                      <span className="font-handwriting text-sm font-bold tracking-wide relative z-10">
                         {cItem.code} // {cItem.title}
                       </span>
                     </div>
@@ -591,7 +591,7 @@ export function CaseActivation({ initialCases }: CaseActivationProps = {}) {
                       <div className="inline-block">
                         <span
                           className={cn(
-                            "font-[family-name:var(--font-handwriting)] text-2xl sm:text-3xl font-bold text-[#1a0f07] tracking-wide leading-none bg-[#f4e8d8] px-3.5 py-1.5 rounded shadow-sm border border-[#2b1b0e]/20 inline-block transition-transform",
+                            "font-handwriting text-2xl sm:text-3xl font-bold text-[#1a0f07] tracking-wide leading-none bg-[#f4e8d8] px-3.5 py-1.5 rounded shadow-sm border border-[#2b1b0e]/20 inline-block transition-transform",
                             cItem.tapeRotateClass,
                           )}
                         >
@@ -653,7 +653,7 @@ export function CaseActivation({ initialCases }: CaseActivationProps = {}) {
                 <span className="font-mono text-[0.65rem] text-[#2b1b0e] font-black uppercase tracking-widest">
                   XÁC THỰC KÍCH HOẠT // {selectedCase.code}
                 </span>
-                <h2 className="font-[family-name:var(--font-handwriting)] text-2xl font-bold text-[#1a0f07]">
+                <h2 className="font-handwriting text-2xl font-bold text-[#1a0f07]">
                   {selectedCase.title}
                 </h2>
               </div>
@@ -793,7 +793,7 @@ export function CaseActivation({ initialCases }: CaseActivationProps = {}) {
                 <div className="inline-block">
                   <span
                     className={cn(
-                      "font-[family-name:var(--font-handwriting)] text-3xl font-bold text-[#1a0f07] bg-[#f4e8d8] px-4 py-1.5 rounded shadow-sm border border-[#2b1b0e]/20 inline-block",
+                      "font-handwriting text-3xl font-bold text-[#1a0f07] bg-[#f4e8d8] px-4 py-1.5 rounded shadow-sm border border-[#2b1b0e]/20 inline-block",
                       selectedCase.tapeRotateClass,
                     )}
                   >
@@ -849,7 +849,7 @@ export function CaseActivation({ initialCases }: CaseActivationProps = {}) {
                   TANG CHỨNG HÌNH ẢNH #01
                 </span>
               </div>
-              <span className="font-[family-name:var(--font-handwriting)] text-sm font-bold text-[#1f1208] text-center mt-1">
+              <span className="font-handwriting text-sm font-bold text-[#1f1208] text-center mt-1">
                 {`Hiện trường vụ án ${selectedCase.code || selectedCase.title}`}
               </span>
             </div>
@@ -872,7 +872,7 @@ export function CaseActivation({ initialCases }: CaseActivationProps = {}) {
                   MẬT
                 </span>
               </div>
-              <p className="font-[family-name:var(--font-handwriting)] text-base leading-snug font-bold text-[#1a0f07]">
+              <p className="font-handwriting text-base leading-snug font-bold text-[#1a0f07]">
                 {selectedCase.summary
                   ? `"${selectedCase.summary.slice(0, 75)}..."`
                   : '"Chúng tôi đã ghi nhận các bất thường tại hiện trường vụ việc..."'}
@@ -896,7 +896,7 @@ export function CaseActivation({ initialCases }: CaseActivationProps = {}) {
                   TANG CHỨNG HÌNH ẢNH #02
                 </span>
               </div>
-              <span className="font-[family-name:var(--font-handwriting)] text-xs font-bold text-[#1f1208] text-center mt-0.5">
+              <span className="font-handwriting text-xs font-bold text-[#1f1208] text-center mt-0.5">
                 Vật chứng số 4-B
               </span>
             </div>

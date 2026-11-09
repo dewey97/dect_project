@@ -544,7 +544,7 @@ export function renderScene({
       const textStartX = eyeletX + (8 * scaleFactor) / transform.scale;
       const maxTextW = badgeWidth - (textStartX - tagX) - (8 * scaleFactor) / transform.scale;
       let bFontSize = (11.5 * scaleFactor) / transform.scale;
-      context.font = `700 ${bFontSize}px 'Courier Prime', 'Roboto Mono', 'Special Elite', monospace`;
+      context.font = `700 ${bFontSize}px 'Roboto Mono', monospace`;
 
       const badgeText = (pin.label || "").trim().toUpperCase();
       while (
@@ -552,7 +552,7 @@ export function renderScene({
         context.measureText(badgeText).width > maxTextW
       ) {
         bFontSize -= 0.5 * scaleFactor;
-        context.font = `700 ${bFontSize}px 'Courier Prime', 'Roboto Mono', 'Special Elite', monospace`;
+        context.font = `700 ${bFontSize}px 'Roboto Mono', monospace`;
       }
 
       context.fillStyle = "#1e140c";
@@ -768,7 +768,7 @@ export function renderScene({
         scaleFactor *
         scaleMod *
         textScaleMod;
-      context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
+      context.font = `700 ${fontSize / transform.scale}px 'Playpen Sans', 'Caveat', 'Segoe Print', cursive`;
       let lines = wrapText(context, pin.label, maxTextWidth, 3);
 
       const minFontSize = 7.0 * scaleFactor * scaleMod * textScaleMod;
@@ -780,7 +780,7 @@ export function renderScene({
             availableHeight)
       ) {
         fontSize -= 0.5 * scaleFactor;
-        context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
+        context.font = `700 ${fontSize / transform.scale}px 'Playpen Sans', 'Caveat', 'Segoe Print', cursive`;
         lines = wrapText(context, pin.label, maxTextWidth, 3);
       }
 
@@ -807,7 +807,7 @@ export function renderScene({
         context.fillRect(tagX, tagY, noteWidth, noteHeight);
 
         // Plain white text, larger, centered
-        context.font = `900 ${(15.0 * scaleFactor) / transform.scale}px 'Courier New', monospace, sans-serif`;
+        context.font = `900 ${(15.0 * scaleFactor) / transform.scale}px 'Roboto Mono', monospace`;
         context.fillStyle = "#ffffff";
         context.textAlign = "center";
         context.textBaseline = "middle";
@@ -833,7 +833,7 @@ export function renderScene({
         const centerY = tagY + noteHeight * 0.62;
         const tickFontSize = (noteHeight * 0.32) / transform.scale;
 
-        context.font = `900 ${tickFontSize}px 'Playpen Sans', 'Caveat', 'Segoe Print', 'Patrick Hand', cursive, sans-serif`;
+        context.font = `900 ${tickFontSize}px 'Playpen Sans', 'Caveat', 'Segoe Print', cursive`;
         context.fillStyle = "#1a120b";
         context.textAlign = "center";
         context.textBaseline = "middle";
