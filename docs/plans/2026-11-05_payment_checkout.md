@@ -20,6 +20,7 @@ Khác với bản kế hoạch dưới đây:
 - `orders` có thêm trạng thái `failed` (tạo link PayOS lỗi, hoặc số tiền lệch) và cột `group_credits` chụp lại lúc mua.
 - Link thanh toán hết hạn sau 15 phút (`expiredAt`).
 - Seed case_000: Solo 69.000đ, Nhóm 79.000đ (+1 lượt), Party 89.000đ (+3 lượt), Bộ hộp chưa có link sàn. Sửa giá bằng SQL trên `case_offers`.
+- Cập nhật 2026-11-09: chỉ bán Solo và Party, ẩn gói Nhóm, thêm `party-upgrade` 20.000đ cho người đã sở hữu (xem `license_access.md` mục 5). Dữ liệu: chạy `db/schema/54_offers_solo_party.sql` **sau khi deploy code**.
 - `/buy/<case_id>` nay chuyển hướng sang `/cases/<case_id>#online` (trang vụ án, xem mục Flow).
 - `.env.example` chưa được cập nhật tự động (agent không có quyền đọc file `.env*`). Cần thêm tay 5 dòng: `PAYOS_CLIENT_ID=`, `PAYOS_API_KEY=`, `PAYOS_CHECKSUM_KEY=`, `APP_BASE_URL=`, `PLAY_GATING_ENABLED=false`.
 
@@ -42,7 +43,7 @@ Landing (băng chuyền: badge sở hữu + [Chơi online] [Đặt hộp], hoặ
   ├── badge: Chưa sở hữu / Đã có bản online / Đã kích hoạt hộp
   ├── [Vào chơi]  khóa khi bật chặn và chưa sở hữu
   ├── #box     ảnh hộp, [Đặt hàng] (link sàn), form "Nhập mã trong nắp hộp"
-  └── #online  gói Solo / Nhóm / Party, [Mua] → PayOS → /buy/result/<orderCode>
+  └── #online  thẻ Solo / Party, mỗi thẻ một nút [Mua] → PayOS → /buy/result/<orderCode>
   ▼
 /play/<case_id>    Tạo phòng / Vào phòng / Chơi một mình
 ```

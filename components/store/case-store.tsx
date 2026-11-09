@@ -6,15 +6,11 @@ import { useRouter } from "next/navigation";
 import {
   ExternalLink,
   Monitor,
+  Package,
   Star,
-  ShieldCheck,
-  Truck,
-  RotateCcw,
   ThumbsUp,
   Send,
   ArrowRight,
-  Flame,
-  Check,
   ZoomIn,
   ZoomOut,
   X,
@@ -23,6 +19,7 @@ import {
 } from "lucide-react";
 import { PlayButton, PlayError } from "@/components/play/play-ui";
 import { formatVnd } from "@/lib/payments/format";
+import { isUpgradeSku } from "@/lib/payments/offers";
 import { SafeImg } from "@/components/ui/safe-img";
 import { LandingFooter } from "@/components/public/landing-footer";
 import { LandingNavbar } from "@/components/public/landing-navbar";
@@ -49,6 +46,9 @@ const CHECKOUT_ERRORS: Record<string, string> = {
   already_owned: "Bạn đã sở hữu vụ án này rồi.",
   login_required: "Vui lòng đăng nhập để tiếp tục.",
   payos_misconfigured: "Cổng thanh toán đang bảo trì. Vui lòng thử lại sau.",
+  payments_disabled: "Cổng thanh toán đang bảo trì. Vui lòng thử lại sau.",
+  upgrade_requires_license: "Gói nâng cấp chỉ dành cho người đã sở hữu vụ án.",
+  rate_limited: "Bạn thao tác quá nhanh. Thử lại sau ít phút.",
 };
 
 interface UserReview {
@@ -197,29 +197,25 @@ export function CaseStore({
   const onlineOffers = offers.filter((o) => o.kind === "online");
   const boxOffer = offers.find((o) => o.kind === "box") ?? null;
 
-  // Online options list
-  const onlineOptions = onlineOffers.map((o) => ({
-    key: `online-${o.sku}`,
-    sku: o.sku,
-    title: o.title,
-    priceVnd: o.priceVnd,
-    description:
-      o.description ||
-      (o.groupCredits > 0
-        ? `Quyền truy cập trực tuyến không giới hạn + ${o.groupCredits} lượt tạo phòng chơi nhóm cho đồng đội.`
-        : "Quyền truy cập trực tuyến không giới hạn toàn bộ hồ sơ, hiện trường 360 và điện thoại tang vật."),
-    data: o,
-  }));
-
-  // Selected online package
-  const [selectedOnlineKey, setSelectedOnlineKey] = useState<string>(() => {
-    return onlineOptions[0]?.key || "online-default";
-  });
-
-  const selectedOnlineOption =
-    onlineOptions.find((opt) => opt.key === selectedOnlineKey) ||
-    onlineOptions[0] ||
-    null;
+  // Online offers: purchase cards (Solo, Party) for new players, upgrade cards for owners.
+  const describe = (o: CaseOffer) =>
+    o.description ||
+    (o.groupCredits > 0
+      ? `Chơi trọn vụ án + ${o.groupCredits} lượt mở phòng chơi nhóm cho bạn bè.`
+      : "Chơi trọn vụ án một mình: hồ sơ, hiện trường 360 và điện thoại tang vật.");
+  const purchaseOffers = onlineOffers
+    .filter((o) => !isUpgradeSku(o.sku))
+    .sort((a, b) => a.priceVnd - b.priceVnd);
+  const upgradeOffers = onlineOffers.filter((o) => isUpgradeSku(o.sku));
+  const visibleOffers = owned ? upgradeOffers : purchaseOffers;
+  // Highlight the group offer when there is a choice.
+  const featuredSku =
+    visibleOffers.length > 1
+      ? visibleOffers.reduce((a, b) =>
+          b.groupCredits > a.groupCredits ? b : a,
+        ).sku
+      : null;
+  const startingPrice = purchaseOffers[0]?.priceVnd ?? 0;
 
   // Always use a valid poster URL (guarantee /poster_c0.webp fallback)
   const effectiveCover =
@@ -248,10 +244,14 @@ export function CaseStore({
       if (!isZoomOpen) return;
       if (e.key === "Escape") setIsZoomOpen(false);
       if (e.key === "ArrowLeft") {
-        setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : galleryImages.length - 1));
+        setActiveImageIndex((prev) =>
+          prev > 0 ? prev - 1 : galleryImages.length - 1,
+        );
       }
       if (e.key === "ArrowRight") {
-        setActiveImageIndex((prev) => (prev < galleryImages.length - 1 ? prev + 1 : 0));
+        setActiveImageIndex((prev) =>
+          prev < galleryImages.length - 1 ? prev + 1 : 0,
+        );
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -259,6 +259,14 @@ export function CaseStore({
   }, [isZoomOpen, galleryImages.length]);
 
   // Online checkout state
+  // Selected online offer: defaults to the featured (group) offer.
+  const [selectedSku, setSelectedSku] = useState<string | null>(null);
+  const selectedOffer =
+    visibleOffers.find((o) => o.sku === selectedSku) ??
+    visibleOffers.find((o) => o.sku === featuredSku) ??
+    visibleOffers[0] ??
+    null;
+
   const [pendingSku, setPendingSku] = useState<string | null>(null);
   const [buyError, setBuyError] = useState<string | null>(null);
 
@@ -300,10 +308,12 @@ export function CaseStore({
 
     const brandNewReview: UserReview = {
       id: `rev-${Date.now()}`,
-      author: newAuthor.trim() || (loggedIn ? "Thám tử ẩn danh" : "Người chơi XPLORE"),
+      author:
+        newAuthor.trim() ||
+        (loggedIn ? "Thám tử ẩn danh" : "Người chơi XPLORE"),
       rating: newRating,
       date: new Date().toISOString().slice(0, 16).replace("T", " "),
-      variant: selectedOnlineOption?.title || "Bản Điều Tra",
+      variant: purchaseOffers[0]?.title || "Bản Điều Tra",
       content: newComment.trim(),
       likes: 1,
     };
@@ -328,7 +338,7 @@ export function CaseStore({
 
   return (
     <div className="min-h-dvh w-full flex flex-col justify-between bg-background text-foreground font-sans antialiased selection:bg-amber-500 selection:text-zinc-950">
-      {/* Sticky Top Bar Synced 100% across the platform (No 'Vào chơi' or 'Chưa sở hữu' in header) */}
+      {/* Sticky Top Bar */}
       <LandingNavbar active="cases" />
 
       {/* Main Container */}
@@ -338,9 +348,9 @@ export function CaseStore({
           {/* Left Column: Image Gallery (Object contain, full display with dark padding & zoom) */}
           <div className="lg:col-span-7">
             <div className="space-y-3">
-              {/* Main Image Container: object-contain with black padding to show 100% of the image */}
+              {/* Main Image Container: object-contain with black padding to show 100% of the image (aspect-square 1:1) */}
               <div
-                className="group relative aspect-[4/3] w-full overflow-hidden rounded-none border border-zinc-800 bg-zinc-950 flex items-center justify-center p-2 cursor-zoom-in select-none"
+                className="group relative aspect-square w-full overflow-hidden rounded-none border border-zinc-800 bg-zinc-950 flex items-center justify-center p-2 cursor-zoom-in select-none"
                 onClick={() => {
                   setZoomScale(1);
                   setIsZoomOpen(true);
@@ -348,20 +358,15 @@ export function CaseStore({
                 title="Nhấn để phóng to ảnh"
               >
                 <SafeImg
+                  key={galleryImages[activeImageIndex] || galleryImages[0]}
                   src={galleryImages[activeImageIndex] || galleryImages[0]}
                   fallbackSrc="/poster_c0.webp"
                   alt={`Ảnh hồ sơ ${caseTitle}`}
                   className="h-full w-full object-contain transition-transform duration-200 group-hover:scale-[1.02]"
                 />
-
-                {/* Phóng to button indicator */}
-                <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1.5 rounded-none bg-black/80 px-2.5 py-1 text-[11px] font-mono text-zinc-300 opacity-80 backdrop-blur-sm transition-opacity group-hover:opacity-100">
-                  <ZoomIn className="size-3.5 text-amber-400" />
-                  <span>Phóng to</span>
-                </div>
               </div>
 
-              {/* Thumbnails row (rounded-none, object-contain) */}
+              {/* Thumbnails row (rounded-none, object-contain, aspect-square) */}
               <div className="flex items-center gap-2 overflow-x-auto pb-1">
                 {galleryImages.map((imgSrc, idx) => {
                   const isActive = idx === activeImageIndex;
@@ -370,7 +375,7 @@ export function CaseStore({
                       key={idx}
                       type="button"
                       onClick={() => setActiveImageIndex(idx)}
-                      className={`relative aspect-[4/3] w-20 shrink-0 overflow-hidden rounded-none border bg-zinc-950 p-1 flex items-center justify-center transition-all ${
+                      className={`relative aspect-square w-16 sm:w-20 shrink-0 overflow-hidden rounded-none border bg-zinc-950 p-1 flex items-center justify-center transition-all cursor-pointer ${
                         isActive
                           ? "border-amber-500 ring-1 ring-amber-500"
                           : "border-zinc-800 opacity-60 hover:border-zinc-600 hover:opacity-100"
@@ -380,81 +385,69 @@ export function CaseStore({
                         src={imgSrc}
                         fallbackSrc="/poster_c0.webp"
                         alt={`Ảnh thumbnail ${idx + 1}`}
-                        className="h-full w-full object-contain"
+                        className="h-full w-full object-contain pointer-events-none"
                       />
                     </button>
                   );
                 })}
               </div>
-
-              {/* Assurance points */}
-              <div className="grid grid-cols-3 gap-2 border-t border-zinc-900 pt-4 text-center text-xs text-zinc-400">
-                <div className="flex flex-col items-center gap-1">
-                  <ShieldCheck className="size-4 text-amber-400" />
-                  <span>Bảo mật kịch bản 100%</span>
-                </div>
-                <div className="flex flex-col items-center gap-1">
-                  <Truck className="size-4 text-amber-400" />
-                  <span>Freeship toàn quốc</span>
-                </div>
-                <div className="flex flex-col items-center gap-1">
-                  <RotateCcw className="size-4 text-amber-400" />
-                  <span>Đổi trả 1-1 trong 7 ngày</span>
-                </div>
-              </div>
             </div>
           </div>
 
           {/* Right Column: Case Info, Options & Action Buttons */}
-          <div className="flex flex-col justify-start space-y-5 lg:col-span-5">
-            {/* Classification & Title */}
+          <div className="flex flex-col justify-start space-y-4 lg:col-span-5">
+            {/* Title & Quick Rating Header */}
             <div className="space-y-1.5">
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-xs font-semibold uppercase tracking-widest text-amber-400">
-                  XPLORE DETECTIVE CASE // #{caseId.toUpperCase()}
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-none bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-400">
-                  <Flame className="size-3" /> BESTSELLER
-                </span>
-              </div>
               <h1 className="text-2xl font-black uppercase tracking-tight text-zinc-50 sm:text-3xl">
                 {caseTitle}
               </h1>
 
-              {/* Shopee-style quick review rating header */}
-              <div className="flex flex-wrap items-center gap-3 pt-1 text-xs">
+              {/* Quick review rating header */}
+              <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-400 pt-0.5">
                 <div className="flex items-center gap-1 text-amber-400">
                   <span className="font-bold underline">5.0</span>
                   <div className="flex">
                     {[1, 2, 3, 4, 5].map((s) => (
-                      <Star key={s} className="size-3 fill-amber-400 text-amber-400" />
+                      <Star
+                        key={s}
+                        className="size-3 fill-amber-400 text-amber-400"
+                      />
                     ))}
                   </div>
                 </div>
-                <span className="text-zinc-600">|</span>
-                <a href="#reviews" className="text-zinc-400 underline hover:text-zinc-200">
+                <span className="text-zinc-600">·</span>
+                <a href="#reviews" className="underline hover:text-zinc-200">
                   128 Đánh giá
                 </a>
-                <span className="text-zinc-600">|</span>
-                <span className="text-zinc-400">Đã bán 450+</span>
+                <span className="text-zinc-600">·</span>
+                <span>Đã bán 450+</span>
               </div>
             </div>
 
-            {/* Dynamic Price Banner */}
-            <div className="rounded-none border border-zinc-800/80 bg-zinc-900/40 p-4">
-              <div className="flex items-baseline gap-3">
+            {/* Status / Price Display */}
+            <div className="py-0.5">
+              {owned ? (
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="font-mono text-2xl sm:text-3xl font-black text-emerald-400 uppercase tracking-tight">
+                    ĐÃ SỞ HỮU
+                  </span>
+                  {ownership.groupCredits > 0 ? (
+                    <span className="font-mono text-xs text-zinc-300 bg-zinc-900 border border-zinc-800 px-2 py-0.5">
+                      Còn {ownership.groupCredits} lượt tạo phòng nhóm
+                    </span>
+                  ) : (
+                    <span className="font-mono text-xs text-zinc-500">
+                      (Bản quyền trực tuyến vĩnh viễn)
+                    </span>
+                  )}
+                </div>
+              ) : (
                 <span className="font-mono text-3xl font-extrabold text-amber-400">
-                  {selectedOnlineOption && selectedOnlineOption.priceVnd > 0
-                    ? formatVnd(selectedOnlineOption.priceVnd)
+                  {startingPrice > 0
+                    ? `Từ ${formatVnd(startingPrice)}`
                     : "199.000₫"}
                 </span>
-                <span className="font-mono text-xs text-zinc-400">
-                  (Bản Online trên web)
-                </span>
-              </div>
-              <p className="mt-1.5 text-xs text-zinc-400 leading-relaxed">
-                Mở khóa trực tuyến vĩnh viễn trên trình duyệt, không cần chờ đợi giao hàng. Hoặc đặt mua Bộ Hộp Hồ Sơ Vật Lý (199.000₫) để nhận hồ sơ in tận tay.
-              </p>
+              )}
             </div>
 
             {/* Synopsis */}
@@ -464,148 +457,192 @@ export function CaseStore({
               </p>
             )}
 
-            {/* CLASSIFICATION: CHỌN GÓI CHƠI ONLINE (Đã bỏ khối Hộp vật lý lặp lại thừa) */}
-            <div id="pricing" className="space-y-3 pt-1">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Monitor className="size-3.5 text-amber-400" />
-                  <span className="text-xs font-bold uppercase tracking-wider text-zinc-300 font-mono">
-                    Chọn gói chơi online:
-                  </span>
+            {/* Primary action for players who can already play: kept apart from the offers */}
+            {canPlay && (
+              <Link
+                href={`/play/${caseId}`}
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-none bg-emerald-500 px-4 text-sm font-bold uppercase tracking-wider text-zinc-950 transition-colors hover:bg-emerald-400"
+              >
+                <span>Vào chơi ngay</span>
+                <ArrowRight className="size-4" aria-hidden />
+              </Link>
+            )}
+
+            {/* ONLINE OFFERS: one card per offer, each with its own buy button */}
+            <div id="pricing" className="space-y-2.5 pt-1">
+              {visibleOffers.length > 0 && (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Monitor className="size-3.5 text-amber-400" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-300 font-mono">
+                      {owned ? "Nâng cấp chơi nhóm:" : "Chọn cách chơi online:"}
+                    </span>
+                  </div>
+                  {owned && (
+                    <span className="text-xs font-semibold text-emerald-400">
+                      ✓ Đã sở hữu vụ án
+                    </span>
+                  )}
                 </div>
-                {owned && (
-                  <span className="text-xs font-semibold text-emerald-400">
-                    ✓ Đã sở hữu vụ án
-                  </span>
-                )}
-              </div>
-
-              {/* Online Packages Buttons */}
-              <div className="flex flex-wrap items-center gap-2">
-                {onlineOptions.map((opt) => {
-                  const isSelected = selectedOnlineKey === opt.key;
-                  return (
-                    <button
-                      key={opt.key}
-                      type="button"
-                      onClick={() => setSelectedOnlineKey(opt.key)}
-                      className={`inline-flex items-center gap-2 rounded-none px-3.5 py-2 text-xs font-semibold transition-all ${
-                        isSelected
-                          ? "border border-amber-500 bg-amber-500/15 text-amber-300 shadow-sm"
-                          : "border border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
-                      }`}
-                    >
-                      <span>{opt.title} · {formatVnd(opt.priceVnd)}</span>
-                      {isSelected && <Check className="size-3 text-amber-400" />}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Description text of selected online package (No box / no frame) */}
-              {selectedOnlineOption?.description && (
-                <p className="text-xs leading-relaxed text-zinc-400 pt-0.5">
-                  <span className="text-zinc-500">Mô tả gói: </span>
-                  {selectedOnlineOption.description}
-                </p>
               )}
-            </div>
 
-            {/* SEPARATED ACTION BUTTONS: Bản Online vs Bản Hộp Vật Lý */}
-            <div className="space-y-3 pt-3 border-t border-zinc-800/80">
-              {/* If user already has access to play this case, show prominently 'Vào chơi' */}
-              {canPlay ? (
-                <Link
-                  href={`/play/${caseId}`}
-                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-none bg-emerald-500 px-4 text-sm font-bold uppercase tracking-wider text-zinc-950 transition-colors hover:bg-emerald-400"
-                >
-                  <span>Vào chơi ngay</span>
-                  <ArrowRight className="size-4" aria-hidden />
-                </Link>
-              ) : (
-                <div>
+              {selectedOffer && (
+                <>
+                  {/* Small selectable price boxes */}
+                  <div
+                    role="radiogroup"
+                    aria-label="Gói chơi online"
+                    className="flex flex-wrap gap-2"
+                  >
+                    {visibleOffers.map((o) => {
+                      const selected = o.sku === selectedOffer.sku;
+                      return (
+                        <button
+                          key={o.sku}
+                          type="button"
+                          role="radio"
+                          aria-checked={selected}
+                          onClick={() => setSelectedSku(o.sku)}
+                          className={`relative flex min-h-11 min-w-[7.5rem] flex-col items-start rounded-none border px-3 py-2 text-left transition-colors cursor-pointer ${
+                            selected
+                              ? "border-amber-500 bg-amber-500/10"
+                              : "border-zinc-800 bg-zinc-900/60 hover:border-zinc-600"
+                          }`}
+                        >
+                          {o.sku === featuredSku && (
+                            <span className="absolute -top-2 right-2 bg-amber-500 px-1.5 font-mono text-[0.55rem] font-bold uppercase tracking-wider text-zinc-950">
+                              Phổ biến
+                            </span>
+                          )}
+                          <span
+                            className={`text-sm font-bold ${selected ? "text-amber-200" : "text-zinc-200"}`}
+                          >
+                            {o.title}
+                          </span>
+                          <span className="font-mono text-sm font-extrabold text-amber-400">
+                            {formatVnd(o.priceVnd)}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Description follows the selected box */}
+                  <p
+                    key={selectedOffer.sku}
+                    aria-live="polite"
+                    className="text-xs leading-relaxed text-zinc-400 animate-in fade-in duration-200"
+                  >
+                    {describe(selectedOffer)}
+                  </p>
+
                   <PlayButton
                     className="w-full rounded-none py-3 text-sm font-bold uppercase tracking-wider"
                     variant="primary"
                     disabled={!paymentsEnabled || pendingSku !== null}
-                    onClick={() => selectedOnlineOption && buy(selectedOnlineOption.sku)}
+                    onClick={() => buy(selectedOffer.sku)}
                   >
                     {!paymentsEnabled
-                      ? "Sắp mở bán trực tuyến"
-                      : pendingSku === selectedOnlineOption?.sku
+                      ? "Sắp mở bán"
+                      : pendingSku === selectedOffer.sku
                         ? "Đang tạo đơn hàng PayOS…"
-                        : loggedIn
-                          ? `Mở khóa bản online ngay · ${formatVnd(selectedOnlineOption?.priceVnd || 0)}`
-                          : "Đăng nhập để mua bản online"}
+                        : !loggedIn
+                          ? "Đăng nhập để mua"
+                          : owned
+                            ? `Nâng cấp · ${formatVnd(selectedOffer.priceVnd)}`
+                            : `Mua ${selectedOffer.title} · ${formatVnd(selectedOffer.priceVnd)}`}
                   </PlayButton>
-                  <PlayError>{buyError}</PlayError>
-                </div>
+                </>
               )}
+              <PlayError>{buyError}</PlayError>
+            </div>
 
-              {/* Physical Box External Link Button */}
-              <div>
-                <a
-                  href={boxOffer?.externalUrl || "https://shopee.vn"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-none border border-amber-500/40 bg-amber-500/10 px-4 text-sm font-bold uppercase tracking-wider text-amber-400 transition-colors hover:bg-amber-500/20 hover:border-amber-500"
-                >
-                  <span>Đặt hàng hộp vật lý (199.000₫)</span>
-                  <ExternalLink className="size-4" aria-hidden />
-                </a>
+            <div className="space-y-2.5 pt-2">
+              {/* Physical box: title + two plain shop links, same style, no price */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Package className="size-3.5 text-amber-400" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-zinc-300 font-mono">
+                    Đặt hộp hồ sơ vật lý:
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <a
+                    href={boxOffer?.externalUrl || "https://shopee.vn"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-10 sm:min-h-9 items-center gap-1.5 rounded-none border border-zinc-700 bg-zinc-900/60 px-3.5 text-xs font-semibold text-zinc-200 transition-colors hover:border-amber-500/60 hover:text-amber-300"
+                  >
+                    <span>Shopee</span>
+                    <ExternalLink className="size-3 shrink-0" aria-hidden />
+                  </a>
+                  <a
+                    href="https://www.tiktok.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-10 sm:min-h-9 items-center gap-1.5 rounded-none border border-zinc-700 bg-zinc-900/60 px-3.5 text-xs font-semibold text-zinc-200 transition-colors hover:border-amber-500/60 hover:text-amber-300"
+                  >
+                    <span>TikTok Shop</span>
+                    <ExternalLink className="size-3 shrink-0" aria-hidden />
+                  </a>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Section: Shopee-Style Reviews and Feedback */}
-        <section id="reviews" className="mt-14 border-t border-zinc-800 pt-10">
+        {/* Section: Reviews and Feedback (Clean minimal layout, no redundant box frames) */}
+        <section id="reviews" className="mt-14 pt-8 border-t border-zinc-900">
           <div className="space-y-6">
-            <h2 className="text-lg font-bold uppercase tracking-wider text-zinc-100">
-              ĐÁNH GIÁ SẢN PHẨM
-            </h2>
-
-            {/* Rating Overview Box */}
-            <div className="flex flex-col gap-6 rounded-none border border-zinc-800 bg-zinc-900/40 p-5 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex flex-col items-center">
-                  <span className="font-mono text-4xl font-black text-amber-400">5.0</span>
-                  <div className="flex text-amber-400 mt-1">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-lg font-bold uppercase tracking-wider text-zinc-100">
+                  ĐÁNH GIÁ SẢN PHẨM
+                </h2>
+                <div className="flex items-center gap-3 mt-1.5">
+                  <span className="font-mono text-2xl font-black text-amber-400">
+                    5.0
+                  </span>
+                  <div className="flex text-amber-400">
                     {[1, 2, 3, 4, 5].map((s) => (
-                      <Star key={s} className="size-3.5 fill-amber-400 text-amber-400" />
+                      <Star
+                        key={s}
+                        className="size-3.5 fill-amber-400 text-amber-400"
+                      />
                     ))}
                   </div>
-                  <span className="text-[11px] text-zinc-500 mt-1">trên 5 sao</span>
+                  <span className="text-xs text-zinc-500">
+                    trên 5 sao (128 lượt)
+                  </span>
                 </div>
+              </div>
 
-                <div className="h-10 w-px bg-zinc-800 hidden sm:block" />
-
-                <div className="flex flex-wrap items-center gap-2">
-                  {[
-                    { id: "all", label: "Tất cả" },
-                    { id: "5star", label: "5 Sao (120)" },
-                    { id: "4star", label: "4 Sao (8)" },
-                  ].map((filter) => (
-                    <button
-                      key={filter.id}
-                      type="button"
-                      onClick={() => setActiveFilter(filter.id)}
-                      className={`rounded-none px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-colors ${
-                        activeFilter === filter.id
-                          ? "border border-amber-500 bg-amber-500/10 text-amber-400"
-                          : "border border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
-                      }`}
-                    >
-                      {filter.label}
-                    </button>
-                  ))}
-                </div>
+              {/* Filters */}
+              <div className="flex flex-wrap items-center gap-2">
+                {[
+                  { id: "all", label: "Tất cả" },
+                  { id: "5star", label: "5 Sao (120)" },
+                  { id: "4star", label: "4 Sao (8)" },
+                ].map((filter) => (
+                  <button
+                    key={filter.id}
+                    type="button"
+                    onClick={() => setActiveFilter(filter.id)}
+                    className={`rounded-none px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
+                      activeFilter === filter.id
+                        ? "border border-amber-500 bg-amber-500/10 text-amber-400"
+                        : "border border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
+                    }`}
+                  >
+                    {filter.label}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Always-open Review Input Form */}
-            <div className="rounded-none border border-zinc-800/80 bg-zinc-950/60 p-5">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-300 mb-3">
+            {/* Review Input Form: Direct minimal inputs without outer container box */}
+            <div className="pt-1">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2.5">
                 Viết đánh giá của bạn
               </h3>
               <form onSubmit={handleAddReview} className="space-y-3">
@@ -615,7 +652,7 @@ export function CaseStore({
                     value={newAuthor}
                     onChange={(e) => setNewAuthor(e.target.value)}
                     placeholder="Tên thám tử / Biệt danh (tuỳ chọn)"
-                    className="w-full rounded-none border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-xs text-zinc-200 placeholder:text-zinc-600 focus:border-amber-500/60 focus:outline-none"
+                    className="w-full rounded-none border border-zinc-800/80 bg-zinc-900/50 px-3 py-2 text-xs text-zinc-200 placeholder:text-zinc-600 focus:border-amber-500/60 focus:outline-none"
                   />
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-zinc-400">Đánh giá:</span>
@@ -625,7 +662,7 @@ export function CaseStore({
                           key={star}
                           type="button"
                           onClick={() => setNewRating(star)}
-                          className="p-0.5 hover:scale-110 transition-transform"
+                          className="p-0.5 hover:scale-110 transition-transform cursor-pointer"
                         >
                           <Star
                             className={`size-4 ${
@@ -645,7 +682,7 @@ export function CaseStore({
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder="Chia sẻ trải nghiệm khám nghiệm hiện trường, bóc tách mâu thuẫn lời khai..."
-                  className="w-full rounded-none border border-zinc-800 bg-zinc-900/60 p-3 text-xs text-zinc-200 placeholder:text-zinc-600 focus:border-amber-500/60 focus:outline-none"
+                  className="w-full rounded-none border border-zinc-800/80 bg-zinc-900/50 p-3 text-xs text-zinc-200 placeholder:text-zinc-600 focus:border-amber-500/60 focus:outline-none"
                 />
 
                 <div className="flex items-center justify-between">
@@ -661,7 +698,7 @@ export function CaseStore({
                   <button
                     type="submit"
                     disabled={!newComment.trim()}
-                    className="inline-flex items-center gap-1.5 rounded-none bg-amber-500 px-4 py-2 text-xs font-bold uppercase tracking-wider text-zinc-950 transition-colors hover:bg-amber-400 disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 rounded-none bg-amber-500 px-4 py-2 text-xs font-bold uppercase tracking-wider text-zinc-950 transition-colors hover:bg-amber-400 disabled:opacity-50 cursor-pointer"
                   >
                     <Send className="size-3" />
                     <span>Gửi đánh giá</span>
@@ -671,11 +708,11 @@ export function CaseStore({
             </div>
 
             {/* Reviews List */}
-            <div className="space-y-4">
+            <div className="space-y-2 pt-2">
               {filteredReviews.map((rev) => (
                 <div
                   key={rev.id}
-                  className="border-b border-zinc-800/80 pb-5 pt-2"
+                  className="border-b border-zinc-900 pb-4 pt-2"
                 >
                   <div className="flex items-start gap-3">
                     {/* Detective Avatar Initial */}
@@ -716,7 +753,7 @@ export function CaseStore({
 
                       {/* Seller Response if any */}
                       {rev.sellerResponse && (
-                        <div className="mt-2 rounded-none border border-zinc-800/80 bg-zinc-950 p-2.5 text-[11px] leading-relaxed text-zinc-400">
+                        <div className="mt-2 border-l-2 border-amber-500/50 pl-3 py-1 text-[11px] leading-relaxed text-zinc-400">
                           <span className="font-semibold text-amber-400">
                             Phản hồi của XPLORE Team:{" "}
                           </span>
@@ -729,7 +766,7 @@ export function CaseStore({
                         <button
                           type="button"
                           onClick={() => handleLike(rev.id)}
-                          className="flex items-center gap-1.5 text-[11px] text-zinc-500 transition-colors hover:text-zinc-300"
+                          className="flex items-center gap-1.5 text-[11px] text-zinc-500 transition-colors hover:text-zinc-300 cursor-pointer"
                         >
                           <ThumbsUp className="size-3" />
                           Hữu ích ({rev.likes})
@@ -744,7 +781,7 @@ export function CaseStore({
         </section>
 
         {/* Section: Other Cases & Products (Synced with Collection style) */}
-        <section className="mt-16 border-t border-zinc-800/60 pt-10">
+        <section className="mt-14">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-xl font-black uppercase tracking-tight text-zinc-100 sm:text-2xl">
               CÁC SẢN PHẨM KHÁC
@@ -759,7 +796,10 @@ export function CaseStore({
 
           <div className="grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
             {RELATED_PRODUCTS.map((prod) => (
-              <div key={prod.id} className="group flex flex-col justify-between">
+              <div
+                key={prod.id}
+                className="group flex flex-col justify-between"
+              >
                 <div>
                   {/* A4 Poster Aspect Ratio (1 / 1.414) */}
                   <div className="relative aspect-[1/1.414] w-full overflow-hidden bg-zinc-950">
@@ -799,7 +839,7 @@ export function CaseStore({
         </section>
       </main>
 
-      {/* FULLSCREEN IMAGE LIGHTBOX MODAL (Cho phép zoom phóng đại ảnh hồ sơ) */}
+      {/* FULLSCREEN IMAGE LIGHTBOX MODAL */}
       {isZoomOpen && (
         <div
           role="dialog"
@@ -816,17 +856,21 @@ export function CaseStore({
             <button
               type="button"
               onClick={() => setZoomScale((prev) => (prev === 1 ? 1.6 : 1))}
-              className="flex size-9 items-center justify-center rounded-none border border-zinc-700 bg-zinc-900/80 text-zinc-300 transition-colors hover:border-amber-500 hover:text-amber-400"
+              className="flex size-9 items-center justify-center rounded-none border border-zinc-700 bg-zinc-900/80 text-zinc-300 transition-colors hover:border-amber-500 hover:text-amber-400 cursor-pointer"
               title={zoomScale === 1 ? "Phóng đại 160%" : "Thu về 100%"}
             >
-              {zoomScale === 1 ? <ZoomIn className="size-4" /> : <ZoomOut className="size-4" />}
+              {zoomScale === 1 ? (
+                <ZoomIn className="size-4" />
+              ) : (
+                <ZoomOut className="size-4" />
+              )}
             </button>
 
             {/* Close Button */}
             <button
               type="button"
               onClick={() => setIsZoomOpen(false)}
-              className="flex size-9 items-center justify-center rounded-none border border-zinc-700 bg-zinc-900/80 text-zinc-300 transition-colors hover:border-red-500 hover:text-red-400"
+              className="flex size-9 items-center justify-center rounded-none border border-zinc-700 bg-zinc-900/80 text-zinc-300 transition-colors hover:border-red-500 hover:text-red-400 cursor-pointer"
               title="Đóng (ESC)"
             >
               <X className="size-4" />
@@ -839,9 +883,11 @@ export function CaseStore({
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : galleryImages.length - 1));
+                setActiveImageIndex((prev) =>
+                  prev > 0 ? prev - 1 : galleryImages.length - 1,
+                );
               }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 flex size-10 items-center justify-center rounded-none border border-zinc-800 bg-zinc-900/80 text-zinc-300 transition-colors hover:border-amber-500 hover:text-amber-400 z-10"
+              className="absolute left-4 top-1/2 -translate-y-1/2 flex size-10 items-center justify-center rounded-none border border-zinc-800 bg-zinc-900/80 text-zinc-300 transition-colors hover:border-amber-500 hover:text-amber-400 z-10 cursor-pointer"
               title="Ảnh trước"
             >
               <ChevronLeft className="size-5" />
@@ -874,9 +920,11 @@ export function CaseStore({
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                setActiveImageIndex((prev) => (prev < galleryImages.length - 1 ? prev + 1 : 0));
+                setActiveImageIndex((prev) =>
+                  prev < galleryImages.length - 1 ? prev + 1 : 0,
+                );
               }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 flex size-10 items-center justify-center rounded-none border border-zinc-800 bg-zinc-900/80 text-zinc-300 transition-colors hover:border-amber-500 hover:text-amber-400 z-10"
+              className="absolute right-4 top-1/2 -translate-y-1/2 flex size-10 items-center justify-center rounded-none border border-zinc-800 bg-zinc-900/80 text-zinc-300 transition-colors hover:border-amber-500 hover:text-amber-400 z-10 cursor-pointer"
               title="Ảnh tiếp"
             >
               <ChevronRight className="size-5" />

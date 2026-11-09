@@ -331,7 +331,7 @@ export function StoreClient({
                 onChange={(e) =>
                   setEditing({ ...editing, sku: e.target.value.toLowerCase() })
                 }
-                placeholder="solo, group, party, box"
+                placeholder="solo, party, party-upgrade, box"
               />
             </label>
             <label className={label}>

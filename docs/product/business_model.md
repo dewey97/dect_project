@@ -104,9 +104,10 @@ Hệ thống phục vụ 2 nhóm khách hàng B2C chính và 1 nhóm tiềm năn
 ### 5.1. Cơ Cấu Giá Bán
 * **Bộ Boardgame Vật Lý:** `249.000đ – 349.000đ` / bộ (bán đứt sản phẩm).
 * **Bản Online:**
-  * **Gói Đơn (Solo):** `69.000đ – 89.000đ` (1 tài khoản chơi vĩnh viễn).
-  * **Gói Nhóm (Party):** `129.000đ – 149.000đ` (quyền solo + 3 lượt tạo phòng chơi chung cho bạn bè).
-* **Mua Lẻ Thêm Lượt Tạo Phòng (Room Add-on):** `25.000đ – 35.000đ` / lượt.
+  * Chỉ 2 gói (chốt 2026-11-09), chi tiết SKU ở [`license_access.md`](license_access.md):
+  * **Solo:** `69.000đ` (1 tài khoản chơi vĩnh viễn).
+  * **Party:** `89.000đ` (quyền solo + 3 lượt tạo phòng chơi chung cho bạn bè).
+* **Nâng cấp Solo lên Party:** `20.000đ` (giá chênh lệch, +3 lượt), chỉ bán cho người đã sở hữu vụ; mua lại được để thêm lượt.
 
 ### 5.2. Luồng Doanh Thu Mở Rộng
 * **Nâng Cấp Bản Online Cho Người Mua Boardgame:** Giảm giá 50% mua Bản Online cho khách đã mua bộ Boardgame (dành cho người muốn lưu trữ hồ sơ số hoặc host chơi từ xa với bạn).

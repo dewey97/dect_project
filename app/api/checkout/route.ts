@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isValidCaseId, normalizeCaseId } from "@/lib/cases/case-id";
 import { checkRateLimit } from "@/lib/security/rate-limiter";
+import { isUpgradeSku } from "@/lib/payments/offers";
 import {
   PayosError,
   createPaymentLink,
@@ -19,8 +20,9 @@ const LINK_LIFETIME_SECONDS = 15 * 60;
 /**
  * Creates an order and a PayOS payment link. Body: { caseId, sku }.
  * The price comes from case_offers (order_create RPC), never from the client.
- * Errors: 401 not_logged_in, 400 bad_request, 404 offer_not_found,
- * 429 rate_limited, 503 payments_disabled, 502 provider_error.
+ * Upgrade offers (SKU "*-upgrade") are sold only to players who already own the case.
+ * Errors: 401 not_logged_in, 400 bad_request, 403 upgrade_requires_license,
+ * 404 offer_not_found, 429 rate_limited, 503 payments_disabled, 502 provider_error.
  */
 export async function POST(req: Request) {
   const supabase = await createClient();
@@ -48,6 +50,19 @@ export async function POST(req: Request) {
   if (!config || !baseUrl) return noStoreJson({ error: "payments_disabled" }, 503);
 
   const admin = createAdminClient();
+
+  if (isUpgradeSku(sku)) {
+    const { data: license } = await admin
+      .from("licenses")
+      .select("online_at, box_activated_at")
+      .eq("user_id", user.id)
+      .eq("case_id", caseId)
+      .maybeSingle();
+    if (!license?.online_at && !license?.box_activated_at) {
+      return noStoreJson({ error: "upgrade_requires_license" }, 403);
+    }
+  }
+
   const { data: order, error } = await admin.rpc("order_create", {
     p_user_id: user.id,
     p_case_id: caseId,

@@ -91,14 +91,18 @@ Bất kỳ ai submit đáp án → Case kết thúc → Phòng đóng
 
 > Cập nhật 2026-11-05: luồng chơi nhóm của **bản hộp** đã chốt trong [`group_play_realtime.md`](../architecture/group_play_realtime.md) (tạo phòng miễn phí, không trừ lượt). Luồng chơi nhóm của **bản online** (trừ `group_credits` hay không) để sau. Thuật ngữ: bước cuối gọi là "kết luận".
 
-**Gói bán gợi ý:**
+**Gói bán online (chốt 2026-11-09: chỉ 2 gói, bỏ gói Duo/Nhóm):**
 
-| Gói          | Nội dung                       |
-| ------------ | ------------------------------ |
-| **Solo**     | Tự chơi vĩnh viễn, 0 lượt nhóm |
-| **Duo/Nhóm** | Tự chơi + 1 lượt nhóm          |
-| **Party**    | Tự chơi + 3 lượt nhóm          |
-| **Add-on**   | +1 lượt nhóm                   |
+| Gói | SKU | Nội dung | Ai mua được |
+| --- | --- | --- | --- |
+| **Solo** | `solo` | Tự chơi vĩnh viễn, 0 lượt nhóm | Mọi người |
+| **Party** | `party` | Tự chơi vĩnh viễn + 3 lượt mở phòng nhóm | Mọi người |
+| **Nâng cấp Party** | `party-upgrade` | Giá chênh lệch Party − Solo, +3 lượt nhóm | Chỉ người đã sở hữu vụ (online hoặc bộ hộp) |
+
+- Quy ước: SKU kết thúc bằng `-upgrade` là gói nâng cấp. `POST /api/checkout` trả `403 upgrade_requires_license` nếu người mua chưa có `licenses.online_at` hoặc `box_activated_at` (`lib/payments/offers.ts`).
+- Trang vụ án: người chưa sở hữu thấy 2 thẻ Solo / Party, mỗi thẻ một nút mua; người đã sở hữu thấy "Vào chơi ngay" và thẻ nâng cấp.
+- Gói nâng cấp không giới hạn số lần mua: người đã có Party mua thêm vẫn được +3 lượt (đóng vai gói mua thêm lượt).
+- Gói "Nhóm" cũ chỉ ẩn (`active = false`), đơn hàng và quyền chơi đã cấp giữ nguyên. Migration: `db/schema/54_offers_solo_party.sql` (chạy sau khi deploy code).
 
 ---
 
