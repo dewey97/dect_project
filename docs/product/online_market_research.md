@@ -1,40 +1,59 @@
 # Nghiên cứu thị trường: game phá án chơi online
 
 > **Trạng thái:** Nghiên cứu bàn giấy (desk research), chưa có dữ liệu người dùng của mình
-> **Cập nhật:** 2026-11-06
-> **Liên quan:** [`business_model.md`](business_model.md), [`license_access.md`](license_access.md), [`../ROADMAP.md`](../ROADMAP.md) việc #17 (thanh toán bản online)
+> **Cập nhật:** 2026-11-09 (bổ sung: độ mạnh bằng chứng, chiến lược marketing theo giai đoạn, kịch bản sẵn sàng 20/11, dòng tiền theo tốc độ ra case, tiêu chí dừng)
+> **Liên quan:** [`business_model.md`](business_model.md), [`financial_founder_model.md`](financial_founder_model.md), [`license_access.md`](license_access.md), [`../ROADMAP.md`](../ROADMAP.md) việc #17 (thanh toán bản online)
 
 ---
 
-## 0. Phạm vi và độ tin cậy
+## 0. Kết luận ngắn
 
-- **Câu hỏi:** Bản online thuần số (không có hộp giấy) có thị trường không, ai chơi, đối thủ và sản phẩm tương tự là gì, rào cản nằm ở đâu.
-- **Nguồn:** trang web của đối thủ, báo chí ngành game, các ước tính từ bên thứ ba (Raijin, AppMagic, iiMedia), kết hợp với dữ liệu Kalodata/review đã phân tích ở tài liệu marketing.
-- **Giới hạn quan trọng:**
+- Bản online là **cơ hội chưa được kiểm chứng**, không phải hướng đã thất bại. Hiện chưa có dữ liệu Việt Nam nghiêng về phía nào.
+- Bằng chứng mạnh nhất hiện có là hộp giấy bán được (Trace ~5.400 bộ/năm chỉ riêng TikTok Shop). Bằng chứng ủng hộ online đến từ thị trường nước ngoài, nơi có cả một nhóm sản phẩm thu tiền theo case.
+- Online chỉ có lãi khi có kho case. **Nút thắt quyết định là tốc độ làm case**, không phải giá.
+- Thứ tự ưu tiên: hộp giấy là nguồn tiền chính; online là thí nghiệm có giới hạn, có tiêu chí dừng viết sẵn từ trước (mục 10).
+
+---
+
+## 1. Phạm vi và độ tin cậy
+
+- **Câu hỏi:** Bản online thuần số (không có hộp giấy) có thị trường không, ai chơi, đối thủ và sản phẩm tương tự là gì, rào cản nằm ở đâu, làm thế nào để kiểm chứng.
+- **Nguồn:** trang web đối thủ, báo chí ngành game, ước tính của bên thứ ba (Raijin, AppMagic, iiMedia), cộng với dữ liệu Kalodata và review đã phân tích trong tài liệu marketing.
+- **Giới hạn:**
   - Không có số liệu đáng tin về quy mô thị trường "game phá án online" ở Việt Nam. Các con số toàn cầu chủ yếu là escape room vật lý hoặc dự báo cũ.
   - Số người chơi và rating do đối thủ tự công bố là số liệu marketing, mẫu nhỏ.
-  - Mọi kết luận dưới đây là **giả thuyết cần kiểm chứng** bằng dữ liệu của chính mình (mục 8).
+  - Mọi kết luận là **giả thuyết cần kiểm chứng** bằng dữ liệu của chính mình (mục 8).
+
+### 1.1. Độ mạnh của từng bằng chứng
+
+| Bằng chứng                                                                                              | Nghiêng về                   | Độ mạnh                 | Ghi chú                                                                                             |
+| ------------------------------------------------------------------------------------------------------- | ---------------------------- | ----------------------- | --------------------------------------------------------------------------------------------------- |
+| Trace bán ~5.400 hộp/năm trên TikTok Shop                                                               | Hộp giấy có cầu              | **Mạnh**                | Trực tiếp, cùng thị trường Việt Nam                                                                 |
+| Ở nước ngoài có nhiều sản phẩm thu tiền cho case online (DetectiveOS, Cold Case Inc, Forgotten Mystery) | **Online có người trả tiền** | Trung bình              | Thị trường khác. DetectiveOS tự công bố chỉ ~3.300 người chơi                                       |
+| Chỉ 7–10% người chơi game mobile Việt Nam trả tiền                                                      | Online khó thu tiền          | Yếu                     | Game mobile là thể loại khác                                                                        |
+| App kịch bản sát online ở Trung Quốc khó có lãi                                                         | Online khó thu tiền          | Yếu đến trung bình      | Chỉ là phép so sánh, lối chơi khác (mục 2.4)                                                        |
+| Bản online của UCVN không có dấu hiệu bán chạy                                                          | —                            | **Rất yếu, không dùng** | Hộp giấy của UCVN cũng chỉ ~16 triệu/năm. Họ yếu ở phân phối nói chung, không tách được nguyên nhân |
 
 ---
 
-## 1. Bản đồ sản phẩm tương tự
+## 2. Bản đồ sản phẩm tương tự
 
 "Game phá án online" không phải một danh mục có sẵn. Người chơi so sánh mình với 6 nhóm sản phẩm:
 
-| Nhóm                                                              | Ví dụ                                                                                | Điểm giống mình                                                              | Điểm khác                                                     |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| **A. Hồ sơ vụ án chơi trên trình duyệt** (đối thủ trực tiếp nhất) | DetectiveOS, Cold Case Inc, Forgotten Mystery, Play Inquest, Cold Case Online        | Hồ sơ, lời khai, ảnh, điện thoại nạn nhân, buộc tội nghi phạm, chơi trên web | Tiếng Anh, thị trường Âu Mỹ, chủ yếu solo/cặp đôi trên laptop |
-| **B. Hộp giấy + web tại Việt Nam**                                | Trace Project, Unsolved Case Vietnam (UCVN)                                          | Cùng thể loại, cùng thị trường, đã có phần web                               | Web chỉ là phụ trợ cho hộp; UCVN có bán phần online           |
-| **C. Game trinh thám kể chuyện (video game)**                     | Her Story, Return of the Obra Dinn, Duck Detective, Disco Elysium, CrimeBot (mobile) | Suy luận từ bằng chứng, cốt truyện                                           | Mua trên Steam/App Store, có đồ hoạ và gameplay riêng         |
-| **D. Kịch bản sát online (Trung Quốc)**                           | 百变大侦探, 我是谜 (Woshimi), 谁是凶手                                               | Nhập vai nhóm, chơi qua app, 1–2,5 giờ                                       | Mỗi người một vai, có yếu tố nói dối giữa người chơi          |
-| **E. Escape room / murder mystery online cho doanh nghiệp**       | Các dịch vụ team building có người dẫn                                               | Chơi nhóm từ xa, giải đố                                                     | B2B, có người điều phối, giá theo đầu người                   |
-| **F. Cộng đồng "thám tử mạng" true crime**                        | Kẻ Tò Mò, OSINT & Cyber Investigation Viet Nam                                       | Người Việt thích tự điều tra                                                 | Vụ án thật, không phải sản phẩm                               |
+| Nhóm                                                              | Ví dụ                                                                                | Điểm giống mình                                                              | Điểm khác                                                          |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| **A. Hồ sơ vụ án chơi trên trình duyệt** (đối thủ trực tiếp nhất) | DetectiveOS, Cold Case Inc, Forgotten Mystery, Play Inquest, Cold Case Online        | Hồ sơ, lời khai, ảnh, điện thoại nạn nhân, buộc tội nghi phạm, chơi trên web | Tiếng Anh, thị trường Âu Mỹ, chủ yếu solo hoặc cặp đôi trên laptop |
+| **B. Hộp giấy + web tại Việt Nam**                                | Trace Project, Unsolved Case Vietnam (UCVN)                                          | Cùng thể loại, cùng thị trường, đã có phần web                               | Web chỉ là phụ trợ cho hộp; UCVN có bán phần online                |
+| **C. Game trinh thám kể chuyện (video game)**                     | Her Story, Return of the Obra Dinn, Duck Detective, Disco Elysium, CrimeBot (mobile) | Suy luận từ bằng chứng, cốt truyện                                           | Mua trên Steam/App Store, có đồ hoạ và gameplay riêng              |
+| **D. Kịch bản sát online (Trung Quốc)**                           | 百变大侦探, 我是谜 (Woshimi), 谁是凶手                                               | Chơi nhóm, qua app, 1–2,5 giờ                                                | Mỗi người một vai, người chơi lừa nhau                             |
+| **E. Escape room / murder mystery online cho doanh nghiệp**       | Các dịch vụ team building có người dẫn                                               | Chơi nhóm từ xa, giải đố                                                     | B2B, có người điều phối, giá theo đầu người                        |
+| **F. Cộng đồng "thám tử mạng" true crime**                        | Kẻ Tò Mò, OSINT & Cyber Investigation Viet Nam                                       | Người Việt thích tự điều tra                                                 | Vụ án thật, không phải sản phẩm                                    |
 
 ---
 
-## 2. Đối thủ và sản phẩm chi tiết
+## 3. Đối thủ và sản phẩm chi tiết
 
-### 2.1. Nhóm A: hồ sơ vụ án trên trình duyệt
+### 3.1. Nhóm A: hồ sơ vụ án trên trình duyệt
 
 **DetectiveOS** (detectiveos.net) là mẫu gần nhất với bản online của mình:
 
@@ -54,7 +73,7 @@
 
 Điểm chung: **tất cả đều cho chơi miễn phí case hoặc phần đầu.**
 
-### 2.2. Nhóm B: đối thủ Việt Nam
+### 3.2. Nhóm B: đối thủ Việt Nam
 
 **Unsolved Case Vietnam** (unsolvedcasevietnam.com):
 
@@ -62,50 +81,59 @@
 - **Bản online:** "Trọng điểm đầu tiên miễn phí trên trình duyệt. Mở phần còn lại với 125.000đ."
 - Người mua hộp có khu nội dung số riêng (hồ sơ mật, audio), mở bằng mật khẩu in trong hộp.
 - Không thấy hệ thống gợi ý. Đáp án nằm trong phong bì giấy.
-- Doanh thu TikTok Shop 12 tháng chỉ ~16 triệu (dữ liệu Kalodata). Không có số liệu riêng cho bản online.
+- Mới ra mắt, truyền thông yếu: doanh thu TikTok Shop 12 tháng chỉ ~16 triệu cho cả hộp giấy. **Không dùng UCVN làm bằng chứng về nhu cầu online** (mục 1.1).
 
 **Trace Project:** bán hộp giấy, tiêu đề sản phẩm ghi "có website hỗ trợ". Không thấy bản thuần online. Review nhắc đến web chỉ 4–6%, và 2% phàn nàn web/QR lỗi hoặc không biết bắt đầu.
 
-**Kết luận nhóm B:** tại Việt Nam chưa có đối thủ nào làm **bản online là sản phẩm chính**. UCVN thử bán bản online với giá ~45% giá hộp, nhưng không có dấu hiệu bán chạy.
+**Kết luận nhóm B:** tại Việt Nam chưa có đối thủ nào làm bản online thành sản phẩm chính và làm tốt. Khoảng trống này chưa được kiểm chứng theo chiều nào.
 
-### 2.3. Nhóm C: game trinh thám kể chuyện
+### 3.3. Nhóm C: game trinh thám kể chuyện
 
-- **Her Story** (2015, dạng tìm kiếm trong kho video lời khai): ước tính ~174 nghìn bản trên Steam, ~$1,5 triệu doanh thu gộp (Raijin, độ tin cậy trung bình), 89% đánh giá tích cực. Tác giả cho biết khoảng 40% doanh số đến từ mobile.
+- **Her Story** (2015, tìm kiếm trong kho video lời khai): ước tính ~174 nghìn bản trên Steam, ~$1,5 triệu doanh thu gộp (Raijin, độ tin cậy trung bình), 89% đánh giá tích cực. Tác giả cho biết khoảng 40% doanh số đến từ mobile.
 - **Return of the Obra Dinn:** game trinh thám kinh điển, vẫn có người chơi nhiều năm sau khi ra mắt.
-- **CrimeBot** (mobile): miễn phí và có mua trong app, án mạng sinh ngẫu nhiên, giới hạn số lần thử.
+- **CrimeBot** (mobile): miễn phí, có mua trong app, án mạng sinh ngẫu nhiên, giới hạn số lần thử.
 
-**Bài học:** game suy luận thuần đọc và tìm kiếm vẫn có thị trường ngách bền vững, và mobile chiếm phần đáng kể. Đổi lại, người chơi so sánh giá và độ sâu với game trên Steam, nơi một tựa $5–20 cho 4–10 giờ chơi.
+**Bài học:** game suy luận thuần đọc và tìm kiếm có thị trường ngách bền vững, và mobile chiếm phần đáng kể. Đổi lại, người chơi sẽ so giá và độ sâu với game Steam, nơi một tựa $5–20 cho 4–10 giờ chơi.
 
-### 2.4. Nhóm D: kịch bản sát online ở Trung Quốc
+### 3.4. Nhóm D: kịch bản sát online ở Trung Quốc
 
-- Thời dịch (2020), app kịch bản sát online tăng mạnh. 我是谜 có khoảng 8 triệu người dùng đầu 2020. 百变大侦探 nhận vốn 30 triệu NDT.
+**Kịch bản sát (剧本杀) là gì:**
+
+- Nhóm 4–8 người, mỗi người nhận một nhân vật kèm kịch bản bí mật riêng.
+- Một người trong nhóm là hung thủ và phải nói dối.
+- Cả nhóm thảo luận, chất vấn nhau, rồi bỏ phiếu chọn hung thủ.
+- Thường chơi ở quán có người dẫn.
+
+**Số liệu:**
+
+- Khoảng 2020, trong thời dịch, app kịch bản sát online tăng mạnh. 我是谜 có ~8 triệu người dùng đầu 2020. 百变大侦探 nhận vốn 30 triệu NDT.
 - 2022: 百变大侦探, 剧本杀, 谁是凶手, 推理大师club là 4 app được dùng nhiều nhất, mỗi app có hơn 40% người được khảo sát từng dùng (iiMedia).
 - **Nhận định của iiMedia:** người dùng ít sẵn sàng trả tiền cho kịch bản online. Kịch bản online ngắn (1–2,5 giờ), nên nền tảng khó có lãi nếu chỉ bán kịch bản.
 - Thị trường kịch bản sát nói chung dự báo 44,8 tỷ NDT năm 2025 (iiMedia, dự báo từ 2021). Phần lớn là cửa hàng offline; không tìm được số tách riêng phần online cho 2024–2025.
 
-**Bài học:** đây là tiền lệ gần nhất về "phá án nhóm online" ở châu Á. Nhu cầu chơi có thật, nhưng **sẵn lòng trả tiền cho bản online thấp hơn nhiều so với offline.**
+**Mức độ áp dụng:** chỉ là phép so sánh. Lối chơi khác (nhập vai và lừa nhau, so với cả nhóm cùng điều tra hồ sơ), thị trường khác. Điểm đáng học duy nhất: chơi nhóm online có thể thu hút rất nhiều người, nhưng thu được tiền là bài toán riêng.
 
-### 2.5. Nhóm E: escape room và murder mystery online cho doanh nghiệp
+### 3.5. Nhóm E: escape room và murder mystery online cho doanh nghiệp
 
-- Thị trường escape room toàn cầu được dự báo $31 tỷ vào 2032, CAGR 14,8% (Allied Market Research). Phần lớn là phòng vật lý; không tách được số cho bản online.
+- Thị trường escape room toàn cầu dự báo $31 tỷ vào 2032, CAGR 14,8% (Allied Market Research). Phần lớn là phòng vật lý; không tách được số cho bản online.
 - Team building doanh nghiệp được nhắc là động lực chính. Giá murder mystery online có người dẫn được cho là $30–100/người, nhưng nguồn không đáng tin.
-- Chính các báo cáo cũng nói sức hút cốt lõi của escape room là **tương tác trực tiếp**, nên bản online nhiều khả năng là phân khúc nhỏ.
+- Các báo cáo cũng nói sức hút cốt lõi của escape room là **tương tác trực tiếp**, nên bản online nhiều khả năng là phân khúc nhỏ.
 
-### 2.6. Nhóm F: cộng đồng thám tử mạng tại Việt Nam
+### 3.6. Nhóm F: cộng đồng thám tử mạng tại Việt Nam
 
-Cuối 2025, vụ án Nguyễn Xuân Đạt được cộng đồng mạng tự điều tra và tổng hợp thành tài liệu 88 trang. Các nhóm như Kẻ Tò Mò và OSINT & Cyber Investigation Viet Nam được nhắc đến. **Tín hiệu:** có một tệp người Việt hứng thú với việc tự xâu chuỗi thông tin trên mạng. Đây là tệp tiềm năng cho bản online, và cũng là kênh truyền thông.
+Cuối 2025, vụ án Nguyễn Xuân Đạt được cộng đồng mạng tự điều tra và tổng hợp thành tài liệu 88 trang. Các nhóm như Kẻ Tò Mò và OSINT & Cyber Investigation Viet Nam được nhắc đến. **Tín hiệu:** có một tệp người Việt hứng thú với việc tự xâu chuỗi thông tin trên mạng. Đây vừa là tệp khách tiềm năng cho bản online, vừa là kênh truyền thông.
 
 ---
 
-## 3. Bảng so sánh mô hình
+## 4. Bảng so sánh mô hình
 
 |               | DetectiveOS                          | UCVN online       | Trace               | Kịch bản sát app (TQ)      | **Mình (bản online)**                                                     |
 | ------------- | ------------------------------------ | ----------------- | ------------------- | -------------------------- | ------------------------------------------------------------------------- |
-| Giá           | $7,99/case (~200k), bộ 8 case $35,99 | 125.000đ          | Không bán online    | Thấp, khó thu              | 69.000–89.000đ (dự kiến)                                                  |
+| Giá           | $7,99/case (~200k), bộ 8 case $35,99 | 125.000đ          | Không bán online    | Thấp, khó thu              | Đang cân nhắc (mục 7)                                                     |
 | Miễn phí thử  | Case đầu                             | Phần đầu          | Không               | Có                         | Giai đoạn 0                                                               |
 | Thời lượng    | 1,5–2,5 giờ                          | ~90 phút          | 90 phút–4 giờ (hộp) | 1–2,5 giờ                  | Cần chốt                                                                  |
 | Solo / nhóm   | Solo, cặp đôi                        | 2–6 (hộp)         | 1+ (hộp)            | Nhóm, mỗi người 1 vai      | Solo + phòng nhóm realtime                                                |
-| Thiết bị      | Laptop                               | Trình duyệt       | Hộp + web           | App mobile                 | Web, cần tốt trên mobile                                                  |
+| Thiết bị      | Laptop                               | Trình duyệt       | Hộp + web           | App mobile                 | Web, phải tốt trên mobile                                                 |
 | Gợi ý         | Chỉ ra bằng chứng thiếu              | Không thấy        | Có (web)            | Có người dẫn hoặc kịch bản | Cần chốt                                                                  |
 | Điểm đặc biệt | Hỏi cung, chỉ ra lời nói dối         | Bối cảnh Việt Nam | Vật chứng in đẹp    | Nhập vai từng nhân vật     | Điện thoại giả lập, 360°, bản đồ, chơi nhóm realtime, trắc nghiệm/tự luận |
 
@@ -117,15 +145,15 @@ Cuối 2025, vụ án Nguyễn Xuân Đạt được cộng đồng mạng tự 
 
 ---
 
-## 4. Đặc tính người chơi
+## 5. Đặc tính người chơi
 
-| Phân khúc                              | Họ là ai                           | Muốn gì                                   | Cảnh báo                                                                             |
-| -------------------------------------- | ---------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------ |
-| **Cặp đôi chơi tại nhà**               | 22–30 tuổi, hẹn hò buổi tối        | Một buổi tối 1,5–2 giờ có hoạt động chung | Đây là định vị chính của DetectiveOS và Trace. Với cặp đôi, hộp giấy vẫn hấp dẫn hơn |
-| **Nhóm bạn ở xa**                      | Bạn bè khác thành phố, du học sinh | Một hoạt động chung qua Discord/Zalo call | Nhóm duy nhất mà hộp giấy **không phục vụ được**. Đây là lợi thế thật của bản online |
-| **Người chơi solo buổi đêm**           | Fan trinh thám, true crime         | Chơi ngay, không chờ ship, chơi từ từ     | Quen so giá với game Steam/mobile. Hay bỏ dở giữa chừng                              |
-| **Fan true crime / thám tử mạng**      | Người theo dõi các vụ án thật      | Tự xâu chuỗi thông tin                    | Phù hợp với bản online vì thông tin là tài liệu số                                   |
-| **Doanh nghiệp (team building từ xa)** | HR, trưởng nhóm                    | Hoạt động nhóm 1–2 giờ                    | B2B, cần người điều phối. Để sau                                                     |
+| Phân khúc                              | Họ là ai                           | Muốn gì                                   | Cảnh báo                                                                          |
+| -------------------------------------- | ---------------------------------- | ----------------------------------------- | --------------------------------------------------------------------------------- |
+| **Cặp đôi chơi tại nhà**               | 22–30 tuổi, hẹn hò buổi tối        | Một buổi tối 1,5–2 giờ có hoạt động chung | Định vị chính của DetectiveOS và Trace. Với cặp đôi, hộp giấy vẫn hấp dẫn hơn     |
+| **Nhóm bạn ở xa**                      | Bạn bè khác thành phố, du học sinh | Một hoạt động chung qua Discord/Zalo call | Nhóm duy nhất hộp giấy **không phục vụ được**. Đây là lợi thế thật của bản online |
+| **Người chơi solo buổi đêm**           | Fan trinh thám, true crime         | Chơi ngay, không chờ ship, chơi từ từ     | Quen so giá với game Steam/mobile. Hay bỏ dở giữa chừng                           |
+| **Fan true crime / thám tử mạng**      | Người theo dõi các vụ án thật      | Tự xâu chuỗi thông tin                    | Hợp với bản online vì thông tin là tài liệu số                                    |
+| **Doanh nghiệp (team building từ xa)** | HR, trưởng nhóm                    | Hoạt động nhóm 1–2 giờ                    | B2B, cần người điều phối. Để sau                                                  |
 
 **Bối cảnh Việt Nam:**
 
@@ -135,71 +163,222 @@ Cuối 2025, vụ án Nguyễn Xuân Đạt được cộng đồng mạng tự 
 
 ---
 
-## 5. Rào cản
+## 6. Rào cản
 
 Xếp theo mức độ nghiêm trọng với mình.
 
-1. **Người chơi ít sẵn lòng trả tiền cho nội dung số.** Bằng chứng từ 3 phía:
-   - App kịch bản sát ở Trung Quốc khó có lãi nếu chỉ bán kịch bản.
-   - Chỉ 7–10% người chơi game mobile ở Việt Nam trả tiền.
-   - UCVN chỉ dám định giá bản online ~45% giá hộp.
-
-   Người chơi coi "đọc hồ sơ trên màn hình" là thứ đáng giá thấp hơn cầm hồ sơ giấy.
-
-2. **Đọc nhiều chữ trên điện thoại rất mệt.** DetectiveOS khuyến nghị dùng màn hình lớn. Người Việt chủ yếu dùng điện thoại, và review của các bộ hộp giấy đã có phàn nàn "nhiều chữ". Trên màn hình nhỏ, vấn đề này nặng hơn.
-3. **Mâu thuẫn với xu hướng "giải trí rời màn hình".** Nghiên cứu thị trường của chính nhóm cho thấy người chơi boardgame tìm đến nó để rời khỏi màn hình. Bản online đi ngược lại động cơ này, nên phải phục vụ tệp khác (nhóm ở xa, người chơi solo), không cạnh tranh với hộp giấy.
-4. **Chỉ chơi được một lần.** Biết đáp án rồi thì hết giá trị chơi lại. Hệ quả là phải ra nội dung mới liên tục, và chi phí viết kịch bản trên mỗi case là lớn nhất. Review hộp giấy có 9–18% người "pass" (bán lại sau khi chơi). Với bản online, rủi ro tương ứng là chia sẻ tài khoản hoặc đáp án.
-5. **Bị kẹt và hệ thống gợi ý kém.** Review game trinh thám phàn nàn về gợi ý vô dụng, manh mối không logic, ghi chép rườm rà, khó nhớ tên nhân vật. Kẹt mà không có ai trợ giúp là lý do hàng đầu khiến người chơi bỏ.
+1. **Chưa biết người chơi Việt có chịu trả tiền cho nội dung số không.** Bằng chứng hiện có đều yếu và gián tiếp: tỉ lệ trả tiền thấp của game mobile Việt Nam, và các app kịch bản sát ở Trung Quốc khó có lãi. Đây là câu hỏi lớn nhất, và chỉ trả lời được bằng một bài kiểm chứng có giá (mục 8).
+2. **Đọc nhiều chữ trên điện thoại rất mệt.** DetectiveOS khuyến nghị dùng màn hình lớn. Người Việt chủ yếu dùng điện thoại, và review các bộ hộp giấy đã có phàn nàn "nhiều chữ". Trên màn hình nhỏ, vấn đề này nặng hơn.
+3. **Ngược với lý do khách chọn boardgame.** Nghiên cứu thị trường của nhóm cho thấy người chơi boardgame tìm đến nó để rời khỏi màn hình. Bản online phải phục vụ tệp khác (nhóm ở xa, người chơi solo), không giành khách với hộp giấy.
+4. **Chỉ chơi được một lần.** Biết đáp án rồi thì hết giá trị chơi lại, nên phải ra case mới liên tục (mục 9). Review hộp giấy có 9–18% người "pass" (bán lại sau khi chơi). Với bản online, rủi ro tương ứng là chia sẻ tài khoản hoặc đáp án.
+5. **Bị kẹt và gợi ý kém.** Review game trinh thám phàn nàn về gợi ý vô dụng, manh mối không logic, ghi chép rườm rà, khó nhớ tên nhân vật. Kẹt mà không có ai giúp là lý do hàng đầu khiến người chơi bỏ.
 6. **Chơi nhóm online tốn công phối hợp.** Phải hẹn giờ, dùng thêm app gọi riêng, chờ người vào phòng. Hộp giấy chỉ cần ngồi chung một bàn.
-7. **Niềm tin khi trả tiền online cho thương hiệu mới.** Chưa có rating công khai. Các đối thủ đều xử lý bằng cách cho chơi thử miễn phí trước.
-8. **Khó được tìm thấy.** Không có mục "game phá án online" trong kho app nào. Phải đi bằng SEO, mạng xã hội, cộng đồng.
-9. **Rủi ro công nghệ làm mất niềm tin.** App đi kèm của Hunt A Killer từng biến mất, khách phàn nàn trên Trustpilot. Với sản phẩm 100% số, web lỗi đồng nghĩa với sản phẩm hỏng.
+7. **Khó tin để trả tiền cho thương hiệu mới.** Chưa có rating công khai. Các đối thủ đều xử lý bằng cách cho chơi thử miễn phí trước.
+8. **Khó được tìm thấy.** Không kho app nào có mục "game phá án online". Phải đi bằng SEO, mạng xã hội, cộng đồng.
+9. **Web lỗi là sản phẩm hỏng.** App đi kèm của Hunt A Killer từng biến mất, khách phàn nàn trên Trustpilot. Với sản phẩm 100% số, không có phần giấy nào bù lại.
 
 ---
 
-## 6. Những cách làm các sản phẩm bán được đều dùng
-
-1. **Miễn phí phần đầu.** Đối thủ nào cũng làm. Giai đoạn 0 của mình đã đúng hướng.
-2. **Trả một lần, không thu phí định kỳ, có gói combo nhiều case.** DetectiveOS nói rõ "pay once, no subscription", và gói 8 case giảm giá ~44%.
-3. **Thời lượng 1,5–2,5 giờ, có lưu tiến độ.** Vừa một buổi tối, bỏ dở được.
-4. **Gợi ý theo kiểu chỉ ra chỗ còn thiếu, không đưa đáp án.**
-5. **Có nhãn độ khó và thời lượng cho từng case.** DetectiveOS ghi rõ "Medium · 2h", "Expert".
-6. **Cảm giác ngồi đối diện nghi phạm.** Hỏi cung, chỉ ra đúng câu nói dối. Đây là thứ màn hình làm tốt hơn giấy.
-7. **Có danh sách chờ case tiếp theo.** DetectiveOS thu email cho "Case 9 – Being written".
-
----
-
-## 7. Định vị đề xuất cho bản online
+## 7. Định vị và giá
 
 - **Không định vị là "bản rẻ của hộp giấy".** Định vị là **"phá án cùng nhau khi không ngồi cùng một chỗ"**. Hộp giấy và đối thủ Việt Nam đều không phục vụ được nhóm này.
 - **Lợi thế cần làm nổi bật:** phòng nhóm realtime, điện thoại giả lập, chọn trắc nghiệm hoặc tự luận, tiếng Việt và bối cảnh Việt Nam.
-- **Giá:** 69–89k thấp hơn UCVN online (125k) và DetectiveOS (~200k). Đủ rẻ để mua không cần suy nghĩ nhiều, nhưng biên lãi chỉ bền khi có nhiều case. Cân nhắc giá theo phòng nhóm (một người mua, cả nhóm chơi) thay vì theo đầu người, vì người mua thực tế là host.
-- **Tone:** giữ nguyên nguyên tắc "li kì, nhức đầu, cãi nhau vui", không kinh dị nặng.
-- **Thiết bị:** thiết kế cho điện thoại trước. Chia nhỏ tài liệu, có tìm kiếm, có sổ ghi chép và danh sách nhân vật luôn mở được.
+- **Tone:** giữ nguyên tắc "li kì, nhức đầu, cãi nhau vui", không kinh dị nặng.
+- **Thiết bị:** thiết kế cho điện thoại trước. Tài liệu chia nhỏ, có tìm kiếm, sổ ghi chép và danh sách nhân vật luôn mở được.
+
+**Giá:**
+
+- Giá trong [`business_model.md`](business_model.md) là 69–89k cho gói chơi một mình. So với hộp 269k là chênh khoảng 3 lần; khi công bố rộng, nhiều người có thể chọn bản rẻ thay vì hộp.
+- **Phương án cân nhắc: bán theo phòng nhóm khoảng 99–129k cho cả nhóm**, giữ gói chơi một mình rẻ hơn. Lý do: người trả tiền thực tế là người tạo phòng; chia ra mỗi người vẫn rẻ; khoảng cách với giá hộp hẹp lại; mức 125k của UCVN cho thấy giá này không lạ với thị trường.
+- **Giá rẻ để hút khách ban đầu là hợp lý, với 3 điều kiện:**
+  1. Ghi rõ "giá ra mắt, áp dụng đến ngày X", để giá rẻ là ưu đãi có hạn, không thành mức giá khách quen.
+  2. Giá không chắc là rào cản chính: Giai đoạn 0 đã miễn phí. Người chơi thử xong mà không mua thường là do phần thử chưa đủ cuốn, hoặc họ không đủ thời gian và hứng thú. Hạ giá không sửa được hai điều đó.
+  3. Giá càng rẻ thì càng cần nhiều đơn và nhiều case (mục 9).
 
 ---
 
-## 8. Giả thuyết cần kiểm chứng và cách đo
+## 8. Kiểm chứng: làm gì, đo gì
 
-| Giả thuyết                               | Cách đo                                                            | Ngưỡng gợi ý để đi tiếp                                  |
-| ---------------------------------------- | ------------------------------------------------------------------ | -------------------------------------------------------- |
-| Có đủ người muốn bản online              | Số đăng ký waitlist từ bài đăng và tờ hướng dẫn trong hộp          | Tự đặt trước khi chạy; ví dụ ≥10% người mua hộp đăng ký  |
-| Giai đoạn 0 giữ chân được người chơi thử | Tỉ lệ hoàn thành Giai đoạn 0 trên số người bắt đầu                 | Đo baseline trước                                        |
-| Người chơi thử chịu trả tiền             | Tỉ lệ chuyển đổi từ hoàn thành Giai đoạn 0 sang mua (PayOS)        | So với các tỉ lệ chuyển đổi freemium thông thường        |
-| Chơi được trên điện thoại                | Tỉ lệ bỏ giữa chừng theo thiết bị, thời gian đến manh mối đầu tiên | Tỉ lệ bỏ trên mobile không cao hơn hẳn desktop           |
-| Nhóm ở xa là tệp chính                   | Tỉ lệ license có tạo phòng nhóm, số người mỗi phòng                | Phần lớn license có tạo phòng                            |
-| Gợi ý không làm hỏng trải nghiệm         | Số gợi ý đã dùng, checkpoint bị kẹt lâu nhất                       | Không checkpoint nào làm >30% người chơi kẹt quá 15 phút |
+### 8.1. Bán hộp giấy trước không làm hỏng việc kiểm chứng online
 
-**Ràng buộc kỹ thuật hiện tại:** luồng thanh toán PayOS đã có code nhưng chưa chặn vào game theo license (ROADMAP #17). Trước khi bán bản online cần nối license với quyền chơi, và gắn sự kiện đo cho các chỉ số trên.
+- Người đã mua hộp #000 đã biết đáp án, nên không phải khách online của case #000. Hai tệp khách gần như tách biệt.
+- Giai đoạn 0 miễn phí là phễu chung cho cả hai. Gắn đo lường ngay từ bây giờ.
+
+### 8.2. Không mở miễn phí cả case online trong lúc hộp đang bán
+
+Kể cả khi hộp bán giá ưu đãi ~200k, miễn phí cả case online là không hợp lý vì 3 lý do:
+
+1. **Không đo được điều cần biết.** Câu hỏi cần trả lời là "có chịu trả tiền không". Miễn phí chỉ đo được "có hứng thú không".
+2. **Kéo khách khỏi hộp giấy.** Có bản miễn phí thì khách khó có lý do trả 200k.
+3. **Lộ đáp án.** Người chơi miễn phí đông và không ràng buộc, dễ đăng đáp án lên group.
+
+### 8.3. Các bài kiểm chứng hợp lý
+
+| Kiểm chứng                                                  | Miễn phí? | Đo được gì                                                         |
+| ----------------------------------------------------------- | --------- | ------------------------------------------------------------------ |
+| Giai đoạn 0 công khai                                       | Miễn phí  | Có ai bắt đầu chơi, có ai chơi hết đoạn thử                        |
+| Phần còn lại của case với giá ra mắt có hạn (ví dụ 49–69k)  | Trả tiền  | **Có chịu trả tiền không**, câu hỏi chính                          |
+| Nhóm chơi thử kín 10–20 người, mời riêng                    | Miễn phí  | Lỗi, độ dễ dùng trên điện thoại, chỗ bị kẹt. Không đo được nhu cầu |
+| Tặng bản online cho người mua hộp để mời bạn ở xa chơi cùng | Miễn phí  | Phòng nhóm có được dùng thật không, người ở xa có thích không      |
+| Trang đăng ký chờ                                           | Miễn phí  | Mức quan tâm trước khi mở bán                                      |
+
+### 8.4. Chỉ số cần đo
+
+| Giả thuyết                               | Cách đo                                                                                     |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Có đủ người muốn bản online              | Số đăng ký chờ từ bài đăng, FAQ và tờ hướng dẫn trong hộp                                   |
+| Giai đoạn 0 giữ chân được người chơi thử | Tỉ lệ chơi hết Giai đoạn 0 trên số người bắt đầu                                            |
+| Người chơi thử chịu trả tiền             | Tỉ lệ từ chơi hết Giai đoạn 0 sang mua qua PayOS                                            |
+| Bản online không kéo khách khỏi hộp      | Số khách đang định mua hộp lại chuyển sang online; mỗi đơn online hỏi "vì sao chọn online?" |
+| Chơi được trên điện thoại                | Tỉ lệ bỏ giữa chừng theo thiết bị, thời gian đến manh mối đầu tiên                          |
+| Nhóm ở xa là tệp chính                   | Tỉ lệ license có tạo phòng nhóm, số người mỗi phòng                                         |
+| Gợi ý không làm hỏng trải nghiệm         | Số gợi ý đã dùng, checkpoint bị kẹt lâu nhất                                                |
+
+Ngưỡng cụ thể cho các chỉ số này nằm ở mục 10 (tiêu chí dừng), phải chốt **trước** khi mở bán.
+
+**Ràng buộc kỹ thuật:** luồng thanh toán PayOS đã có code nhưng chưa chặn vào game theo license (ROADMAP #17). Trước khi bán bản online phải nối license với quyền chơi và gắn sự kiện đo cho các chỉ số trên.
 
 ---
 
-## 9. Đề xuất bước tiếp theo
+## 9. Dòng tiền theo tốc độ ra case
 
-1. Giai đoạn bán hộp giấy (11–12/2026): chỉ mở waitlist bản online, đo nhu cầu. Không đầu tư marketing riêng.
-2. Gắn đo lường cho Giai đoạn 0 ngay, vì đây là phễu chung cho cả hộp và online.
-3. Chơi thử DetectiveOS (case miễn phí) và phần miễn phí của UCVN online, ghi lại luồng onboarding, gợi ý, cách buộc tội.
-4. Khi waitlist đạt ngưỡng: mở bản online cho case #000 với gói cho cả nhóm, đo các chỉ số ở mục 8, rồi mới quyết định đầu tư case online tiếp theo.
+Tính theo cách chủ dự án chọn: **không quy công làm ra tiền**, chỉ tính chi phí bằng tiền mặt. Các con số đánh dấu (giả định) cần thay bằng số thật.
+
+### 9.1. Chi phí
+
+**Cố định mỗi tháng:**
+
+| Khoản      | Ước tính/tháng                                                            | Nguồn                                                      |
+| ---------- | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| VPS        | 150–300k                                                                  | [`financial_founder_model.md`](financial_founder_model.md) |
+| Supabase   | 0đ (gói miễn phí); có thể cần gói Pro ~$25 (~650k) cho chơi nhóm realtime | ROADMAP #12 còn chờ xác nhận gói                           |
+| Công cụ AI | ~500k                                                                     | Giả định                                                   |
+| Tên miền   | ~30–40k (~400k/năm)                                                       | Giả định                                                   |
+| **Tổng**   | **~0,7–1,5 triệu/tháng; dùng 1,2 triệu để tính**                          |                                                            |
+
+**Mỗi case (không tính công):** ảnh và giọng đọc AI, đạo cụ chụp ảnh, in 5–10 bộ mẫu để chơi thử, quà cho người chơi thử. Giả định **~3 triệu/case**.
+
+**Ra mắt mỗi case:** lấy theo ngân sách marketing hiện tại, **~3,7 triệu**.
+
+### 9.2. Mỗi đơn mang về bao nhiêu
+
+Chưa trừ marketing, khách trả ship.
+
+| Sản phẩm          | Giá  | Còn lại mỗi đơn                |
+| ----------------- | ---- | ------------------------------ |
+| Hộp               | 269k | ~185k (trừ in 80k và đóng gói) |
+| Hộp ưu đãi        | 200k | ~115k                          |
+| Online            | 69k  | ~67k (trừ ~2% phí PayOS)       |
+| Online giá ra mắt | 49k  | ~48k                           |
+
+Chỉ riêng chi phí cố định 1,2 triệu/tháng cần khoảng **7 hộp giá 269k, hoặc 11 hộp giá 200k, hoặc 18 đơn online giá 69k mỗi tháng**. Mức này không đáng lo.
+
+### 9.3. Số đơn cần cho mỗi case
+
+Chi phí mỗi chu kỳ = 3 triệu làm case + 3,7 triệu ra mắt + 1,2 triệu × số tháng.
+
+| Tốc độ ra case | Chi phí/chu kỳ | Chỉ bán hộp 269k | Chỉ bán hộp 200k | Chỉ bán online 69k |
+| -------------- | -------------- | ---------------- | ---------------- | ------------------ |
+| 2 tháng/case   | ~9,1 triệu     | ~49 hộp          | ~79 hộp          | ~136 đơn           |
+| 3 tháng/case   | ~10,3 triệu    | ~56 hộp          | ~90 hộp          | ~154 đơn           |
+| 6 tháng/case   | ~13,9 triệu    | ~75 hộp          | ~121 hộp         | ~207 đơn           |
+
+**Cách đọc:**
+
+- **Ra case chậm không làm dòng tiền xấu đi nhiều**, vì chi phí cố định thấp. Thứ thay đổi là tổng doanh thu cả năm.
+- **Online chỉ đáng đầu tư khi tốc độ ra case đủ nhanh.** Ra được 1 case mỗi 6–8 tuần thì chiến lược "giá rẻ cộng nhiều case" khả thi. Mỗi case mất 4–6 tháng thì giá rẻ không gom đủ đơn để bù. Trace ra 4 case trong 12 tháng; mình hiện có 1 case. **Cần đo thời gian thật để làm một case**, và xem Studio đã rút ngắn case #001 được bao nhiêu.
+- **Mỗi case mới bán được cả hộp giấy và online.** Đây là điểm mạnh của mô hình hai dạng, nhưng chỉ phát huy khi ra case đủ nhanh.
+- **Hộp giấy cần bỏ tiền trước:** in 50 bộ tốn ~4 triệu trước khi bán được bộ nào. Online không có tồn kho, nhưng cần khoảng 2,8 lần số đơn để mang về cùng số tiền.
+- **Case cũ vẫn ra tiền:** bán lại case cũ trên online gần như không tốn thêm; hộp thì phải in lô mới. Không nên trông chờ quá nhiều: doanh số R302 của Trace giảm 81% sau khoảng một năm.
+- **Giá hộp 200k cần gần gấp đôi số hộp so với 269k.** Chỉ nên dùng cho đợt đầu, có giới hạn số lượng.
+
+**Giới hạn của bảng:** bảng chỉ trả lời "dự án có tự nuôi được hạ tầng không". Nếu sau này thuê người viết case, hoặc chủ dự án cần thu nhập từ dự án, phải tính lại toàn bộ.
+
+---
+
+## 10. Thiên kiến và tiêu chí dừng
+
+**Những lực kéo về phía online cần nhận diện:**
+
+1. **Người xây phần công nghệ thường đánh giá cao thứ mình làm ra** (IKEA effect), và không muốn công sức đó chỉ làm phần phụ trợ (sunk cost). Trong khi đó, khách của đối thủ chỉ nhắc đến web 2–6%.
+2. **Online nằm trong vùng thoải mái của người làm kỹ thuật.** Hộp giấy kéo theo in ấn, ship, COD, chốt đơn qua inbox, là những việc ngoài chuyên môn.
+3. **Online đẹp trên bảng tính:** chi phí biến đổi ~2k mỗi đơn, không tồn kho. Nhưng bảng tính không có dòng "bao nhiêu người chịu trả tiền".
+4. **Thị trường trống dễ được xem là cơ hội**, trong khi nó cũng có thể là nơi không có cầu. Hiện chưa có dữ liệu để phân biệt.
+
+**Những lý do thật, không phải thiên kiến:** nhóm bạn ở xa là tệp hộp giấy không phục vụ được; đối thủ trong nước chưa có lợi thế công nghệ tương đương; biên lợi nhuận của online cao nếu có người trả tiền.
+
+**Cách tách thiên kiến khỏi phán đoán:**
+
+1. Tự hỏi: nếu phần công nghệ do người khác làm và mình chỉ là người bán, có vẫn chọn online không?
+2. **Viết tiêu chí dừng trước khi mở bán.** Ví dụ khung (chủ dự án điền số):
+   - Sau 2 tuần mở bán: tỉ lệ từ chơi hết Giai đoạn 0 sang trả tiền ≥ ___%.
+   - Số đơn online ≥ ___.
+   - Số khách đang định mua hộp mà chuyển sang online ≤ ___%.
+   - Không checkpoint nào làm quá ___% người chơi kẹt hơn 15 phút.
+
+   Không đạt thì online giữ vai trò quà kèm hộp, không đầu tư thêm case riêng cho online. Viết trước để kết quả xấu không bị diễn giải thành "cần thêm thời gian".
+
+3. Giữ thứ tự ưu tiên theo bằng chứng: hộp giấy là nguồn tiền chính, online là thí nghiệm có giới hạn. Chỉ đổi thứ tự khi số liệu buộc phải đổi.
+
+---
+
+## 11. Marketing theo giai đoạn
+
+### 11.1. Giai đoạn 1: bán hộp giấy (từ 16/11/2026)
+
+- **Không có ngân sách, chiến dịch hay bài đăng riêng cho online.** Tiền và công sức dồn vào 50 bộ hộp đầu.
+- **Chưa nói "có bán bản online".** Chỉ nói "đang hoàn thiện, để lại thông tin để được báo". Lý do:
+  1. Chưa giao được: PayOS chưa chạy giao dịch thật và chưa chặn quyền chơi theo license.
+  2. Dễ làm khách phân vân hộp 269k khi biết có bản rẻ hơn.
+  3. Trang đăng ký chờ là công cụ đo nhu cầu trước khi bỏ tiền.
+- **Phần web, điện thoại nạn nhân và ảnh 360°** được giới thiệu như **dụng cụ điều tra đi kèm hộp**, không gọi là "bản online".
+- **Bản online chỉ xuất hiện ở 3 chỗ, không tốn tiền:**
+  - Trả lời khi khách hỏi "có bản online không" hoặc "bạn mình ở xa chơi được không".
+  - Tờ hướng dẫn trong hộp hoặc tin nhắn sau khi chơi: link đăng ký chờ, kèm ưu đãi cho người đã mua hộp (giảm 50% như trong business model). Ưu đãi này biến bản online thành quà thêm của hộp, không phải đối thủ của hộp.
+  - Một dòng trong FAQ fanpage.
+- Không công bố giá bản online.
+
+### 11.2. Kịch bản: bản online sẵn sàng sớm (khoảng 20/11)
+
+**"Sẵn sàng" nghĩa là đủ checklist này.** Thiếu mục nào thì chưa tính:
+
+- License chặn được quyền vào game; PayOS đã chạy ít nhất 1 giao dịch thật.
+- **Toàn bộ tài liệu case #000 đã có bản số trên Dossier Studio.** Hộp giấy có tài liệu in, người chơi online thì không; thiếu một tờ là kẹt case.
+- Đã chơi trọn từ đầu đến cuối trên điện thoại thật (Android đời cũ, trình duyệt trong Zalo, 4G yếu), cả chơi một mình lẫn phòng nhóm.
+- Có kênh hỗ trợ khi khách bị kẹt hoặc lỗi thanh toán.
+- Đã chốt giá (mục 7) và tiêu chí dừng (mục 10).
+
+**20/11 đến khoảng 5/12: mở lặng lẽ.** Không đăng bài, không chạy quảng cáo. Chỉ bán ở 3 chỗ:
+
+1. **Khách không hợp mua hộp:** ở xa, nhóm không ngồi chung được, không muốn chờ ship, phân vân giá. Trước đây những khách này sẽ mất.
+2. **Người đã mua hộp:** ưu đãi bản online để mời bạn ở xa chơi cùng.
+3. **Danh sách đăng ký chờ.**
+
+**Lý do không công bố rộng ngay:** 16/11 mở bán hộp và 20/11 mở online thì cùng một tuần phải lo chốt đơn, ship và hỗ trợ lỗi web. Mở lặng lẽ giữ khối lượng hỗ trợ nhỏ, đồng thời đo được bản online có kéo khách khỏi hộp hay không.
+
+**Khoảng 5/12: quyết định** dựa trên tiêu chí dừng ở mục 10.
+
+### 11.3. Giai đoạn 2: công bố bản online
+
+Chỉ khi đạt tiêu chí ở mục 10 và đã bán xong đợt hộp đầu tiên.
+
+- Mở cho danh sách đăng ký chờ trước; nhóm này cho phản hồi và review đầu tiên.
+- Thông điệp: **"phá án cùng nhau khi không ngồi cùng một chỗ"**. Tách hẳn khỏi hộp giấy, không nói "bản rẻ hơn".
+- Thời điểm hợp: Noel và Tết, khi bạn bè ở xa muốn có hoạt động chung.
+- Kênh: group du học sinh, nhóm bạn ở các thành phố khác nhau, cộng đồng Discord, group true crime và thám tử mạng. Đến lúc này mới cân nhắc TikTok.
+- Giai đoạn 0 miễn phí là cửa vào; người chơi thử xong mới được mời mua.
+
+---
+
+## 12. Việc cần làm
+
+1. Chủ dự án điền 3 con số thật: chi phí AI mỗi tháng, gói Supabase sẽ dùng, chi phí tiền mặt của case #000 (không tính công). Sau đó tính lại mục 9 và đưa vào [`financial_founder_model.md`](financial_founder_model.md).
+2. Đo thời gian thật để làm một case (case #000 và tiến độ case #001 với Studio).
+3. Điền ngưỡng tiêu chí dừng ở mục 10 trước khi mở bán online.
+4. Gắn đo lường cho Giai đoạn 0 ngay, vì đây là phễu chung cho hộp và online.
+5. Tạo trang đăng ký chờ bản online; gắn link vào FAQ và tờ hướng dẫn trong hộp.
+6. Chơi thử case miễn phí của DetectiveOS và phần miễn phí của UCVN online; ghi lại cách họ hướng dẫn người mới, gợi ý và buộc tội.
+7. Hoàn thành checklist "sẵn sàng" ở mục 11.2 nếu muốn mở lặng lẽ khoảng 20/11.
 
 ---
 
@@ -219,3 +398,4 @@ Xếp theo mức độ nghiêm trọng với mình.
 - Hunt A Killer (Trustpilot): https://ie.trustpilot.com/review/huntakiller.com
 - Phàn nàn về game trinh thám: https://vaporlens.app/app/2797960/confidential_killings_a_detective_game ; https://vaporlens.app/app/2653470/little_problems_a_cozy_detective_game ; https://escapistmagazine.com/?p=133636
 - Thám tử mạng Việt Nam: https://www.thestar.com.my/aseanplus/aseanplus-news/2025/12/28/whodunnit-vietnams-online-sleuths-step-up-their-game-tracking-true-crime
+- Dữ liệu Trace và UCVN: export Kalodata TikTok Shop (25/10/2025–24/10/2026), không lưu trong repo
