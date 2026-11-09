@@ -18,31 +18,33 @@ interface LandingLogoMotionProps {
 
 /*
  * Geometry (980x250 wordmark space, measured from public/brand/logo_*_layer.png
- * and the app emblem public/brand/logo-x.png):
+ * and the app emblem public/brand/mark-dark.png):
  * - Yellow X: x 0..272, y 7..243 → centre (136, 125).
  * - Glass home (letter O): ring centre (597.5, 124), outer radius 77, ring width 15.5.
  * - Emblem: glass centred on X centre, scale 0.79 of home size,
- *   background-coloured stroke ≈ 0.8 × ring width around ring + handle.
+ *   background-coloured stroke ≈ 0.8 × ring width around the ring only (handle sits straight on the X).
  */
-const GLASS_CX = 597.5;
-const GLASS_CY = 124;
+const GLASS_CX = 597;
+const GLASS_CY = 124.2;
 const EMBLEM_SCALE = 0.79;
-// X optical centre (symmetry of arm edges) ≈ (135.3, 120.4); emblem glass sits +1.1/+2.0 off it.
-const EMBLEM_SHIFT_X = `${(((136.4 - GLASS_CX) / 980) * 100).toFixed(3)}%`;
-const EMBLEM_SHIFT_Y = `${(((122.4 - GLASS_CY) / 250) * 100).toFixed(3)}%`;
+// Emblem glass centre measured on mark-dark.png, mapped into wordmark space.
+const EMBLEM_CX = 136.4;
+const EMBLEM_CY = 123.5;
+const EMBLEM_SHIFT_X = `${(((EMBLEM_CX - GLASS_CX) / 980) * 100).toFixed(3)}%`;
+const EMBLEM_SHIFT_Y = `${(((EMBLEM_CY - GLASS_CY) / 250) * 100).toFixed(3)}%`;
 // Emblem handle points 53.5° below horizontal, wordmark handle 45° → rotate 8.5° at start.
 const EMBLEM_ROTATE = 8.5;
 const CENTER_SHIFT = `${(((980 - 272) / 2 / 980) * 100).toFixed(3)}%`; // X → container centre
 
 // Clip right inset aligned to glass centre x: emblem centre 136.4 → home centre GLASS_CX.
-const CLIP_EMBLEM = `${(((980 - 136.4) / 980) * 100).toFixed(2)}%`;
+const CLIP_EMBLEM = `${(((980 - EMBLEM_CX) / 980) * 100).toFixed(2)}%`;
 const CLIP_HOME = `${(((980 - GLASS_CX) / 980) * 100).toFixed(2)}%`;
 
 const RING_R = 69.25;
 const RING_W = 15.5;
 const HANDLE_W = 24;
 const STROKE = 12.5;
-const HANDLE = { x1: 650, y1: 176.5, x2: 703, y2: 230 };
+const HANDLE = { x1: 649.5, y1: 176.7, x2: 702.5, y2: 229.7 };
 
 function arc(r: number, from: number, to: number) {
   const p = (deg: number) => {
@@ -96,7 +98,6 @@ export function LandingLogoMotion({
   // để không khoét rãnh tối vào X và để lộ mẩu vàng mảnh ở mép.
   const cutStroke = useTransform(progress, [0.15, 0.25, 0.5, 0.6], [STROKE, 0, 0, STROKE]);
   const ringCutWidth = useTransform(cutStroke, (v) => RING_W + v * 2);
-  const handleCutWidth = useTransform(cutStroke, (v) => HANDLE_W + v * 2);
 
   const lettersGlowStrength = useTransform(
     progress,
@@ -158,7 +159,7 @@ export function LandingLogoMotion({
           }}
           className="absolute inset-0 w-full h-full pointer-events-none will-change-transform"
         >
-          {/* Cut-out: same shapes, wider, in page background colour */}
+          {/* Cut-out: ring only, wider, in page background colour (emblem mới: cán kính không có viền cắt) */}
           <svg
             viewBox="0 0 980 250"
             className="absolute inset-0 w-full h-full overflow-visible"
@@ -172,7 +173,6 @@ export function LandingLogoMotion({
                 fill="var(--background)"
                 style={{ strokeWidth: ringCutWidth }}
               />
-              <motion.line {...HANDLE} style={{ strokeWidth: handleCutWidth }} />
             </g>
           </svg>
           {/* Glass, glow theo đúng hình kính */}

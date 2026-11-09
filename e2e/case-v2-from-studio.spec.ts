@@ -252,7 +252,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
             role: "suspect",
             motive: "V2-01",
             contradiction: "V2-03",
-            avatar: "/brand/logo-x.png",
+            avatar: "/brand/mark-dark.png",
           },
           {
             name: "Bùi Đức Minh",

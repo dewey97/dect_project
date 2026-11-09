@@ -37,23 +37,19 @@ export const metadata: Metadata = {
     images: ['/brand/og-image.jpg'],
   },
   icons: {
+    // Tab favicon theo màu giao diện trình duyệt: nền sáng dùng bản light, nền tối dùng bản dark.
     icon: [
       {
-        url: '/brand/icon-light-32x32.png',
-        sizes: '32x32',
+        url: '/brand/favicon-light.png',
+        sizes: '64x64',
         type: 'image/png',
         media: '(prefers-color-scheme: light)',
       },
       {
-        url: '/brand/icon-dark-32x32.png',
-        sizes: '32x32',
+        url: '/brand/favicon-dark.png',
+        sizes: '64x64',
         type: 'image/png',
         media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/brand/icon.png',
-        sizes: '512x512',
-        type: 'image/png',
       },
     ],
     apple: [
@@ -63,7 +59,6 @@ export const metadata: Metadata = {
         type: 'image/png',
       },
     ],
-    shortcut: '/favicon.ico',
   },
 }
 

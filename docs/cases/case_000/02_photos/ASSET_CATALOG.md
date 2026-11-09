@@ -33,14 +33,18 @@ public/
 
 | Tên File                      | Mục Đích Sử Dụng                            | Vị Trí Hiển Thị Trong Code / UI       |
 | :---------------------------- | :------------------------------------------ | :------------------------------------ |
-| `logo.png`                    | Banner Logo thương hiệu chính thức (XPLORE) | Navbar, Header, Component `BrandMark` |
-| `logo-x.png`                  | Biểu tượng X kính lúp (Noir Emblem Master)  | Thẻ ngành, tem niêm phong, sidebar    |
-| `logo-xplore.png`             | Icon/Logo ứng dụng chính (512x512)          | Favicon source, icon hệ thống         |
-| `icon.png`                    | App Icon độ phân giải cao (512x512)         | PWA Manifest, Web App Metadata        |
-| `icon-light-32x32.png`        | Favicon chế độ sáng (32x32)                 | Browser Tab Bar (`app/layout.tsx`)    |
-| `icon-dark-32x32.png`         | Favicon chế độ tối (32x32)                  | Browser Tab Bar (`app/layout.tsx`)    |
-| `apple-icon.png`              | Icon cảm ứng trên iOS / iPadOS (180x180)    | Màn hình chính thiết bị Apple         |
-| `favicon.png` / `favicon.ico` | Favicon chuẩn đa kích thước (16, 32, 48)    | Bookmark & trình duyệt                |
+| `logo-dark.png`               | Logo ngang XPLORE, chữ xám cho nền tối      | Navbar, footer, Component `BrandMark` |
+| `logo-light.png`              | Logo ngang XPLORE, chữ đen cho nền sáng     | Trang `/brand` (chế độ nền sáng)      |
+| `mark-dark.png`               | Biểu tượng X kính lúp cho nền tối (512x512) | `BrandMark variant="favicon"`, `/brand` |
+| `mark-light.png`              | Biểu tượng X kính lúp cho nền sáng (512x512)| Trang `/brand` (chế độ nền sáng)      |
+| `favicon-dark.png`            | Favicon tab khi trình duyệt ở chế độ tối (64x64) | `app/layout.tsx` (`media: dark`)  |
+| `favicon-light.png`           | Favicon tab khi trình duyệt ở chế độ sáng (64x64)| `app/layout.tsx` (`media: light`) |
+| `apple-icon.png`              | Icon iOS / iPadOS, nền đặc #0a0a0d (180x180)| `app/layout.tsx` (`icons.apple`)      |
+| `logo_x_layer.png`            | Lớp chữ X vàng (980x250) cho motion logo    | `LandingLogoMotion`                   |
+| `logo_letters_layer.png`      | Lớp chữ P L R E (980x250) cho motion logo   | `LandingLogoMotion`                   |
+| `/favicon.ico` (thư mục `public/`) | Favicon dự phòng 16/32/48 cho trình duyệt cũ, crawler | Request mặc định `/favicon.ico` |
+
+> File gốc từ thiết kế (4 ảnh 1920x1080 nền trong suốt) lưu tại `docs/design/brand/logo-xplore.zip`: `2.png` logo nền tối, `4.png` logo nền sáng, `3.png` biểu tượng nền tối, `5.png` biểu tượng nền sáng. Không đặt file `icon.png`, `apple-icon.png`, `favicon.ico` trong `app/`: quy ước file của Next.js sẽ ghi đè `metadata.icons`.
 
 ---
 

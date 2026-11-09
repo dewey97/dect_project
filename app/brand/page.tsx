@@ -11,9 +11,7 @@ import { LandingFooter } from '@/components/public/landing-footer'
 export default function BrandGuidelinesPage() {
   const [copiedKey, setCopiedKey] = useState<string | null>(null)
   const [logoTheme, setLogoTheme] = useState<'dark' | 'light'>('dark')
-  const [sampleText, setSampleText] = useState(
-    'Vụ án #000: Trốn Tìm — Mọi manh mối rồi sẽ được đưa ra ánh sáng.'
-  )
+  const [sampleText, setSampleText] = useState('')
 
   const copyToClipboard = (text: string, key: string) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -68,27 +66,44 @@ export default function BrandGuidelinesPage() {
     }
   ]
 
+  // Thang chữ thật đang dùng trên landing. Chỉ 3 font: Inter, EB Garamond, Roboto Mono.
   const FONT_SPECIMENS = [
     {
-      type: 'Sans / Giao diện & Nội dung',
-      family: 'Inter / Geist Sans',
-      fontClass: 'font-sans'
+      type: 'Tiêu đề chính (H1)',
+      spec: 'Inter · Black 900 · 30 / 36 / 48px · in hoa',
+      fontClass: 'font-sans font-black uppercase tracking-tight text-3xl sm:text-4xl xl:text-5xl leading-[1.15]',
+      sample: 'Những vụ án chưa có lời giải...',
     },
     {
-      type: 'Monospace / Kỹ thuật & Mốc thời gian',
-      family: 'Roboto Mono / Geist Mono',
-      fontClass: 'font-mono'
+      type: 'Tiêu đề section (H2)',
+      spec: 'Inter · Black 900 · 24 / 30 / 36px',
+      fontClass: 'font-sans font-black tracking-tight text-2xl sm:text-3xl lg:text-4xl leading-tight',
+      sample: 'Đừng bỏ lỡ vụ án tiếp theo',
     },
     {
-      type: 'Handwriting / Ghi chú viết tay',
-      family: 'Playpen Sans / Caveat',
-      fontClass: 'font-handwriting'
+      type: 'Tiêu đề khối (H3)',
+      spec: 'Inter · Bold 700 · 20 / 24px',
+      fontClass: 'font-sans font-bold tracking-tight text-xl sm:text-2xl',
+      sample: 'Điện thoại nạn nhân',
     },
     {
-      type: 'Typewriter / Biên bản pháp y',
-      family: 'Courier Prime / Special Elite',
-      fontClass: 'font-typewriter'
-    }
+      type: 'Nội dung',
+      spec: 'Inter · Regular 400 · 14 / 16px · giãn dòng 1.6',
+      fontClass: 'font-sans text-sm sm:text-base leading-relaxed text-muted-foreground',
+      sample: 'Khi cảnh sát địa phương hoàn toàn bế tắc trước những kỳ án chấn động, hồ sơ sẽ được chuyển giao đến tổ điều tra.',
+    },
+    {
+      type: 'Trích dẫn',
+      spec: 'EB Garamond · Italic 400 · 16 / 18px',
+      fontClass: 'font-serif italic text-base lg:text-lg leading-snug text-zinc-300',
+      sample: '“Mọi tiếp xúc đều để lại dấu vết.” — Edmond Locard',
+    },
+    {
+      type: 'Nhãn & mã hồ sơ',
+      spec: 'Roboto Mono · Medium 500 · 12px · in hoa, giãn chữ',
+      fontClass: 'font-mono font-medium text-xs uppercase tracking-widest text-amber-400',
+      sample: 'Vụ án #000 · Thời gian 60–90 phút',
+    },
   ]
 
   return (
@@ -105,7 +120,7 @@ export default function BrandGuidelinesPage() {
           <h1 className="text-2xl sm:text-4xl font-black uppercase tracking-tight font-sans">
             BỘ NHẬN DIỆN THƯƠNG HIỆU <span className="text-primary">XPLORE</span>
           </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground font-mono">
+          <p className="text-sm sm:text-base text-muted-foreground font-sans">
             Quy chuẩn biểu tượng, bảng màu tài liệu, kiểu chữ và kho tài nguyên số hóa chính thức.
           </p>
         </div>
@@ -151,17 +166,15 @@ export default function BrandGuidelinesPage() {
                   : 'bg-[#f4efe6] border-[#d8d0c2] text-zinc-900'
               }`}
             >
-              <span className="font-mono text-[0.65rem] uppercase tracking-widest opacity-60">
+              <span className="font-mono text-xs uppercase tracking-widest opacity-60">
                 LOGO CHÍNH
               </span>
 
               <div className="flex items-center justify-center py-6">
                 <img
-                  src="/brand/logo.png"
+                  src={logoTheme === 'light' ? '/brand/logo-light.png' : '/brand/logo-dark.png'}
                   alt="XPLORE Logo"
-                  className={`max-h-16 w-auto object-contain transition-all ${
-                    logoTheme === 'light' ? 'invert hue-rotate-180 brightness-90' : ''
-                  }`}
+                  className="max-h-16 w-auto object-contain transition-all"
                 />
               </div>
 
@@ -176,13 +189,13 @@ export default function BrandGuidelinesPage() {
                   : 'bg-[#f4efe6] border-[#d8d0c2] text-zinc-900'
               }`}
             >
-              <span className="font-mono text-[0.65rem] uppercase tracking-widest opacity-60">
+              <span className="font-mono text-xs uppercase tracking-widest opacity-60">
                 BIỂU TƯỢNG
               </span>
 
               <div className="flex items-center justify-center py-6">
                 <img
-                  src={logoTheme === 'light' ? '/brand/logo-x-light.png' : '/brand/logo-x.png'}
+                  src={logoTheme === 'light' ? '/brand/mark-light.png' : '/brand/mark-dark.png'}
                   alt="XPLORE Mark"
                   className="max-h-16 w-auto object-contain transition-all"
                 />
@@ -214,7 +227,7 @@ export default function BrandGuidelinesPage() {
                     className={`h-14 w-full rounded-none border ${c.borderClass} ${c.bgClass} flex items-end justify-center pb-1`}
                   >
                     {isCopied ? (
-                      <span className="text-[0.65rem] font-mono font-bold text-emerald-400 bg-black/80 px-1">
+                      <span className="text-xs font-mono font-bold text-emerald-400 bg-black/80 px-1">
                         ĐÃ COPY
                       </span>
                     ) : (
@@ -224,7 +237,7 @@ export default function BrandGuidelinesPage() {
 
                   <div className="flex flex-col">
                     <span className="font-bold text-xs text-foreground truncate">{c.name}</span>
-                    <span className="text-[0.7rem] font-mono text-muted-foreground">{c.hex}</span>
+                    <span className="text-xs font-mono text-muted-foreground">{c.hex}</span>
                   </div>
                 </div>
               )
@@ -246,11 +259,18 @@ export default function BrandGuidelinesPage() {
                 type="text"
                 value={sampleText}
                 onChange={(e) => setSampleText(e.target.value)}
-                className="w-full sm:w-80 bg-card border border-border/60 rounded-none px-2.5 py-1 text-xs text-foreground focus:outline-hidden focus:border-primary font-mono"
-                placeholder="Nhập văn bản mẫu để kiểm tra..."
+                className="w-full sm:w-80 bg-card border border-border/60 rounded-none px-2.5 py-1 text-xs text-foreground focus:outline-hidden focus:border-primary font-sans"
+                placeholder="Gõ để thử chữ trên mọi kiểu..."
               />
             </div>
           </div>
+
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Website chỉ dùng 3 font: <strong className="text-foreground">Inter</strong> cho giao diện và nội dung,{' '}
+            <strong className="text-foreground">EB Garamond</strong> in nghiêng cho trích dẫn,{' '}
+            <strong className="text-foreground">Roboto Mono</strong> cho nhãn và mã hồ sơ. Chữ viết tay (Playpen Sans)
+            chỉ dùng cho ghi chú trên bảng điều tra trong game.
+          </p>
 
           {/* Typography Specimen Grid */}
           <div className="flex flex-col gap-3">
@@ -259,13 +279,13 @@ export default function BrandGuidelinesPage() {
                 key={f.type}
                 className="rounded-none border border-border/40 bg-card/30 p-4 sm:p-5 flex flex-col gap-2"
               >
-                <div className="flex items-center justify-between text-xs font-mono text-muted-foreground border-b border-border/15 pb-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs text-muted-foreground border-b border-border/15 pb-2">
                   <span className="font-bold text-primary">{f.type}</span>
-                  <span>{f.family}</span>
+                  <span className="font-mono">{f.spec}</span>
                 </div>
 
-                <div className={`text-base sm:text-xl text-foreground pt-1 ${f.fontClass}`}>
-                  {sampleText || 'Vụ án #000: Trốn Tìm — Mọi manh mối rồi sẽ được đưa ra ánh sáng.'}
+                <div className={`text-foreground pt-1 ${f.fontClass}`}>
+                  {sampleText || f.sample}
                 </div>
               </div>
             ))}
@@ -319,7 +339,7 @@ export default function BrandGuidelinesPage() {
               <div className="rounded-none border border-border/40 bg-card/40 p-4 flex flex-col justify-between gap-4 hover:border-primary/50 transition-all shadow-sm group">
                 <div className="w-full h-32 rounded-none bg-black/60 border border-white/5 flex items-center justify-center p-4 overflow-hidden relative">
                   <img
-                    src="/brand/logo.png"
+                    src="/brand/logo-dark.png"
                     alt="Logo Ngang"
                     className="max-h-full max-w-full object-contain drop-shadow transition-transform duration-300 group-hover:scale-105"
                   />
@@ -330,14 +350,14 @@ export default function BrandGuidelinesPage() {
                     <h3 className="font-bold text-sm text-foreground truncate">
                       Logo Chính
                     </h3>
-                    <span className="text-[0.7rem] font-mono text-muted-foreground mt-0.5">
-                      1920 × 1080 px
+                    <span className="text-xs font-mono text-muted-foreground mt-0.5">
+                      1914 × 463 px · nền tối
                     </span>
                   </div>
 
                   <a
-                    href="/brand/logo.png"
-                    download="xplore_logo.png"
+                    href="/brand/logo-dark.png"
+                    download="xplore_logo_dark.png"
                     className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-none bg-primary text-black font-bold text-xs hover:bg-primary/90 transition-all shadow-sm active:scale-95"
                   >
                     <Download className="size-3.5" />
@@ -350,7 +370,7 @@ export default function BrandGuidelinesPage() {
               <div className="rounded-none border border-border/40 bg-card/40 p-4 flex flex-col justify-between gap-4 hover:border-primary/50 transition-all shadow-sm group">
                 <div className="w-full h-32 rounded-none bg-black/60 border border-white/5 flex items-center justify-center p-4 overflow-hidden relative">
                   <img
-                    src="/brand/logo-x.png"
+                    src="/brand/mark-dark.png"
                     alt="Biểu Tượng X"
                     className="max-h-full max-w-full object-contain drop-shadow transition-transform duration-300 group-hover:scale-105"
                   />
@@ -361,14 +381,14 @@ export default function BrandGuidelinesPage() {
                     <h3 className="font-bold text-sm text-foreground truncate">
                       Biểu Tượng
                     </h3>
-                    <span className="text-[0.7rem] font-mono text-muted-foreground mt-0.5">
-                      512 × 512 px
+                    <span className="text-xs font-mono text-muted-foreground mt-0.5">
+                      512 × 512 px · nền tối
                     </span>
                   </div>
 
                   <a
-                    href="/brand/logo-x.png"
-                    download="xplore_mark.png"
+                    href="/brand/mark-dark.png"
+                    download="xplore_mark_dark.png"
                     className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-none bg-primary text-black font-bold text-xs hover:bg-primary/90 transition-all shadow-sm active:scale-95"
                   >
                     <Download className="size-3.5" />
@@ -381,7 +401,7 @@ export default function BrandGuidelinesPage() {
               <div className="rounded-none border border-border/40 bg-card/40 p-4 flex flex-col justify-between gap-4 hover:border-primary/50 transition-all shadow-sm group">
                 <div className="w-full h-32 rounded-none bg-black/60 border border-white/5 flex items-center justify-center p-4 overflow-hidden relative">
                   <img
-                    src="/brand/icon-dark-32x32.png"
+                    src="/brand/favicon-dark.png"
                     alt="Favicon"
                     className="size-10 object-contain drop-shadow transition-transform duration-300 group-hover:scale-110"
                   />
@@ -392,13 +412,13 @@ export default function BrandGuidelinesPage() {
                     <h3 className="font-bold text-sm text-foreground truncate">
                       Bộ Favicon Trình Duyệt
                     </h3>
-                    <span className="text-[0.7rem] font-mono text-muted-foreground mt-0.5">
+                    <span className="text-xs font-mono text-muted-foreground mt-0.5">
                       16x16, 32x32, 48x48
                     </span>
                   </div>
 
                   <a
-                    href="/brand/favicon.ico"
+                    href="/favicon.ico"
                     download="favicon.ico"
                     className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-none bg-primary text-black font-bold text-xs hover:bg-primary/90 transition-all shadow-sm active:scale-95"
                   >
