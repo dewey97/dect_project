@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
-import { LandingNavbar } from "@/components/public/landing-navbar";
-import { LandingFooter } from "@/components/public/landing-footer";
+import {
+  LegalDocument,
+  LEGAL_ENTITY,
+  type LegalSection,
+} from "@/components/public/legal-document";
 
 export const metadata: Metadata = {
   title: "Điều Khoản Dịch Vụ | XPLORE",
@@ -8,111 +11,347 @@ export const metadata: Metadata = {
     "Quy định và điều khoản sử dụng nền tảng trò chơi trinh thám tương tác XPLORE.",
 };
 
+const E = LEGAL_ENTITY;
+
+const SECTIONS: LegalSection[] = [
+  {
+    id: "pham-vi",
+    title: "Phạm vi áp dụng và chấp thuận điều khoản",
+    body: (
+      <>
+        <p>
+          Điều khoản này quy định quyền và nghĩa vụ giữa người dùng và{" "}
+          {E.published ? (
+            <>
+              <strong>{E.name}</strong> (mã số thuế {E.taxCode}),{" "}
+            </>
+          ) : null}
+          đơn vị vận hành nền tảng trò chơi trinh thám XPLORE.
+        </p>
+        <p>
+          Khi truy cập website, tạo tài khoản, mua sản phẩm, tham gia phòng chơi
+          hoặc kích hoạt mã trong hộp hồ sơ, bạn xác nhận đã đọc, hiểu và đồng ý
+          với Điều khoản này cùng{" "}
+          <a
+            href="/privacy"
+            className="text-amber-400 hover:underline underline-offset-4"
+          >
+            Chính sách bảo mật
+          </a>
+          . Nếu không đồng ý, vui lòng ngừng sử dụng dịch vụ.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "dinh-nghia",
+    title: "Định nghĩa",
+    body: (
+      <ul>
+        <li>
+          <strong>Vụ án:</strong> một bộ nội dung trò chơi gồm cốt truyện, hồ
+          sơ, vật chứng, câu đố và lời giải.
+        </li>
+        <li>
+          <strong>Bản trực tuyến:</strong> quyền chơi một vụ án trên website,
+          gắn với tài khoản người mua.
+        </li>
+        <li>
+          <strong>Bản hộp hồ sơ:</strong> bộ tài liệu in và vật chứng được giao
+          tận nơi, kèm mã QR mở phần điều tra trên web.
+        </li>
+        <li>
+          <strong>Phòng chơi nhóm:</strong> phiên chơi trực tuyến cho nhiều
+          người cùng điều tra một vụ án.
+        </li>
+      </ul>
+    ),
+  },
+  {
+    id: "tai-khoan",
+    title: "Điều kiện sử dụng và tài khoản",
+    body: (
+      <>
+        <p>
+          Một số vụ án có nội dung án mạng và yếu tố kinh dị, phù hợp với người
+          từ 16 tuổi trở lên. Người dưới 16 tuổi cần có sự đồng ý và giám sát
+          của cha, mẹ hoặc người giám hộ.
+        </p>
+        <p>
+          Bạn có thể đăng ký bằng email hoặc đăng nhập bằng tài khoản Google.
+          Bạn chịu trách nhiệm về tính chính xác của thông tin cung cấp, tự bảo
+          mật thông tin đăng nhập và mọi hoạt động diễn ra trên tài khoản của
+          mình.
+        </p>
+        <p>
+          Mỗi tài khoản dành cho một người. Không chia sẻ, mua bán hay chuyển
+          nhượng tài khoản. Hãy báo ngay cho chúng tôi nếu phát hiện tài khoản
+          bị truy cập trái phép.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "san-pham",
+    title: "Sản phẩm và quyền sử dụng",
+    body: (
+      <>
+        <p>
+          <strong>Bản trực tuyến:</strong> sau khi thanh toán thành công, vụ án
+          được mở khóa trên tài khoản người mua trong suốt thời gian XPLORE còn
+          cung cấp dịch vụ. Quyền này dành cho mục đích giải trí cá nhân, không
+          được chuyển nhượng.
+        </p>
+        <p>
+          <strong>Bản hộp hồ sơ:</strong> người sở hữu hộp được dùng mã QR trong
+          hộp để mở phần điều tra trên web đi kèm vụ án. Bạn có thể tặng hoặc
+          cho mượn hộp hồ sơ.
+        </p>
+        <p>
+          <strong>Gói chơi nhóm:</strong> số lượt tạo phòng và số người tham gia
+          mỗi phòng theo mô tả của gói tại thời điểm mua.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "gia-thanh-toan",
+    title: "Giá, thanh toán và hóa đơn",
+    body: (
+      <>
+        <p>
+          Giá sản phẩm được niêm yết bằng Việt Nam đồng tại trang sản phẩm, đã
+          bao gồm thuế theo quy định. Phí vận chuyển của hộp hồ sơ (nếu có) được
+          hiển thị trước khi bạn xác nhận đặt hàng.
+        </p>
+        <p>
+          Thanh toán trực tuyến được thực hiện qua cổng thanh toán PayOS. Đơn
+          hàng được xác nhận khi hệ thống nhận được kết quả thanh toán thành
+          công. Nếu đã bị trừ tiền nhưng vụ án chưa được mở khóa, vui lòng liên
+          hệ hỗ trợ kèm mã đơn hàng.
+        </p>
+        <p>
+          Hóa đơn điện tử được xuất theo quy định. Nếu cần hóa đơn ghi thông tin
+          doanh nghiệp, vui lòng gửi thông tin xuất hóa đơn khi đặt hàng hoặc
+          trong vòng 3 ngày kể từ ngày thanh toán.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "giao-hang",
+    title: "Giao hàng hộp hồ sơ vật lý",
+    body: (
+      <>
+        <p>
+          Hộp hồ sơ được giao qua đơn vị vận chuyển tới địa chỉ bạn cung cấp.
+          Thời gian giao dự kiến được thông báo khi đặt hàng và có thể thay đổi
+          tùy khu vực.
+        </p>
+        <p>
+          Khi nhận hàng, vui lòng kiểm tra tem niêm phong và tình trạng hộp. Nếu
+          hộp bị móp, rách hoặc mất niêm phong, hãy chụp ảnh và báo cho chúng
+          tôi trong vòng 48 giờ kể từ khi nhận.
+        </p>
+        <p>
+          Chúng tôi không chịu trách nhiệm cho việc giao chậm hoặc thất lạc do
+          thông tin người nhận không chính xác.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "doi-tra",
+    title: "Đổi trả và hoàn tiền",
+    body: (
+      <>
+        <p>
+          <strong>Bản hộp hồ sơ:</strong> đổi mới miễn phí trong 7 ngày kể từ
+          ngày nhận nếu hộp bị lỗi in, thiếu tài liệu hoặc hư hỏng do vận
+          chuyển. Nếu không còn hàng để đổi, chúng tôi hoàn tiền đầy đủ.
+        </p>
+        <p>
+          <strong>Bản trực tuyến:</strong> do nội dung được mở ngay sau khi
+          thanh toán, vụ án đã kích hoạt không được hoàn tiền. Ngoại lệ: lỗi kỹ
+          thuật từ phía hệ thống khiến bạn không thể chơi và chúng tôi không
+          khắc phục được trong 7 ngày kể từ khi nhận báo lỗi.
+        </p>
+        <p>
+          Tiền hoàn được chuyển về phương thức thanh toán ban đầu hoặc tài khoản
+          ngân hàng do bạn cung cấp, trong vòng 7 ngày làm việc kể từ khi yêu
+          cầu được chấp nhận.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "so-huu-tri-tue",
+    title: "Quyền sở hữu trí tuệ",
+    body: (
+      <>
+        <p>
+          Toàn bộ kịch bản, cốt truyện, nhân vật, hình ảnh, tài liệu, âm thanh,
+          thiết kế, thương hiệu XPLORE và mã nguồn là tài sản trí tuệ của XPLORE
+          hoặc được XPLORE cấp phép sử dụng, được pháp luật bảo hộ.
+        </p>
+        <p>
+          Nghiêm cấm sao chép, in lại, trích xuất dữ liệu, đăng tải tài liệu vụ
+          án, phát tán lời giải hoặc thương mại hóa nội dung dưới bất kỳ hình
+          thức nào khi chưa có sự đồng ý bằng văn bản của XPLORE.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "quy-tac-ung-xu",
+    title: "Quy tắc ứng xử",
+    body: (
+      <>
+        <p>Khi sử dụng dịch vụ, bạn không được:</p>
+        <ul>
+          <li>
+            Tiết lộ hung thủ, lời giải hoặc manh mối mấu chốt ở nơi công cộng mà
+            không có cảnh báo trước (spoiler).
+          </li>
+          <li>
+            Dùng công cụ, phần mềm hoặc thủ thuật để can thiệp hệ thống, bỏ qua
+            bước kiểm tra, xem trước đáp án.
+          </li>
+          <li>Sao chép, dịch ngược hoặc khai thác lỗ hổng của website.</li>
+          <li>
+            Đăng tên hiển thị hoặc nội dung xúc phạm, vi phạm pháp luật, thuần
+            phong mỹ tục.
+          </li>
+          <li>Spam, gây quá tải hoặc làm gián đoạn dịch vụ của người khác.</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    id: "phong-choi-nhom",
+    title: "Phòng chơi nhóm trực tuyến",
+    body: (
+      <>
+        <p>
+          Người tạo phòng có quyền mời thành viên, quản lý và loại thành viên vi
+          phạm khỏi phiên điều tra.
+        </p>
+        <p>
+          Các thành viên tự chịu trách nhiệm về nội dung mình chia sẻ trong
+          phòng. Nghiêm cấm phá hoại tiến trình giải đố của thành viên khác.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "gioi-han-trach-nhiem",
+    title: "Gián đoạn dịch vụ và giới hạn trách nhiệm",
+    body: (
+      <>
+        <p>
+          Dịch vụ có thể tạm gián đoạn để bảo trì, nâng cấp hoặc do sự cố ngoài
+          tầm kiểm soát như mất điện, lỗi mạng, thiên tai hay sự cố của đối tác
+          hạ tầng. Chúng tôi sẽ thông báo trước với các đợt bảo trì có kế hoạch
+          và khắc phục sự cố sớm nhất có thể.
+        </p>
+        <p>
+          Trong phạm vi pháp luật cho phép, XPLORE không chịu trách nhiệm với
+          thiệt hại gián tiếp phát sinh từ việc không thể sử dụng dịch vụ. Trách
+          nhiệm bồi thường (nếu có) không vượt quá số tiền bạn đã thanh toán cho
+          sản phẩm liên quan. Điều này không hạn chế các quyền của người tiêu
+          dùng theo quy định pháp luật.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "cham-dut",
+    title: "Tạm khóa và chấm dứt tài khoản",
+    body: (
+      <>
+        <p>
+          Chúng tôi có thể tạm khóa hoặc chấm dứt tài khoản vi phạm Điều khoản
+          này, sau khi thông báo lý do qua email, trừ trường hợp cần ngăn chặn
+          ngay hành vi gây hại cho hệ thống hoặc người khác.
+        </p>
+        <p>
+          Bạn có thể ngừng sử dụng và yêu cầu xóa tài khoản bất kỳ lúc nào theo
+          hướng dẫn tại Chính sách bảo mật.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "du-lieu-ca-nhan",
+    title: "Bảo vệ dữ liệu cá nhân",
+    body: (
+      <p>
+        Việc thu thập và xử lý dữ liệu cá nhân của bạn được thực hiện theo{" "}
+        <a
+          href="/privacy"
+          className="text-amber-400 hover:underline underline-offset-4"
+        >
+          Chính sách bảo mật
+        </a>
+        , là một phần không tách rời của Điều khoản này.
+      </p>
+    ),
+  },
+  {
+    id: "sua-doi",
+    title: "Sửa đổi điều khoản",
+    body: (
+      <p>
+        Chúng tôi có thể sửa đổi Điều khoản để phù hợp với sự thay đổi của dịch
+        vụ hoặc pháp luật. Bản sửa đổi được đăng trên trang này kèm ngày cập
+        nhật. Với thay đổi ảnh hưởng tới quyền lợi của bạn, chúng tôi thông báo
+        qua email hoặc trên website ít nhất 7 ngày trước khi áp dụng. Việc bạn
+        tiếp tục sử dụng dịch vụ sau thời điểm đó được hiểu là đồng ý với bản
+        sửa đổi.
+      </p>
+    ),
+  },
+  {
+    id: "luat-ap-dung",
+    title: "Luật áp dụng và giải quyết tranh chấp",
+    body: (
+      <>
+        <p>Điều khoản này được điều chỉnh bởi pháp luật Việt Nam.</p>
+        <p>
+          Mọi tranh chấp trước hết được giải quyết bằng thương lượng. Bạn có thể
+          gửi khiếu nại tới {E.supportEmail}; chúng tôi phản hồi trong vòng 7
+          ngày làm việc. Nếu không thương lượng được, các bên có thể yêu cầu hòa
+          giải hoặc đưa vụ việc ra Tòa án có thẩm quyền tại Việt Nam.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "lien-he",
+    title: "Liên hệ",
+    body: (
+      <>
+        <p>
+          Hỗ trợ, khiếu nại và câu hỏi về Điều khoản:{" "}
+          <span className="text-amber-400 font-mono">{E.supportEmail}</span>
+        </p>
+        {E.published && (
+          <p>
+            {E.name} • MST {E.taxCode} • {E.address}
+          </p>
+        )}
+      </>
+    ),
+  },
+];
+
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans antialiased relative flex flex-col justify-between selection:bg-amber-500 selection:text-zinc-950">
-      {/* Sticky Top Header */}
-      <LandingNavbar />
-
-      {/* Main Container: Văn bản pháp lý thuần túy, sạch sẽ, không khung viền rườm rà */}
-      <main className="flex-1 w-full max-w-3xl mx-auto px-6 py-12 sm:py-16">
-        {/* Header Title */}
-        <div className="space-y-2 pb-8 mb-10 border-b border-zinc-800/80">
-          <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-zinc-100 font-sans">
-            ĐIỀU KHOẢN DỊCH VỤ
-          </h1>
-          <p className="text-xs text-zinc-500 font-mono">
-            Áp dụng từ: Tháng 01/2026 • Cập nhật lần cuối: Tháng 03/2026
-          </p>
-        </div>
-
-        {/* Legal Text Body */}
-        <div className="space-y-8 text-[13.5px] text-zinc-300 leading-relaxed font-sans">
-          {/* Điều 1 */}
-          <section className="space-y-2.5">
-            <h2 className="text-base font-bold uppercase tracking-wide text-zinc-100 font-mono">
-              Điều 1. Phạm vi áp dụng & Chấp thuận điều khoản
-            </h2>
-            <p>
-              1.1. Các điều khoản này quy định quyền và nghĩa vụ giữa người chơi (sau đây gọi là &quot;Người dùng&quot;) và Ban điều hành nền tảng trò chơi trinh thám tương tác XPLORE (sau đây gọi là &quot;XPLORE&quot;).
-            </p>
-            <p>
-              1.2. Bằng việc truy cập hệ thống, đăng ký tài khoản, tham gia bàn điều tra trực tuyến hoặc kích hoạt mã hộp vật lý, Người dùng mặc nhiên đồng ý tuân thủ toàn bộ các nội dung quy định tại văn bản này.
-            </p>
-          </section>
-
-          {/* Điều 2 */}
-          <section className="space-y-2.5">
-            <h2 className="text-base font-bold uppercase tracking-wide text-zinc-100 font-mono">
-              Điều 2. Quyền sở hữu trí tuệ & Bản quyền kịch bản
-            </h2>
-            <p>
-              2.1. Toàn bộ kịch bản vụ án, cốt truyện, thông tin nhân vật, ảnh chụp hiện trường, tài liệu giám định pháp y, âm thanh và mã nguồn trò chơi là tài sản trí tuệ độc quyền của XPLORE và được pháp luật bảo hộ.
-            </p>
-            <p>
-              2.2. Người dùng được cấp quyền trải nghiệm giải trí cá nhân hoặc theo nhóm bạn bè. Nghiêm cấm sao chép, trích xuất dữ liệu, phát tán nội dung lên mạng xã hội, chia sẻ lời giải hoặc thương mại hóa tài liệu vụ án dưới mọi hình thức mà không có sự đồng ý bằng văn bản từ XPLORE.
-            </p>
-          </section>
-
-          {/* Điều 3 */}
-          <section className="space-y-2.5">
-            <h2 className="text-base font-bold uppercase tracking-wide text-zinc-100 font-mono">
-              Điều 3. Tài khoản người chơi & Trách nhiệm bảo mật
-            </h2>
-            <p>
-              3.1. Người dùng có trách nhiệm tự bảo mật thông tin đăng nhập và địa chỉ email dùng để truy cập dịch vụ.
-            </p>
-            <p>
-              3.2. Nhằm tôn trọng trải nghiệm chung của cộng đồng, Người dùng cam kết không tiết lộ danh tính hung thủ, phương thức gây án hoặc các manh mối mấu chốt (spoilers) tại các kênh thảo luận công cộng khi chưa có gắn nhãn cảnh báo trước.
-            </p>
-          </section>
-
-          {/* Điều 4 */}
-          <section className="space-y-2.5">
-            <h2 className="text-base font-bold uppercase tracking-wide text-zinc-100 font-mono">
-              Điều 4. Mở khóa vụ án, Thanh toán & Giao nhận
-            </h2>
-            <p>
-              4.1. <strong>Bản trực tuyến:</strong> Thanh toán được thực hiện an toàn qua cổng thanh toán đối tác (PayOS). Sau khi giao dịch thành công, quyền phá án được mở khóa vĩnh viễn trên tài khoản người mua.
-            </p>
-            <p>
-              4.2. <strong>Hộp hồ sơ vật lý:</strong> Được vận chuyển theo bưu điện tới địa chỉ Người dùng cung cấp. Người dùng có trách nhiệm kiểm tra tính nguyên vẹn của tem niêm phong hộp khi nhận hàng.
-            </p>
-            <p>
-              4.3. <strong>Chính sách đổi trả & Hoàn tiền:</strong> XPLORE hỗ trợ đổi mới 1-1 trong 7 ngày đối với sản phẩm hộp vật lý bị lỗi in ấn, thiếu tài liệu hoặc hư hỏng do vận chuyển. Các gói mở khóa trực tuyến đã kích hoạt không áp dụng hoàn tiền trừ trường hợp phát sinh lỗi kỹ thuật hệ thống kéo dài từ máy chủ.
-            </p>
-          </section>
-
-          {/* Điều 5 */}
-          <section className="space-y-2.5">
-            <h2 className="text-base font-bold uppercase tracking-wide text-zinc-100 font-mono">
-              Điều 5. Quy chế phòng chơi nhóm trực tuyến
-            </h2>
-            <p>
-              5.1. Người tạo phòng (Host) có quyền quản trị phòng chơi, mời thành viên tham gia hoặc loại bỏ thành viên vi phạm khỏi phiên điều tra.
-            </p>
-            <p>
-              5.2. Nghiêm cấm các hành vi gửi yêu cầu phá hoại, spam kết nối realtime hoặc can thiệp trái phép vào tiến trình giải đố của các thành viên khác trong phòng.
-            </p>
-          </section>
-
-          {/* Điều 6 */}
-          <section className="space-y-2.5">
-            <h2 className="text-base font-bold uppercase tracking-wide text-zinc-100 font-mono">
-              Điều 6. Sửa đổi điều khoản & Liên hệ hỗ trợ
-            </h2>
-            <p>
-              6.1. XPLORE có quyền điều chỉnh nội dung các điều khoản để phù hợp với quy định pháp luật và sự phát triển của hệ thống. Các thay đổi sẽ có hiệu lực ngay khi được công bố trên trang web.
-            </p>
-            <p>
-              6.2. Mọi thắc mắc, khiếu nại hoặc yêu cầu hỗ trợ kỹ thuật, vui lòng gửi thư điện tử về hòm thư: <span className="text-amber-400 font-mono">support@xplore.vn</span>.
-            </p>
-          </section>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <LandingFooter />
-    </div>
+    <LegalDocument
+      title="Điều khoản dịch vụ"
+      effective="Tháng 01/2026"
+      updated="Tháng 11/2026"
+      sections={SECTIONS}
+    />
   );
 }
