@@ -17,6 +17,7 @@ import { CanvasWalkthroughTour } from "@/components/investigation/evidence/canva
 import { BrandMark } from "@/components/investigation/brand-mark";
 import { UserNav } from "@/components/auth/user-nav";
 import { RoomModal } from "@/components/investigation/room/room-modal";
+import { RoomPresenceBar } from "@/components/investigation/room/room-presence-bar";
 import { cn } from "@/lib/utils";
 import { MainInvestigationCanvas } from "@/components/investigation/board/main-investigation-canvas";
 import { DossierCanvasBoard } from "@/components/investigation/evidence/dossier-canvas-board";
@@ -47,6 +48,7 @@ import { CanvasNotebookWindow } from "./canvas/notebook-window";
 import { CanvasPhoneWindow } from "./canvas/phone-window";
 import { CanvasBoardWindow } from "./canvas/board-window";
 import { CanvasSidebar } from "./canvas/sidebar";
+import { CanvasReaderPanel, type ReaderMode } from "./canvas/reader-panel";
 
 export interface CanvasInvestigationWorkspaceProps {
   caseId: string;
@@ -68,7 +70,6 @@ export interface CanvasInvestigationWorkspaceProps {
   activeModal: InvestigationActiveModal;
   setActiveModal: (modal: InvestigationActiveModal) => void;
   setSelectedView: (view: SelectedView | null) => void;
-  onSwitchToSingleView: () => void;
   onBoardReady?: () => void;
 }
 
@@ -99,7 +100,6 @@ export function CanvasInvestigationWorkspace({
   activeModal,
   setActiveModal,
   setSelectedView,
-  onSwitchToSingleView,
   onBoardReady,
 }: CanvasInvestigationWorkspaceProps) {
   const [isBoardOpen, setIsBoardOpen] = useState(true);
@@ -107,31 +107,17 @@ export function CanvasInvestigationWorkspace({
   const [isDossierCollapsed, setIsDossierCollapsed] = useState(false);
   const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
+  // Khung đọc tài liệu (thay kiểu xem "Xem lẻ"): chọn tài liệu trong khay là mở cạnh bàn.
+  const [readerMode, setReaderMode] = useState<ReaderMode>("closed");
+  const openInReader = useCallback(() => {
+    setReaderMode((m) => (m === "closed" ? "docked" : m));
+  }, []);
   const [isTourOpen, setIsTourOpen] = useState(false);
   const [showFirstTimePill, setShowFirstTimePill] = useState(false);
 
-  // Chế độ giao diện UI Canvas (Dark / Light Theme)
-  const [uiTheme, setUiTheme] = useState<"dark" | "light">(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("dect_canvas_ui_theme");
-        if (saved === "light" || saved === "dark") return saved;
-      } catch {}
-    }
-    return "dark";
-  });
-
-  const handleToggleUiTheme = useCallback(() => {
-    setUiTheme((prev) => {
-      const next = prev === "dark" ? "light" : "dark";
-      try {
-        localStorage.setItem("dect_canvas_ui_theme", next);
-      } catch {}
-      return next;
-    });
-  }, []);
-
-  const isLight = uiTheme === "light";
+  // Bàn hồ sơ chỉ có giao diện tối (đã bỏ theme sáng). Nhánh isLight còn sót: docs/TECHDEBT.md #27.
+  const uiTheme = "dark" as const;
+  const isLight = false;
 
   React.useEffect(() => {
     try {
@@ -652,9 +638,9 @@ export function CanvasInvestigationWorkspace({
   setActiveModal={setActiveModal}
   activeModal={activeModal}
   handleOpenNotebook={handleOpenNotebook}
-  handleToggleUiTheme={handleToggleUiTheme}
   setIsRoomModalOpen={setIsRoomModalOpen}
-  onSwitchToSingleView={onSwitchToSingleView}
+  onOpenReader={() => setReaderMode((m) => (m === "closed" ? "docked" : "closed"))}
+  isReaderOpen={readerMode !== "closed"}
   setIsGuideModalOpen={setIsGuideModalOpen}
 />
 
@@ -777,7 +763,6 @@ export function CanvasInvestigationWorkspace({
         <DossierCanvasBoard
           caseId={caseId}
           uiTheme={uiTheme}
-          onToggleUiTheme={handleToggleUiTheme}
           pdfItems={pdfItems}
           evidenceItems={evidenceItems}
           dossierDocuments={dossierDocs}
@@ -788,7 +773,6 @@ export function CanvasInvestigationWorkspace({
             setSelectedView(view);
             setActiveModal("mobile_pdf");
           }}
-          onSwitchToSingleView={onSwitchToSingleView}
           isExpanded={false}
           onToggleExpand={() => {}}
           activeFilter={String(selectedPhaseFilter)}
@@ -816,6 +800,25 @@ export function CanvasInvestigationWorkspace({
           }
         />
       </div>
+
+      {/* Người đang online khi chơi nhóm (trước nằm ở header ngang của kiểu Xem lẻ) */}
+      <div
+        className={cn(
+          "absolute top-3 z-20 transition-[right] duration-150",
+          readerMode === "docked" ? "right-[calc(max(400px,min(46%,760px))+12px)]" : "right-3",
+          isBoardFullscreen && "hidden",
+        )}
+      >
+        <RoomPresenceBar onOpenModal={() => setIsRoomModalOpen(true)} />
+      </div>
+
+      {/* 4. KHUNG ĐỌC TÀI LIỆU: gắn cạnh phải mặt bàn hoặc phủ màn hình khi đọc tập trung */}
+      <CanvasReaderPanel
+        mode={readerMode}
+        onModeChange={setReaderMode}
+        selectedView={selectedView}
+        caseId={caseId}
+      />
 
       {/* 5. KHAY HỒ SƠ FLOATING (TRƯỢT RA TỪ BÊN TRÁI CẠNH SIDEBAR) */}
       <DossierTray
@@ -848,8 +851,14 @@ export function CanvasInvestigationWorkspace({
         pdfItems={pdfItems}
         evidenceItems={evidenceItems}
         selectedView={selectedView}
-        onSelectPdf={onSelectPdf}
-        onSelectEvidence={onSelectEvidence}
+        onSelectPdf={(item) => {
+          onSelectPdf(item);
+          openInReader();
+        }}
+        onSelectEvidence={(item) => {
+          onSelectEvidence(item);
+          openInReader();
+        }}
         activePing={activePing}
         onBroadcastPing={broadcastPing}
       />

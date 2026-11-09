@@ -11,8 +11,6 @@ import {
   HelpCircle,
   MessageSquareWarning,
   FileText,
-  Sun,
-  Moon,
 } from "lucide-react";
 import { BrandMark } from "@/components/investigation/brand-mark";
 import { UserNav } from "@/components/auth/user-nav";
@@ -51,9 +49,9 @@ export interface CanvasSidebarProps {
   setActiveModal: (modal: InvestigationActiveModal) => void;
   activeModal: InvestigationActiveModal;
   handleOpenNotebook: () => void;
-  handleToggleUiTheme: () => void;
   setIsRoomModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  onSwitchToSingleView: () => void;
+  onOpenReader: () => void;
+  isReaderOpen: boolean;
   setIsGuideModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -67,9 +65,9 @@ export function CanvasSidebar({
   setActiveModal,
   activeModal,
   handleOpenNotebook,
-  handleToggleUiTheme,
   setIsRoomModalOpen,
-  onSwitchToSingleView,
+  onOpenReader,
+  isReaderOpen,
   setIsGuideModalOpen,
 }: CanvasSidebarProps) {
   return (
@@ -228,28 +226,6 @@ export function CanvasSidebar({
 
         {/* PHẦN DƯỚI: TIỆN ÍCH HỆ THỐNG, CHƠI NHÓM & USER PROFILE */}
         <div className="flex flex-col items-center gap-1.5 w-full pt-1">
-          {/* Nút Chuyển đổi Theme Sáng / Tối */}
-          <button
-            type="button"
-            onClick={handleToggleUiTheme}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
-              isLight
-                ? "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
-                : "text-zinc-400 hover:text-amber-300 hover:bg-zinc-800/50"
-            )}
-            title={isLight ? "Chuyển sang giao diện Tối (Dark)" : "Chuyển sang giao diện Sáng (Light)"}
-          >
-            {isLight ? (
-              <Sun className="size-4.5 text-amber-600 group-hover:text-amber-700 transition-transform group-hover:rotate-45 duration-300" />
-            ) : (
-              <Moon className="size-4.5 text-zinc-400 group-hover:text-amber-300 transition-transform group-hover:-rotate-12 duration-300" />
-            )}
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
-              {isLight ? "Sáng" : "Tối"}
-            </span>
-          </button>
-
           {/* 6. Chơi nhóm */}
           <button
             type="button"
@@ -266,19 +242,22 @@ export function CanvasSidebar({
             </span>
           </button>
 
-          {/* 7. Chuyển sang Xem lẻ */}
+          {/* 7. Khung đọc tài liệu (thay kiểu xem "Xem lẻ") */}
           <button
             type="button"
-            onClick={onSwitchToSingleView}
+            onClick={onOpenReader}
+            aria-pressed={isReaderOpen}
             className={cn(
               "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
-              isLight ? "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+              isReaderOpen
+                ? isLight ? "text-zinc-900 bg-zinc-100" : "text-amber-300 bg-zinc-800/70"
+                : isLight ? "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
             )}
-            title="Chuyển sang chế độ Xem lẻ"
+            title="Mở khung đọc tài liệu đang chọn"
           >
             <FileText className={cn("size-4.5 transition-transform group-hover:scale-105", isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")} />
             <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
-              Xem lẻ
+              Đọc
             </span>
           </button>
 
