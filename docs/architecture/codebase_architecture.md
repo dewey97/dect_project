@@ -22,7 +22,6 @@ components/
     room/                Chơi nhóm: RoomSyncProvider, modal phòng, thông báo, presence
     contexts/            Context nhân vật, checkpoint, cài đặt
     modals/              Sổ tay, hậu truyện, gợi ý, góp ý, xem PDF
-    archive_3d_vault/    [ĐÓNG BĂNG] 3D cũ, AGENTS.md §8
   phone-engine/          Hệ điều hành điện thoại giả lập: apps/, chassis/, core/, system/
   play/                  Màn vào game, phòng chờ, intro
   store/                 Trang vụ án, badge sở hữu, cổng quyền chơi, kết quả thanh toán
