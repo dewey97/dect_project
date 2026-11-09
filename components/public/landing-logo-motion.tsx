@@ -27,7 +27,11 @@ interface LandingLogoMotionProps {
 const GLASS_CX = 597.5;
 const GLASS_CY = 124;
 const EMBLEM_SCALE = 0.79;
-const EMBLEM_SHIFT = `${(((136.5 - GLASS_CX) / 980) * 100).toFixed(3)}%`; // glass → X centre
+// X optical centre (symmetry of arm edges) ≈ (135.3, 120.4); emblem glass sits +1.1/+2.0 off it.
+const EMBLEM_SHIFT_X = `${(((136.4 - GLASS_CX) / 980) * 100).toFixed(3)}%`;
+const EMBLEM_SHIFT_Y = `${(((122.4 - GLASS_CY) / 250) * 100).toFixed(3)}%`;
+// Emblem handle points 53.5° below horizontal, wordmark handle 45° → rotate 8.5° at start.
+const EMBLEM_ROTATE = 8.5;
 const CENTER_SHIFT = `${(((980 - 272) / 2 / 980) * 100).toFixed(3)}%`; // X → container centre
 
 const RING_R = 69.25;
@@ -55,8 +59,10 @@ export function LandingLogoMotion({
   const markX = useTransform(progress, [0.15, 0.75], [CENTER_SHIFT, "0%"]);
 
   // Glass: emblem slot on X → home slot on O.
-  const glassX = useTransform(progress, [0.15, 0.6], [EMBLEM_SHIFT, "0%"]);
+  const glassX = useTransform(progress, [0.15, 0.6], [EMBLEM_SHIFT_X, "0%"]);
+  const glassY = useTransform(progress, [0.15, 0.6], [EMBLEM_SHIFT_Y, "0%"]);
   const glassScale = useTransform(progress, [0.15, 0.6], [EMBLEM_SCALE, 1]);
+  const glassRotate = useTransform(progress, [0.15, 0.6], [EMBLEM_ROTATE, 0]);
 
   // Letters pulled out trailing the glass' right edge, then the rest (R, E).
   const lettersClipRight = useTransform(
@@ -67,6 +73,23 @@ export function LandingLogoMotion({
   const lettersClip = useTransform(
     lettersClipRight,
     (v) => `inset(0 ${v} 0 0)`,
+  );
+
+  // Glow while pulling out: halo on the glass + amber bloom on freshly revealed letters.
+  const glowOpacity = useTransform(
+    progress,
+    [0.1, 0.2, 0.65, 0.85],
+    [0, 1, 1, 0],
+  );
+  const lettersGlowStrength = useTransform(
+    progress,
+    [0.15, 0.3, 0.7, 0.9],
+    [0, 1, 1, 0.25],
+  );
+  const lettersGlow = useTransform(
+    lettersGlowStrength,
+    (g) =>
+      `drop-shadow(0 0 ${(10 * g).toFixed(1)}px rgba(245,158,11,${(0.6 * g).toFixed(2)}))`,
   );
 
   const coGiOpacity = useTransform(progress, [0.75, 0.95], [0, 1]);
@@ -91,25 +114,42 @@ export function LandingLogoMotion({
         />
 
         {/* Layer 2: Letters P L R E, pulled out behind the glass */}
-        <motion.img
-          src="/brand/logo_letters_layer.png"
-          alt=""
-          style={{ clipPath: lettersClip }}
-          className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-          draggable={false}
-        />
+        {/* Glow filter lives on a wrapper OUTSIDE the clip, so the bloom is never cut square */}
+        <motion.div
+          style={{ filter: lettersGlow }}
+          className="absolute inset-0 pointer-events-none"
+        >
+          <motion.img
+            src="/brand/logo_letters_layer.png"
+            alt=""
+            style={{ clipPath: lettersClip }}
+            className="w-full h-full object-contain"
+            draggable={false}
+          />
+        </motion.div>
 
         {/* Layer 3: Magnifying glass (vector) with background-coloured cut-out stroke */}
         <motion.div
           // origin = glass ring centre so scaling keeps it locked on the X / O centre
           style={{
             x: glassX,
+            y: glassY,
             scale: glassScale,
+            rotate: glassRotate,
             originX: GLASS_CX / 980,
             originY: GLASS_CY / 250,
           }}
           className="absolute inset-0 w-full h-full pointer-events-none will-change-transform"
         >
+          {/* Amber halo travelling with the glass while the wordmark is pulled out */}
+          <motion.div
+            style={{
+              opacity: glowOpacity,
+              left: `${(GLASS_CX / 980) * 100}%`,
+              top: `${(GLASS_CY / 250) * 100}%`,
+            }}
+            className="absolute w-[30%] aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle_closest-side,rgba(251,191,36,0.5)_0%,rgba(245,158,11,0.22)_50%,transparent_100%)]"
+          />
           <svg
             viewBox="0 0 980 250"
             className="w-full h-full overflow-visible"
