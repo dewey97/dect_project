@@ -25,9 +25,7 @@ import {
   type UnlockedModalData,
 } from "@/components/investigation/evidence/phase-unlocked-modal";
 import { CanvasInvestigationWorkspace } from "@/components/investigation/evidence/workspaces/canvas-investigation-workspace";
-import { SingleInvestigationWorkspace } from "@/components/investigation/evidence/workspaces/single-investigation-workspace";
 import { MobileInvestigationWorkspace } from "@/components/investigation/evidence/workspaces/mobile-investigation-workspace";
-import { GameDesktopHeader } from "@/components/investigation/evidence/game-desktop-header";
 import { EpilogueModal } from "@/components/investigation/modals/epilogue-modal";
 import { IndictmentModal } from "@/components/investigation/board/indictment-modal";
 import { JumpscareEndgame } from "@/components/investigation/jumpscare-endgame";
@@ -181,28 +179,6 @@ function WebEvidencePageContent() {
   // Cột 2 (Giữa): Bảng điều tra (Investigation Canvas) - flex-1 (chiếm trọn không gian trung tâm)
   // Cột 3 (Phải): Trình duyệt chi tiết PDF / Vật chứng / Phone (Viewer Inspector) - width cố định/resizable (320px -> 750px)
   const [, setIsDossierCollapsed] = useState<boolean>(false);
-  const [viewMode, setViewMode] = useState<"single" | "canvas">("single");
-
-  // Đọc preference chế độ xem tài liệu từ localStorage sau khi mount
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("dect_evidence_view_mode");
-      if (saved === "canvas" || saved === "single") {
-        setViewMode(saved);
-      }
-    } catch {
-      // Ignore
-    }
-  }, []);
-
-  const handleSetViewMode = useCallback((mode: "single" | "canvas") => {
-    setViewMode(mode);
-    try {
-      localStorage.setItem("dect_evidence_view_mode", mode);
-    } catch {
-      // Ignore
-    }
-  }, []);
   const [, setIsReinvestigationExpanded] =
     useState(false);
   const [isBoardOpen, setIsBoardOpen] = useState(false);
@@ -272,11 +248,6 @@ function WebEvidencePageContent() {
   useInvestigationEvent("OPEN_PHONE", () => setActiveModal("phone"));
   useInvestigationEvent("OPEN_REINVESTIGATE", () => setActiveModal("reinvestigate"));
   useInvestigationEvent("OPEN_NOTEBOOK", () => setActiveModal("notebook"));
-  useInvestigationEvent("OPEN_CANVAS_THEME", () => {
-    if (viewMode !== "canvas") {
-      handleSetViewMode("canvas");
-    }
-  });
   useInvestigationEvent("OPEN_HINT", (e: any) => {
     const cpId =
       e?.detail?.checkpointId ||
@@ -757,16 +728,6 @@ function WebEvidencePageContent() {
       suppressHydrationWarning
       className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col items-stretch justify-start box-border min-h-0 min-w-0 select-none"
     >
-      {/* DESKTOP HEADER (CHỈ HIỂN THỊ KHI Ở CHẾ ĐỘ XEM LẺ; CHẾ ĐỘ CANVAS ĐÃ TÍCH HỢP TOÀN BỘ VÀO SIDEBAR DỌC) */}
-      {!(isMounted && isMobile) && viewMode !== "canvas" && (
-        <GameDesktopHeader
-          viewMode={viewMode}
-          onViewModeChange={handleSetViewMode}
-          isBoardOpen={isBoardOpen}
-          onToggleBoard={() => setIsBoardOpen((prev) => !prev)}
-        />
-      )}
-
       {/* CHỈ MOUNT DUY NHẤT 1 WORKSPACE: MOBILE HOẶC DESKTOP THEO TRẠNG THÁI isMobile SAU MOUNT */}
       {isMounted && isMobile ? (
         /* 1. MÀN HÌNH DI ĐỘNG (< LG): WORKSPACE RIÊNG BIỆT CHO MOBILE */
@@ -799,13 +760,12 @@ function WebEvidencePageContent() {
           />
         </div>
       ) : (
-        /* 2. MÀN HÌNH MÁY TÍNH (>= LG): WORKSPACE RIÊNG BIỆT CHO DESKTOP (BÀN HỒ SƠ HOẶC XEM LẺ) */
+        /* 2. MÀN HÌNH MÁY TÍNH (>= LG): BÀN HỒ SƠ (đọc tài liệu bằng khung đọc gắn cạnh bàn) */
         <div
           ref={workspaceRef}
           className="w-full flex-1 min-h-0 flex flex-row items-stretch justify-start overflow-hidden min-w-0 relative gap-0 p-0"
         >
-        {viewMode === "canvas" ? (
-          <CanvasInvestigationWorkspace
+        <CanvasInvestigationWorkspace
             caseId={caseId}
             filterTab={filterTab}
             onSetFilterTab={(tab) => setFilterTab(tab)}
@@ -825,31 +785,8 @@ function WebEvidencePageContent() {
             activeModal={activeModal}
             setActiveModal={setActiveModal}
             setSelectedView={setSelectedView}
-            onSwitchToSingleView={() => handleSetViewMode("single")}
             onBoardReady={handleBoardReady}
           />
-        ) : (
-          <SingleInvestigationWorkspace
-            caseId={caseId}
-            filterTab={filterTab}
-            onSetFilterTab={(tab) => setFilterTab(tab)}
-            selectedPhaseFilter={selectedPhaseFilter}
-            onSetPhaseFilter={(val) => setSelectedPhaseFilter(val)}
-            pdfItems={pdfItems}
-            evidenceItems={evidenceItems}
-            dossiers={dossiers}
-            selectedView={selectedView}
-            onSelectPdf={handleSelectPdf}
-            onSelectEvidence={handleSelectEvidence}
-            isPhaseUnlocked={isPhaseUnlocked}
-            isDossierUnlocked={isDossierUnlocked}
-            activePing={activePing}
-            broadcastPing={broadcastPing}
-            activeModal={activeModal}
-            setActiveModal={setActiveModal}
-            onBoardReady={handleBoardReady}
-          />
-        )}
       </div>
       )}
 
@@ -950,8 +887,8 @@ function WebEvidencePageContent() {
         }}
       />
 
-      {/* DETECTIVE NOTEBOOK MODAL — Chỉ mở modal toàn cục có backdrop khi ở Single/Mobile view. Canvas view dùng Floating Notebook độc lập */}
-      {viewMode !== "canvas" && (
+      {/* DETECTIVE NOTEBOOK MODAL — chỉ mobile; desktop (Bàn hồ sơ) dùng cửa sổ sổ tay nổi */}
+      {isMounted && isMobile && (
         <DetectiveNotebookModal
           isOpen={activeModal === "notebook"}
           onClose={() => setActiveModal(null)}
