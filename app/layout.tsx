@@ -4,9 +4,9 @@ import './globals.css'
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://xplore.vn'),
-  title: 'XPLORE — Hệ Thống Trinh Thám Tương Tác',
+  title: 'XPLORE — Nền Tảng Trinh Thám Tương Tác',
   description:
-    'Game trinh thám điều tra tương tác lai: Đối chiếu hồ sơ hiện vật giấy, khai thác dữ liệu điện thoại và bẻ khóa kỳ án trực tuyến.',
+    'Nền tảng chơi game trinh thám điều tra tương tác lai: Đối chiếu hồ sơ hiện vật giấy, khai thác dữ liệu điện thoại và bẻ khóa kỳ án trực tuyến.',
   applicationName: 'XPLORE',
   appleWebApp: {
     capable: true,
@@ -14,16 +14,16 @@ export const metadata: Metadata = {
     title: 'XPLORE',
   },
   openGraph: {
-    title: 'XPLORE — Hệ Thống Trinh Thám Tương Tác',
+    title: 'XPLORE — Nền Tảng Trinh Thám Tương Tác',
     description:
-      'Chuyên án #000: Trốn Tìm. Đối chiếu hồ sơ vật chứng, trích xuất dữ liệu điện thoại và vạch trần thủ phạm.',
+      'Nền tảng chơi game trinh thám điều tra tương tác lai: Đối chiếu hồ sơ vật chứng, trích xuất dữ liệu điện thoại và vạch trần thủ phạm.',
     siteName: 'XPLORE',
     images: [
       {
         url: '/brand/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'XPLORE — Chuyên Án #000: Trốn Tìm',
+        alt: 'XPLORE — Nền Tảng Trinh Thám Tương Tác',
       },
     ],
     locale: 'vi_VN',
@@ -31,9 +31,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'XPLORE — Hệ Thống Trinh Thám Tương Tác',
+    title: 'XPLORE — Nền Tảng Trinh Thám Tương Tác',
     description:
-      'Chuyên án #000: Trốn Tìm. Đối chiếu hồ sơ vật chứng, trích xuất dữ liệu điện thoại và vạch trần thủ phạm.',
+      'Nền tảng chơi game trinh thám điều tra tương tác lai: Đối chiếu hồ sơ vật chứng, trích xuất dữ liệu điện thoại và vạch trần thủ phạm.',
     images: ['/brand/og-image.jpg'],
   },
   icons: {
