@@ -317,7 +317,7 @@ export function CasesCollectionView({
               const isOwned = item.slug ? Boolean(ownedMap[item.slug]?.online || ownedMap[item.slug]?.box) : false;
 
               const cardContent = (
-                <article className="group flex flex-col justify-between cursor-pointer">
+                <article className="flex flex-col justify-between cursor-pointer">
                   <div>
                     {/* A4 Poster Aspect Ratio (1 / 1.414) */}
                     <div className="relative aspect-[1/1.414] w-full overflow-hidden bg-zinc-950">
@@ -325,21 +325,17 @@ export function CasesCollectionView({
                         src={item.coverImage}
                         fallbackSrc="/poster_c0.webp"
                         alt={item.title}
-                        className="h-full w-full rounded-none object-cover transition-transform duration-300 group-hover:scale-105"
+                        className="h-full w-full rounded-none object-cover"
                       />
 
-                      {/* Status label overlay */}
-                      <div className="absolute left-2 top-2 z-10">
-                        <span
-                          className={`px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider ${
-                            item.status === "AVAILABLE"
-                              ? "bg-amber-500 text-zinc-950"
-                              : "bg-black/80 text-zinc-300"
-                          }`}
-                        >
-                          {item.statusLabel}
-                        </span>
-                      </div>
+                      {/* Status label overlay (Bỏ badge 'Đang mở điều tra', chỉ hiện badge cho case sắp ra mắt) */}
+                      {item.status !== "AVAILABLE" && (
+                        <div className="absolute left-2 top-2 z-10">
+                          <span className="bg-black/80 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-zinc-300">
+                            {item.statusLabel}
+                          </span>
+                        </div>
+                      )}
 
                       {/* Owned badge */}
                       {isOwned && (
@@ -355,7 +351,7 @@ export function CasesCollectionView({
                         {item.code}
                       </div>
 
-                      <h2 className="text-sm font-bold uppercase text-zinc-100 group-hover:text-amber-400 transition-colors">
+                      <h2 className="text-sm font-bold uppercase text-zinc-100">
                         {item.title}
                       </h2>
 
